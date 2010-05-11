@@ -8,9 +8,12 @@ using System.Windows.Forms;
 
 namespace TVSorter
 {
+    /// <summary>
+    /// A class containing methods for accessing The TVDB API
+    /// </summary>
     public class TVDB
     {
-
+        //The program's API key and other paths
         const string ApiKey = "D4DCAEBFCA5A6BC1";
         const string SiteAddress = "http://www.thetvdb.com/";
         const string ApiLoc = "/api/" + ApiKey + "/";
@@ -20,12 +23,14 @@ namespace TVSorter
 
         static string AppData = Environment
             .GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\TVSorter2\\";
-        static string ShowsIDFile = AppData + "ShowsIDs.dat";
         static string MirrorAddress;
         public static long ServerTime;
 
         static bool EnvironmentSet = false;
 
+        /// <summary>
+        /// Sets up the environment for getting data from The TVDB
+        /// </summary>
         private static void SetEnvironment()
         {
             if (EnvironmentSet)
@@ -49,6 +54,9 @@ namespace TVSorter
             EnvironmentSet = true;
         }
 
+        /// <summary>
+        /// Updates the ServerTime variable with the current time of The TVDB server
+        /// </summary>
         private static void UpdateServerTime()
         {
                 XmlDocument timeDoc = new XmlDocument();
@@ -56,6 +64,11 @@ namespace TVSorter
                 ServerTime = long.Parse(timeDoc.GetElementsByTagName("Time")[0].InnerText);
         }
 
+        /// <summary>
+        /// Searches The TVDB for the specified show and returns the results in a list
+        /// </summary>
+        /// <param name="name">The name of the show to search for</param>
+        /// <returns>The possible results</returns>
         public static List<TVShow> SearchShow(string name)
         {
             SetEnvironment();
@@ -63,6 +76,7 @@ namespace TVSorter
             searchDoc.Load(MirrorAddress + "/api/GetSeries.php?seriesname=" + name);
             XmlNodeList seriess = searchDoc.GetElementsByTagName("Series");
             List<TVShow> results = new List<TVShow>();
+            //For each show found, add the result to the list
             foreach (XmlNode series in seriess)
             {
                 int id = int.Parse(series.ChildNodes[0].InnerText);
@@ -74,6 +88,11 @@ namespace TVSorter
             return results;
         }
 
+        /// <summary>
+        /// Get a show's data from its TVDB ID number
+        /// </summary>
+        /// <param name="showid">The ID to search for</param>
+        /// <returns>A TVShow object representing the show</returns>
         public static TVShow GetShow(int showid)
         {
             SetEnvironment();
@@ -86,6 +105,10 @@ namespace TVSorter
             return show;
         }
 
+        /// <summary>
+        /// Downloads the banner for the specified show
+        /// </summary>
+        /// <param name="show">The show to download the banner for</param>
         private static void DownloadShowBanner(TVShow show)
         {
             SetEnvironment();
@@ -99,19 +122,28 @@ namespace TVSorter
                 client.DownloadFile(address, save);
         }
 
+        /// <summary>
+        /// Updates a show's episode data in the database
+        /// </summary>
+        /// <param name="show">The show to update</param>
+        /// <param name="force">If the update should be forced rather
+        /// than checking if there are any updates</param>
         public static void UpdateShow(TVShow show, bool force)
         {
             SetEnvironment();
             //Download banner.
             DownloadShowBanner(show);
+            //Not being forced to update and has updated in the last month
+            //check if it needs it.
             if (!force && ServerTime - show.UpdateTime < 2419200)
             {
-                //Check if it needs updating
+                //Check if it needs updating - get the time of the show's update
                 XmlDocument updates = new XmlDocument();
                 updates.Load("http://www.thetvdb.com/api/Updates.php?time=" +
                     show.UpdateTime + "&type=series");
                 XmlNodeList series = updates.GetElementsByTagName("Series");
                 bool shouldUpdate = false;
+                //Search for the show
                 foreach (XmlNode seriesId in series)
                 {
                     string id = seriesId.InnerText;
@@ -121,6 +153,7 @@ namespace TVSorter
                         break;
                     }
                 }
+                //If the show doesn't need updating, refresh its update time and return
                 if (!shouldUpdate)
                 {
                     string show_query = "Update Shows Set update_time = " + ServerTime + " Where id = " +
@@ -137,16 +170,19 @@ namespace TVSorter
                 "/all/en.xml";
             XmlDocument showDoc = new XmlDocument();
             showDoc.Load(showAddress);
+            //Download the banner if necessary
             XmlNode banner = showDoc.GetElementsByTagName("banner")[0];
             if (banner.InnerText != show.Banner)
             {
                 show.Banner = banner.InnerText;
                 DownloadShowBanner(show);
             }
+            //Get all the episodes and add to the database
             XmlNodeList episodes = showDoc.GetElementsByTagName("Episode");
             string query = "";
             foreach (XmlNode episode in episodes)
             {
+                //Get each piece of data from the XML
                 string tvdb_id = episode.ChildNodes[0].InnerText;
                 string episode_name = episode.ChildNodes[9].InnerText;
                 int episode_num = int.Parse(episode.ChildNodes[10].InnerText);
@@ -167,6 +203,7 @@ namespace TVSorter
                 {
                     first_air = 0;
                 }
+                //Build the query
                 query += "Insert Into Episodes (show_id, tvdb_id, episode_num, season_num," +
                     "first_air, episode_name) Values (" +
                     show.DatabaseId + ", '" +
@@ -175,8 +212,12 @@ namespace TVSorter
                     season_num + ", " +
                     first_air + ", \"" +
                     episode_name.Replace("\"", "\"\"") + "\");";  
+                //TODO - with lots of episodes, the query could get too long, check for that.
+                //works fine with The Daily Show at over 1600 episodes though so no immediate issue
             }
+            //Execute the query
             int eps = _database.ExecuteQuery(query);
+            //Refresh the update time
             string showquery = "Update Shows Set update_time = " + ServerTime +
                 ", banner = '" + show.Banner + "' Where id = " +
                 show.DatabaseId + ";";

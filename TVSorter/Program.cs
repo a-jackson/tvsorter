@@ -23,11 +23,12 @@ namespace TVSorter
                 Application.SetCompatibleTextRenderingDefault(false);
                 Application.Run(new frmMain());
             }
-            else if (args[0] == "-update_all")
+            else if (args[0] == "-update_all") //Update the database
             {
                 AllocConsole();
                 Database database = new Database();
                 Log.Init();
+                //Get all the tv shows
                 List<Dictionary<string, object>> shows =
                     database.ExecuteResults("SELECT * FROM shows ORDER BY name");
                 List<TVShow> showList = new List<TVShow>();
@@ -41,6 +42,7 @@ namespace TVSorter
                         altNames += (string)altNameRow["alt_name"] + ",";
                     if (altNames.EndsWith(","))
                         altNames = altNames.Substring(0, altNames.Length - 1);
+                    //Create the TVShow object with the data in the database
                     TVShow tvshow = new TVShow((long)row["id"],
                         (string)row["tvdb_id"], (string)row["name"],
                         (long)row["update_time"],
@@ -53,6 +55,7 @@ namespace TVSorter
                 }
                 try
                 {
+                    //Update each show
                     foreach (TVShow show in showList)
                     {
                         TVDB.UpdateShow(show, false);

@@ -5,6 +5,9 @@ using System.Text;
 
 namespace TVSorter
 {
+    /// <summary>
+    /// Class representing a TV Show
+    /// </summary>
     public class TVShow
     {
         private long _databaseId;
@@ -43,19 +46,28 @@ namespace TVSorter
             _banner = banner;
             _altNames = altNames;
         }
-
+        /// <summary>
+        /// Create a TVShow and attempt to fill in missing data from the database
+        /// </summary>
+        /// <param name="showName">The show object to create</param>
         public TVShow(string showName)
         {
             Database database = new Database();
             Dictionary<string, object> results;
+            //See if the show is in the database. Check the name against the show name, folder name 
+            //and all alt names
             if ((long)database.ExecuteScalar("Select Count(*) From Shows Where name Like \"" + showName 
                 + "\" Or folder_name Like \""+showName
-                + "\" Or Upper(\""+showName+"\") In (Select Trim(Upper(alt_name)) From AltNames Where AltNames.show_id = Shows.id);") > 0)
+                + "\" Or Upper(\""+showName+"\") In (Select Trim(Upper(alt_name)) From AltNames"
+                + " Where AltNames.show_id = Shows.id);") > 0)
             {
+                //Get the first show that matches
                 results =
                     database.ExecuteResults("Select * From Shows Where name Like \"" + showName
                 + "\" Or folder_name Like \"" + showName
-                + "\" Or Upper(\"" + showName + "\") In (Select Trim(Upper(alt_name)) From AltNames Where AltNames.show_id = Shows.id);")[0];
+                + "\" Or Upper(\"" + showName + "\") In (Select Trim(Upper(alt_name)) From AltNames"
+                + "Where AltNames.show_id = Shows.id);")[0];
+                //Set the values using the results in the database
                 _databaseId = (long)results["id"];
                 _tvdbid = (string)results["tvdb_id"];
                 _name = (string)results["name"];
@@ -64,7 +76,9 @@ namespace TVSorter
                 _customFormat = (string)results["custom_format"];
                 _folderName = (string)results["folder_name"];
                 _banner = (string)results["banner"];
-                List<Dictionary<string, object>> altName = database.ExecuteResults("Select * From AltNames Where show_id = "
+                //Get the altnames for this show
+                List<Dictionary<string, object>> altName = database.ExecuteResults
+                    ("Select * From AltNames Where show_id = "
                     + _databaseId + ";");
                 _altNames = "";
                 foreach (Dictionary<string, object> altNameRow in altName)

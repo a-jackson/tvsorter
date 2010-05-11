@@ -413,8 +413,8 @@ namespace TVSorter
             {
                 string path = episode.Key;
                 string show = episode.Value.Show.Name;
-                string seasonNum = episode.Value.Season.ToString();
-                string episodeNum = episode.Value.Epiosde.ToString();
+                string seasonNum = episode.Value.SeasonNum.ToString();
+                string episodeNum = episode.Value.EpisodeNum.ToString();
                 string name = episode.Value.EpisodeName;
                 string outputPath = episode.Value.FormatOutputPath();
                 lstInputFolder.Items.Add(new ListViewItem(
@@ -525,8 +525,8 @@ namespace TVSorter
                     ep.Show = selectShow.SelectedShow;
                     string path = item.Text;
                     string show = ep.Show.Name;
-                    string seasonNum = ep.Season.ToString();
-                    string episodeNum = ep.Epiosde.ToString();
+                    string seasonNum = ep.SeasonNum.ToString();
+                    string episodeNum = ep.EpisodeNum.ToString();
                     string name = ep.EpisodeName;
                     string outputPath = ep.FormatOutputPath();
                     item.SubItems[1].Text = show;

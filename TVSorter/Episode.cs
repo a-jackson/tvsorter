@@ -7,10 +7,20 @@ using System.IO;
 
 namespace TVSorter
 {
+    /// <summary>
+    /// Contains the data for a specific episode
+    /// </summary>
     public class Episode
     {
+        /// <summary>
+        /// The source of the data that defined which episode it was.
+        /// Required for reidentification if the show is changed by the user
+        /// </summary>
         private enum OriginalData { Episode, Date, All };
 
+        /// <summary>
+        /// An example used for the output format examples
+        /// </summary>
         public static Episode ExampleEpiosde = new Episode(
             new TVShow("","The IT Crowd",0,"", "The IT Crowd"),
             1, 1, "Yesterday's Jam",
@@ -60,51 +70,65 @@ namespace TVSorter
             GetEpisodeInfo();
         }
 
+        /// <summary>
+        /// Fills in the blanks with data from the database
+        /// </summary>
         public void GetEpisodeInfo()
         {
             Database database = new Database();
+            //If the show has no database ID then it couldn't be identified
+            //from the available data so can't look up the episode
             if (_show.DatabaseId == -1)
             {
                 _episodeName = "";
                 return;//Show unknown
             }
-            else if (_origData == OriginalData.Episode)
+            else if (_origData == OriginalData.Episode) //Have the season/episode number
             {
                 //use season/episode numbers to get rest
                 try
                 {
-                    Dictionary<string, object> results = database.ExecuteResults("Select * From Episodes Where show_id = "
+                    //Attempt to find the episode in the database to get the name and date
+                    Dictionary<string, object> results = database.ExecuteResults(
+                        "Select * From Episodes Where show_id = "
                         + _show.DatabaseId + " And season_num = "
-                        + Season + " And episode_num = " + Epiosde + ";")[0];
+                        + SeasonNum + " And episode_num = " + EpisodeNum + ";")[0];
                     _episodeName = (string)results["episode_name"];
                     _firstAir = frmMain.ConvertFromUnixTimestamp((long)results["first_air"]);
                 }
                 catch
                 {
+                    //Failed to find it
                     _firstAir = NullDate;
                     _episodeName = "";
                 }
             }
-            else if (_origData == OriginalData.Date)
+            else if (_origData == OriginalData.Date) //Have the date
             {
                 //use date to get rest
                 try
                 {
+                    //Convert to a timestamp as is stored in the database
                     long firstAir = frmMain.ConvertToUnixTimestamp(_firstAir);
-                    Dictionary<string, object> results = database.ExecuteResults("Select * From Episodes Where show_id = "
+                    //Attempt to find an episode with the same airdate
+                    Dictionary<string, object> results = database.ExecuteResults(
+                        "Select * From Episodes Where show_id = "
                         + _show.DatabaseId + " And first_air = "
                         + firstAir + ";")[0];
+                    //Get the name, season and episode number
                     _episodeName = (string)results["episode_name"];
                     _season = (long)results["season_num"];
                     _episode = (long)results["episode_num"];
                 }
                 catch
                 {
+                    //Failed, no name
                     _episodeName = "";
                 }
             }
             else
             {
+                //Not enough data to look anything up
                 _episodeName = "";
             }
         }
@@ -112,6 +136,7 @@ namespace TVSorter
         public TVShow Show
         {
             get { return _show; }
+            //After the show has changed, refresh the episode info
             set { _show = value; GetEpisodeInfo(); }
         }
 
@@ -119,11 +144,11 @@ namespace TVSorter
         {
             get { return _episodeName; }
         }
-        public long Epiosde
+        public long EpisodeNum
         {
             get { return _episode; }
         }
-        public long Season
+        public long SeasonNum
         {
             get { return _season; }
         }
@@ -132,25 +157,39 @@ namespace TVSorter
             get { return _fileInfo; }
         }
 
+        /// <summary>
+        /// Gets the formatted output path for the current episode, uses the appropriate format.
+        /// </summary>
+        /// <returns>The formatted output path for the episode</returns>
         public string FormatOutputPath()
         {
+            //If there is no show, it's not in the database, or the show uses the default format
+            //then use the default format
             if (_show == null || _show.DatabaseId == -1 || _show.UseDefaultFormat)
             {
                 return FormatOutputPath(Properties.Settings.Default.FileNameFormat);
             }
             else
             {
+                //Use the custom format for the show
                 return FormatOutputPath(_show.CustomFormat);
             }
         }
 
+        /// <summary>
+        /// Formats the output path to the specified format
+        /// </summary>
+        /// <param name="format">The format string to use</param>
+        /// <returns>The formatted string</returns>
         public string FormatOutputPath(string format)
         {
+            //Search for the variables and replace them in the string. This is searching for
+            //{Var(Arg)}
             format = Regex.Replace(format, "{([a-zA-Z]+)\\(([^\\)}]+)\\)}", delegate(Match match)
             {
                 string type = match.Groups[1].Value;
                 string arg = match.Groups[2].Value;
-                if (type == "SName")
+                if (type == "SName") //Show name
                 {
                     if (_show != null)
                     {
@@ -158,47 +197,33 @@ namespace TVSorter
                     }
                     return "";
                 }
-                else if (type == "EName")
+                else if (type == "EName") //Episode name
                 {
                     return FormatName(_episodeName, arg);
                 }
-                else if (type == "ENum")
+                else if (type == "ENum") //Episode number
                 {
                     try
                     {
-                        int length = int.Parse(arg);
-                        string zeros = "";
-                        if (length == 0)
-                            zeros = "0";
-                        else
-                            for (int i = 0; i < length; i++)
-                                zeros += "0";
-                        return String.Format("{0:" + zeros + "}", _episode);
+                        return FormatNum(arg,_episode);
                     }
                     catch
                     {
                         return match.Value;
                     }
                 }
-                else if (type == "SNum")
+                else if (type == "SNum") //Season number
                 {
                     try
                     {
-                        int length = int.Parse(arg);
-                        string zeros = "";
-                        if (length == 0)
-                            zeros = "0";
-                        else
-                            for (int i = 0; i < length; i++)
-                                zeros += "0";
-                        return String.Format("{0:" + zeros + "}", _season);
+                        return FormatNum(arg, _season);
                     }
                     catch
                     {
                         return match.Value;
                     }
                 }
-                else if (type == "Date")
+                else if (type == "Date") //First air date
                 {
                     try
                     {
@@ -211,6 +236,8 @@ namespace TVSorter
                 }
                 return match.Value;
             });
+            //Set any instances of {Ext} and {FName}
+            //They have no arg so the regexp doesn't match them
             if (_fileInfo != null)
             {
                 format = format.Replace("{Ext}", _fileInfo.Extension);
@@ -231,14 +258,47 @@ namespace TVSorter
             return format;
         }
 
-        private string FormatName(string episodeName, string arg)
+        /// <summary>
+        /// Format the numbers for output
+        /// </summary>
+        /// <param name="arg">The variable's argument, the length of the output num</param>
+        /// <param name="num">The number to format</param>
+        /// <returns>The formatted string</returns>
+        private string FormatNum(string arg, long num)
         {
-            string[] parts = episodeName.Split(' ');
+            int length = int.Parse(arg);
+            string zeros = "";
+            if (length == 0)
+                zeros = "0";
+            else
+                for (int i = 0; i < length; i++)
+                    zeros += "0";
+            return String.Format("{0:" + zeros + "}", num);
+        }
+
+        /// <summary>
+        /// Formatted the name of an episode or show
+        /// </summary>
+        /// <param name="name">The name of the episode/show</param>
+        /// <param name="arg">The variable's argument, should be the separator char</param>
+        /// <returns>The formatted string</returns>
+        private string FormatName(string name, string arg)
+        {
+            //Break into separate words
+            string[] parts = name.Split(' ');
+            //Characters that can be used as separators, if there is one of these at the start
+            //or end of a part then it won't put the arg character next to it. This is to avoid
+            //outputs like Day.1.12.00.-.1.00 for a 24 episode since .-. looks silly.
+            //Or names with titles in like Dr. Smith would be Mr..Smith - equally silly.
             string[] separatorChars = new string[] { "-", ":", "_", ".", "," };
+            //The new name to be returned
             string newName = parts[0];
+            //Loop through each part appending it with the appropriate separator
             for (int i = 1; i < parts.Length; i++)
             {
                 bool prefix = true;
+                //Check for the separator chars at the start of this part of the end of the next,
+                //no extra one should be added
                 foreach (string sep in separatorChars)
                 {
                     if (parts[i].StartsWith(sep) || parts[i - 1].EndsWith(sep))
@@ -247,12 +307,15 @@ namespace TVSorter
                         break;
                     }
                 }
+                //Add the arg character
                 if (prefix)
                 {
                     newName += arg;
                 }
+                //Add the part
                 newName += parts[i];
             }
+            //If the string ends with a separator character then remove it
             foreach (string sep in separatorChars)
             {
                 if (newName.EndsWith(sep))
