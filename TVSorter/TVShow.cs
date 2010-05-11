@@ -66,7 +66,7 @@ namespace TVSorter
                     database.ExecuteResults("Select * From Shows Where name Like \"" + showName
                 + "\" Or folder_name Like \"" + showName
                 + "\" Or Upper(\"" + showName + "\") In (Select Trim(Upper(alt_name)) From AltNames"
-                + "Where AltNames.show_id = Shows.id);")[0];
+                + " Where AltNames.show_id = Shows.id);")[0];
                 //Set the values using the results in the database
                 _databaseId = (long)results["id"];
                 _tvdbid = (string)results["tvdb_id"];

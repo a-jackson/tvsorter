@@ -724,14 +724,16 @@ namespace TVSorter
             if (addShow.ShowDialog() == DialogResult.OK)
             {
                 TVShow show = addShow.newShow;
-                lstTVShows.Items.Add(addShow.newShow);
                 _database.ExecuteQuery("Insert Into Shows " +
                        "(tvdb_id, name, update_time, use_default_format, custom_format, folder_name, banner) " +
-                       "Values ('" + show.TvdbId + "', '" + show.Name + "', " +
+                       "Values (\"" + show.TvdbId + "\", \"" + show.Name.Replace("\"","\"\"") + "\", " +
                        show.UpdateTime + ", "
-                        + (show.UseDefaultFormat ? 1 : 0) + ", '" +
-                         show.CustomFormat + "', '" + show.FolderName + "', '"
-                         + show.Banner + "');");
+                        + (show.UseDefaultFormat ? 1 : 0) + ", \"" +
+                         show.CustomFormat + "\", \"" + show.FolderName + "\", \""
+                         + show.Banner + "\");");
+                //Create a new TV show so that it gets the newly added show from the database
+                //and therefore changes can be made to it - Issue ID 1.
+                lstTVShows.Items.Add(new TVShow(show.Name));
 
             }
         }
