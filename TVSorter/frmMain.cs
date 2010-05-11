@@ -750,8 +750,10 @@ namespace TVSorter
                 lstTVShows.Items.Remove(show);
                 string showRemove = "Delete From Shows Where id = " + show.DatabaseId + ";";
                 string episodeRemove = "Delete From Episodes Where show_id = " + show.DatabaseId + ";";
+                string altNameQuery = "Delete From AltNames Where show_id = " + show.DatabaseId + ";";
                 _database.ExecuteQuery(showRemove);
                 _database.ExecuteQuery(episodeRemove);
+                _database.ExecuteQuery(altNameQuery);
             }
         }
         #endregion
