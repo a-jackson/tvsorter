@@ -20,6 +20,7 @@ namespace TVSorter
         FileHandler _fileHandler;
         Dictionary<string, Episode> _files;
         private bool _onSettings = false;
+        Dictionary<long, TVShow> _shows;
 
         public frmMain()
         {
@@ -34,10 +35,12 @@ namespace TVSorter
             _settings = Properties.Settings.Default;
             _database = new Database();
             _fileHandler = new FileHandler();
+            _shows = new Dictionary<long, TVShow>();
             LoadSettings();
             UpdateTvShowList();
             grpShowCustomFormat.Enabled = false;
             flShowControls.Enabled = false;
+            this.Text = "TV Sorter " + Program.VersionNumber;
             Log.Init(lstLog);
             Log.Add("Program started");
         }
@@ -191,6 +194,7 @@ namespace TVSorter
         private void UpdateTvShowList()
         {
             lstTVShows.Items.Clear();
+            _shows.Clear();
             List<Dictionary<string, object>> shows = _database.ExecuteResults("SELECT * FROM shows ORDER BY name");
             if (shows.Count > 0)
             {
@@ -212,6 +216,7 @@ namespace TVSorter
                         (string)row["banner"],
                         altNames);
                     lstTVShows.Items.Add(show);
+                    _shows.Add(show.DatabaseId, show);
                 }
             }
         }
@@ -401,7 +406,7 @@ namespace TVSorter
             MethodInvoker inc = new MethodInvoker(delegate() { progress.Invoke(increment); });
             new Thread(new ThreadStart(delegate()
             {
-                _fileHandler.RefreshEpisodes(inc, inputDir);
+                _fileHandler.RefreshEpisodes(inc, inputDir, _shows);
                 progress.Close();
             })).Start();
             progress.ShowDialog();
@@ -733,8 +738,9 @@ namespace TVSorter
                          + show.Banner + "\");");
                 //Create a new TV show so that it gets the newly added show from the database
                 //and therefore changes can be made to it - Issue ID 1.
-                lstTVShows.Items.Add(new TVShow(show.Name));
-
+                TVShow newShow = new TVShow(show.Name);
+                lstTVShows.Items.Add(newShow);
+                _shows.Add(newShow.DatabaseId, newShow);
             }
         }
 

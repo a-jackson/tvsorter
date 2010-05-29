@@ -9,7 +9,9 @@ namespace TVSorter
     static class Program
     {
         [System.Runtime.InteropServices.DllImport("kernel32.dll")]
-        private static extern bool AllocConsole(); 
+        private static extern bool AllocConsole();
+
+        public static string VersionNumber = "0.2";
 
         /// <summary>
         /// The main entry point for the application.
