@@ -40,15 +40,14 @@
             this.btnRenameMove = new System.Windows.Forms.Button();
             this.btnRenameOnly = new System.Windows.Forms.Button();
             this.lstInputFolder = new System.Windows.Forms.ListView();
-            this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
-            this.columnHeader2 = new System.Windows.Forms.ColumnHeader();
-            this.columnHeader3 = new System.Windows.Forms.ColumnHeader();
-            this.columnHeader4 = new System.Windows.Forms.ColumnHeader();
-            this.columnHeader5 = new System.Windows.Forms.ColumnHeader();
-            this.columnHeader6 = new System.Windows.Forms.ColumnHeader();
+            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.tpgTVShows = new System.Windows.Forms.TabPage();
             this.flShowControls = new System.Windows.Forms.FlowLayoutPanel();
-            this.btnApplyShowSetttings = new System.Windows.Forms.Button();
             this.btnSaveShowSettings = new System.Windows.Forms.Button();
             this.btnResetShowSettings = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -89,6 +88,7 @@
             this.txtNameFormat = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.grpDirectories = new System.Windows.Forms.GroupBox();
+            this.chkDeleteEmpty = new System.Windows.Forms.CheckBox();
             this.label2 = new System.Windows.Forms.Label();
             this.txtInputFolder = new System.Windows.Forms.TextBox();
             this.btnBrowseInputFolder = new System.Windows.Forms.Button();
@@ -99,7 +99,6 @@
             this.tpgLog = new System.Windows.Forms.TabPage();
             this.lstLog = new System.Windows.Forms.ListBox();
             this.dlgFolderSelect = new System.Windows.Forms.FolderBrowserDialog();
-            this.chkDeleteEmpty = new System.Windows.Forms.CheckBox();
             this.tabControl1.SuspendLayout();
             this.tpgInputFolder.SuspendLayout();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -309,7 +308,6 @@
             // 
             // flShowControls
             // 
-            this.flShowControls.Controls.Add(this.btnApplyShowSetttings);
             this.flShowControls.Controls.Add(this.btnSaveShowSettings);
             this.flShowControls.Controls.Add(this.btnResetShowSettings);
             this.flShowControls.Dock = System.Windows.Forms.DockStyle.Top;
@@ -318,19 +316,9 @@
             this.flShowControls.Size = new System.Drawing.Size(704, 32);
             this.flShowControls.TabIndex = 9;
             // 
-            // btnApplyShowSetttings
-            // 
-            this.btnApplyShowSetttings.Location = new System.Drawing.Point(3, 3);
-            this.btnApplyShowSetttings.Name = "btnApplyShowSetttings";
-            this.btnApplyShowSetttings.Size = new System.Drawing.Size(75, 23);
-            this.btnApplyShowSetttings.TabIndex = 0;
-            this.btnApplyShowSetttings.Text = "Apply";
-            this.btnApplyShowSetttings.UseVisualStyleBackColor = true;
-            this.btnApplyShowSetttings.Click += new System.EventHandler(this.btnApplyShowSetttings_Click);
-            // 
             // btnSaveShowSettings
             // 
-            this.btnSaveShowSettings.Location = new System.Drawing.Point(84, 3);
+            this.btnSaveShowSettings.Location = new System.Drawing.Point(3, 3);
             this.btnSaveShowSettings.Name = "btnSaveShowSettings";
             this.btnSaveShowSettings.Size = new System.Drawing.Size(75, 23);
             this.btnSaveShowSettings.TabIndex = 1;
@@ -340,7 +328,7 @@
             // 
             // btnResetShowSettings
             // 
-            this.btnResetShowSettings.Location = new System.Drawing.Point(165, 3);
+            this.btnResetShowSettings.Location = new System.Drawing.Point(84, 3);
             this.btnResetShowSettings.Name = "btnResetShowSettings";
             this.btnResetShowSettings.Size = new System.Drawing.Size(75, 23);
             this.btnResetShowSettings.TabIndex = 2;
@@ -740,6 +728,16 @@
             this.grpDirectories.TabStop = false;
             this.grpDirectories.Text = "Directories";
             // 
+            // chkDeleteEmpty
+            // 
+            this.chkDeleteEmpty.AutoSize = true;
+            this.chkDeleteEmpty.Location = new System.Drawing.Point(9, 88);
+            this.chkDeleteEmpty.Name = "chkDeleteEmpty";
+            this.chkDeleteEmpty.Size = new System.Drawing.Size(165, 17);
+            this.chkDeleteEmpty.TabIndex = 7;
+            this.chkDeleteEmpty.Text = "Remove empty subdirectories";
+            this.chkDeleteEmpty.UseVisualStyleBackColor = true;
+            // 
             // label2
             // 
             this.label2.AutoSize = true;
@@ -823,16 +821,6 @@
             this.lstLog.Name = "lstLog";
             this.lstLog.Size = new System.Drawing.Size(913, 498);
             this.lstLog.TabIndex = 0;
-            // 
-            // chkDeleteEmpty
-            // 
-            this.chkDeleteEmpty.AutoSize = true;
-            this.chkDeleteEmpty.Location = new System.Drawing.Point(9, 88);
-            this.chkDeleteEmpty.Name = "chkDeleteEmpty";
-            this.chkDeleteEmpty.Size = new System.Drawing.Size(165, 17);
-            this.chkDeleteEmpty.TabIndex = 7;
-            this.chkDeleteEmpty.Text = "Remove empty subdirectories";
-            this.chkDeleteEmpty.UseVisualStyleBackColor = true;
             // 
             // frmMain
             // 
@@ -925,7 +913,6 @@
         private System.Windows.Forms.TextBox txtShowFolderName;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.FlowLayoutPanel flShowControls;
-        private System.Windows.Forms.Button btnApplyShowSetttings;
         private System.Windows.Forms.Button btnSaveShowSettings;
         private System.Windows.Forms.Button btnResetShowSettings;
         private System.Windows.Forms.Button btnRefresh;

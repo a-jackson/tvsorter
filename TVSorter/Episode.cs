@@ -183,9 +183,40 @@ namespace TVSorter
         /// <returns>The formatted string</returns>
         public string FormatOutputPath(string format)
         {
+                        //Set any instances of {Ext} and {FName}
+            //They have no arg so the regexp doesn't match them
+            if (_fileInfo != null)
+            {
+                format = format.Replace("{Ext}", _fileInfo.Extension);
+            }
+            if (_show != null)
+            {
+                format = format.Replace("{FName}", _show.FolderName);
+            }
+            Regex regExp = new Regex("{([a-zA-Z]+)\\(([^\\)}]+)\\)}");
+            //Search for matches and make sure that the data exists
+            foreach (Match match in regExp.Matches(format))
+            {
+                string type = match.Groups[1].Value;
+                if ((type == "SName" && _show.Name == "") ||
+                    (type == "EName" && _episodeName == ""))
+                {
+                    int start = match.Index - 1;
+                    int end = match.Index + match.Length;
+                    if (start >= 0 && end < format.Length - 1)
+                    {
+                        char[] separatorChars = new char[] { '-', ':', '_', '.', ',' };
+                        if (format[start] == format[end] && separatorChars.Contains(format[start]))
+                        {
+                            format = format.Remove(start, 1);
+                        }
+                    }
+                }
+            }
+
             //Search for the variables and replace them in the string. This is searching for
             //{Var(Arg)}
-            format = Regex.Replace(format, "{([a-zA-Z]+)\\(([^\\)}]+)\\)}", delegate(Match match)
+            format = regExp.Replace(format, delegate(Match match)
             {
                 string type = match.Groups[1].Value;
                 string arg = match.Groups[2].Value;
@@ -236,16 +267,6 @@ namespace TVSorter
                 }
                 return match.Value;
             });
-            //Set any instances of {Ext} and {FName}
-            //They have no arg so the regexp doesn't match them
-            if (_fileInfo != null)
-            {
-                format = format.Replace("{Ext}", _fileInfo.Extension);
-            }
-            if (_show != null)
-            {
-                format = format.Replace("{FName}", _show.FolderName);
-            }
             //Replace : with .
             format = format.Replace(':','.');
             //Remove any characters that can't be in a filename

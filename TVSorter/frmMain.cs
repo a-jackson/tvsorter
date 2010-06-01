@@ -20,7 +20,6 @@ namespace TVSorter
         FileHandler _fileHandler;
         Dictionary<string, Episode> _files;
         private bool _onSettings = false;
-        Dictionary<long, TVShow> _shows;
 
         public frmMain()
         {
@@ -35,7 +34,6 @@ namespace TVSorter
             _settings = Properties.Settings.Default;
             _database = new Database();
             _fileHandler = new FileHandler();
-            _shows = new Dictionary<long, TVShow>();
             LoadSettings();
             UpdateTvShowList();
             grpShowCustomFormat.Enabled = false;
@@ -194,7 +192,6 @@ namespace TVSorter
         private void UpdateTvShowList()
         {
             lstTVShows.Items.Clear();
-            _shows.Clear();
             List<Dictionary<string, object>> shows = _database.ExecuteResults("SELECT * FROM shows ORDER BY name");
             if (shows.Count > 0)
             {
@@ -216,7 +213,6 @@ namespace TVSorter
                         (string)row["banner"],
                         altNames);
                     lstTVShows.Items.Add(show);
-                    _shows.Add(show.DatabaseId, show);
                 }
             }
         }
@@ -245,9 +241,9 @@ namespace TVSorter
         }
 
         /// <summary>
-        /// Applies the settings for the selected show. Sets the show's object to match the controls.
+        /// Saves the selected show's settings into the database
         /// </summary>
-        private void ApplyShowSettings()
+        private void SaveShowSettings()
         {
             TVShow selectedShow = (TVShow)lstTVShows.SelectedItem;
             selectedShow.UseDefaultFormat = chkUseDefaultFormat.Checked;
@@ -263,14 +259,6 @@ namespace TVSorter
                 txtShowExampleFileName.Text =
                     Episode.ExampleEpiosde.FormatOutputPath(selectedShow.CustomFormat);
             }
-        }
-
-        /// <summary>
-        /// Saves the selected show's settings into the database
-        /// </summary>
-        private void SaveShowSettings()
-        {
-            TVShow selectedShow = (TVShow)lstTVShows.SelectedItem;
             string query = "Update Shows Set " +
                 "use_default_format = "+(selectedShow.UseDefaultFormat?1:0)+
             ", custom_format = \""+selectedShow.CustomFormat.Replace("\"","\"\"") +
@@ -406,7 +394,7 @@ namespace TVSorter
             MethodInvoker inc = new MethodInvoker(delegate() { progress.Invoke(increment); });
             new Thread(new ThreadStart(delegate()
             {
-                _fileHandler.RefreshEpisodes(inc, inputDir, _shows);
+                _fileHandler.RefreshEpisodes(inc, inputDir);
                 progress.Close();
             })).Start();
             progress.ShowDialog();
@@ -697,16 +685,9 @@ namespace TVSorter
             this.lstTVShows_SelectedIndexChanged(this, null);
         }
 
-        //Handles the apply settings button for TV shows.
-        private void btnApplyShowSetttings_Click(object sender, EventArgs e)
-        {
-            ApplyShowSettings();
-        }
-
         //Handles the save settings button for TV shows
         private void btnSaveShowSettings_Click(object sender, EventArgs e)
         {
-            ApplyShowSettings();
             SaveShowSettings();
         }
 
@@ -738,9 +719,8 @@ namespace TVSorter
                          + show.Banner + "\");");
                 //Create a new TV show so that it gets the newly added show from the database
                 //and therefore changes can be made to it - Issue ID 1.
-                TVShow newShow = new TVShow(show.Name);
-                lstTVShows.Items.Add(newShow);
-                _shows.Add(newShow.DatabaseId, newShow);
+                lstTVShows.Items.Add(new TVShow(show.Name));
+
             }
         }
 

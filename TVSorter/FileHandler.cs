@@ -205,8 +205,7 @@ namespace TVSorter
         /// </summary>
         /// <param name="inc">Delegate to the increment method, called after each file is processed</param>
         /// <param name="inputFolder">The input directory</param>
-        /// <param name="shows">The TVShow objects</param>
-        public void RefreshEpisodes(MethodInvoker inc, string inputFolder, Dictionary<long,TVShow> shows)
+        public void RefreshEpisodes(MethodInvoker inc, string inputFolder)
         {
             Log.Add("Refresh of directory: " + inputFolder);
             DirectoryInfo dir = new DirectoryInfo(inputFolder);
@@ -214,7 +213,7 @@ namespace TVSorter
             if (!dir.Exists)
                 return;
             //Start the recursive function that processes a directory
-            ProcessFiles(dir, shows, inc);
+            ProcessFiles(dir, inc);
         }
 
         /// <summary>
@@ -222,9 +221,8 @@ namespace TVSorter
         /// get all the episode in it.
         /// </summary>
         /// <param name="dir">The directory to process</param>
-        /// <param name="shows">The TVShow objects</param>
         /// <param name="inc">Delegate for the increment function</param>
-        private void ProcessFiles(DirectoryInfo dir, Dictionary<long, TVShow> shows, MethodInvoker inc)
+        private void ProcessFiles(DirectoryInfo dir, MethodInvoker inc)
         {
             //Process each file in the directory
             foreach (FileInfo file in dir.GetFiles())
@@ -242,14 +240,6 @@ namespace TVSorter
                     Episode episode = GetEpisode(file);
                     if (episode != null)
                     {
-                        //If the show was found in the database then use the object
-                        //we already have to get any settings that might be set but not
-                        //saved.
-                        if (episode.Show != null && episode.Show.DatabaseId != -1)
-                        {
-                            episode.Show = shows[episode.Show.DatabaseId];
-                        }
-                        //Set the show to be one from the 
                         //Add the file if one is found
                         _files.Add(
                             file.FullName.Replace(Properties.Settings.Default.InputDir, ""),
@@ -268,7 +258,7 @@ namespace TVSorter
             {
                 foreach (DirectoryInfo subdir in dir.GetDirectories())
                 {
-                    ProcessFiles(subdir, shows, inc);
+                    ProcessFiles(subdir, inc);
                 }
             }
         }
