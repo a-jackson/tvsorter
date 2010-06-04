@@ -99,6 +99,7 @@
             this.tpgLog = new System.Windows.Forms.TabPage();
             this.lstLog = new System.Windows.Forms.ListBox();
             this.dlgFolderSelect = new System.Windows.Forms.FolderBrowserDialog();
+            this.btnRenameCopy = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tpgInputFolder.SuspendLayout();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -153,6 +154,7 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.btnRenameCopy);
             this.splitContainer1.Panel1.Controls.Add(this.cboFolderFilter);
             this.splitContainer1.Panel1.Controls.Add(this.btnSetShow);
             this.splitContainer1.Panel1.Controls.Add(this.btnRefresh);
@@ -174,14 +176,14 @@
             // 
             this.cboFolderFilter.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboFolderFilter.FormattingEnabled = true;
-            this.cboFolderFilter.Location = new System.Drawing.Point(546, 5);
+            this.cboFolderFilter.Location = new System.Drawing.Point(652, 5);
             this.cboFolderFilter.Name = "cboFolderFilter";
             this.cboFolderFilter.Size = new System.Drawing.Size(192, 21);
             this.cboFolderFilter.TabIndex = 6;
             // 
             // btnSetShow
             // 
-            this.btnSetShow.Location = new System.Drawing.Point(222, 3);
+            this.btnSetShow.Location = new System.Drawing.Point(328, 4);
             this.btnSetShow.Name = "btnSetShow";
             this.btnSetShow.Size = new System.Drawing.Size(75, 23);
             this.btnSetShow.TabIndex = 5;
@@ -191,7 +193,7 @@
             // 
             // btnRefresh
             // 
-            this.btnRefresh.Location = new System.Drawing.Point(465, 3);
+            this.btnRefresh.Location = new System.Drawing.Point(571, 4);
             this.btnRefresh.Name = "btnRefresh";
             this.btnRefresh.Size = new System.Drawing.Size(75, 23);
             this.btnRefresh.TabIndex = 4;
@@ -201,7 +203,7 @@
             // 
             // btnDeselectAll
             // 
-            this.btnDeselectAll.Location = new System.Drawing.Point(384, 3);
+            this.btnDeselectAll.Location = new System.Drawing.Point(490, 3);
             this.btnDeselectAll.Name = "btnDeselectAll";
             this.btnDeselectAll.Size = new System.Drawing.Size(75, 23);
             this.btnDeselectAll.TabIndex = 3;
@@ -211,7 +213,7 @@
             // 
             // btnSelectAll
             // 
-            this.btnSelectAll.Location = new System.Drawing.Point(303, 3);
+            this.btnSelectAll.Location = new System.Drawing.Point(409, 4);
             this.btnSelectAll.Name = "btnSelectAll";
             this.btnSelectAll.Size = new System.Drawing.Size(75, 23);
             this.btnSelectAll.TabIndex = 2;
@@ -822,6 +824,16 @@
             this.lstLog.Size = new System.Drawing.Size(913, 498);
             this.lstLog.TabIndex = 0;
             // 
+            // btnRenameCopy
+            // 
+            this.btnRenameCopy.Location = new System.Drawing.Point(222, 4);
+            this.btnRenameCopy.Name = "btnRenameCopy";
+            this.btnRenameCopy.Size = new System.Drawing.Size(100, 23);
+            this.btnRenameCopy.TabIndex = 7;
+            this.btnRenameCopy.Text = "Rename && Copy";
+            this.btnRenameCopy.UseVisualStyleBackColor = true;
+            this.btnRenameCopy.Click += new System.EventHandler(this.btnRenameCopy_Click);
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -928,6 +940,7 @@
         private System.Windows.Forms.ListBox lstLog;
         private System.Windows.Forms.ComboBox cboFolderFilter;
         private System.Windows.Forms.CheckBox chkDeleteEmpty;
+        private System.Windows.Forms.Button btnRenameCopy;
     }
 }
 

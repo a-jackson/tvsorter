@@ -10,6 +10,8 @@ namespace TVSorter
 {
     public delegate Episode NameHandler(Match match, FileInfo file);
 
+    public enum SortAction { Move, Copy, Rename };
+
     /// <summary>
     /// Class that converts the filename of a TV show to the correct format
     /// </summary>
@@ -269,11 +271,12 @@ namespace TVSorter
         }
 
         /// <summary>
-        /// Renames and moves the files
+        /// Renames and moves/copies the files
         /// </summary>
         /// <param name="inc">Delegate for the increment function</param>
         /// <param name="episodes">The array of episodes to move</param>
-        internal void RenameMove(MethodInvoker inc, Episode[] episodes)
+        /// <param name="action">The type of sorting to do</param>
+        internal void SortEpisodes(MethodInvoker inc, Episode[] episodes, SortAction action)
         {
             //Process each episode
             foreach (Episode ep in episodes)
@@ -283,13 +286,25 @@ namespace TVSorter
                 {
                     //Get the new path
                     newName = Properties.Settings.Default.OutputDir + ep.FormatOutputPath();
+                    if (action == SortAction.Rename)
+                    {
+                        newName = newName.Substring(newName.LastIndexOf('\\') + 1);
+                        newName = ep.FileInfo.DirectoryName + "\\" + newName;
+                    }
                     FileInfo newFile = new FileInfo(newName);
                     //Create the directory if it doesn't exist
                     if (!newFile.Directory.Exists)
                         newFile.Directory.Create();
-                    Log.Add("Moving file: " + ep.FileInfo.FullName + " to " + newName);
-                    //Move te file and delete the directory it was in if it is now empty
-                    File.Move(ep.FileInfo.FullName, newName);
+                    Log.Add(action.ToString() + " file: " + ep.FileInfo.FullName + " to " + newName);
+                    //Move/copy the file and delete the directory it was in if it is now empty
+                    if (action == SortAction.Copy)
+                    {
+                        File.Copy(ep.FileInfo.FullName, newName);
+                    }
+                    else
+                    {
+                        File.Move(ep.FileInfo.FullName, newName);
+                    }
                     if (Properties.Settings.Default.DeleteEmpty)
                     {
                         RecuriveDelete(ep.FileInfo.Directory);
@@ -298,8 +313,6 @@ namespace TVSorter
                 }
                 catch (Exception e)
                 {
-                    MessageBox.Show("Failed to move " + ep.FileInfo.FullName + "\n to " +
-                        newName + "\n" + e.Message + "\n" + e.StackTrace);
                     Log.Add("Failed to move " + ep.FileInfo.FullName + " to " +
                         newName + " " + e.Message);
                 }
@@ -341,40 +354,6 @@ namespace TVSorter
             {
                 directory.Delete();
                 RecuriveDelete(directory.Parent);
-            }
-        }
-
-        /// <summary>
-        /// Only renames the episodes, doesn't move them
-        /// </summary>
-        /// <param name="inc">The increment delegate, called after each file</param>
-        /// <param name="episodes">The array of episodes to process</param>
-        internal void RenameOnly(MethodInvoker inc, Episode[] episodes)
-        {
-            foreach (Episode ep in episodes)
-            {
-                string newName = ""; ;
-                try
-                {
-                    //Determine the new name but strip off any part that represents a file path
-                    newName = ep.FormatOutputPath();
-                    newName = newName.Substring(newName.LastIndexOf('\\') + 1);
-                    newName = ep.FileInfo.DirectoryName + "\\" + newName;
-                    Log.Add("Rename file: " + ep.FileInfo.FullName + " to " + newName);
-                    //Rename the file
-                    File.Move(ep.FileInfo.FullName, newName);
-                }
-                catch (Exception e)
-                {
-                    MessageBox.Show("Failed to rename " + ep.FileInfo.FullName + "\n to " +
-                        newName + "\n" + e.Message + "\n" + e.StackTrace);
-                    Log.Add("Failed to rename " + ep.FileInfo.FullName + " to " +
-                        newName + " " + e.Message);
-                }
-                finally
-                {
-                    inc();
-                }
             }
         }
     }

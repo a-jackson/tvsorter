@@ -329,6 +329,54 @@ namespace TVSorter
             return (long)Math.Floor(diff.TotalSeconds);
         }
 
+        /// <summary>
+        /// Sorts the selected TVShows using the defined sort action
+        /// </summary>
+        /// <param name="action">The sort action to use</param>
+        private void SortEpisodes(SortAction action)
+        {
+            //Check everything is in order
+            if (_settings.InputDir == "" || !Directory.Exists(_settings.InputDir))
+            {
+                MessageBox.Show("Check your input directory and try again");
+                return;
+            }
+            //Don't need the output folder if only renaming
+            if (action != SortAction.Rename)
+            {
+                if (_settings.OutputDir == "" || !Directory.Exists(_settings.OutputDir))
+                {
+                    MessageBox.Show("Check your output directory and try again");
+                    return;
+                }
+            }
+            if (lstInputFolder.CheckedItems.Count == 0)
+            {
+                MessageBox.Show("No items checked");
+                return;
+            }
+            frmProgress progress = new frmProgress(lstInputFolder.CheckedItems.Count);
+            MethodInvoker increment = new MethodInvoker(progress.Increment);
+            MethodInvoker inc = new MethodInvoker(delegate() { progress.Invoke(increment); });
+            //Create an array of episode to process
+            Episode[] episodes = new Episode[lstInputFolder.CheckedItems.Count];
+            int i = 0;
+            foreach (ListViewItem item in lstInputFolder.CheckedItems)
+            {
+                episodes[i] = _files[lstInputFolder.CheckedItems[i].Text];
+                i++;
+            }
+            new Thread(new ThreadStart(delegate()
+            {
+                _fileHandler.SortEpisodes(inc, episodes,action);
+                progress.Close();
+            })).Start();
+            progress.ShowDialog();
+            UpdateFolderFilter();
+            //Refresh the directory again. - Todo: Only change things that have changed, don't force a full refresh.
+            btnRefresh_Click(this, null);
+        }
+
         #region Event Handlers
         private void frmMain_Load(object sender, EventArgs e)
         {
@@ -436,69 +484,18 @@ namespace TVSorter
         //Handles the rename and move button
         private void btnRenameMove_Click(object sender, EventArgs e)
         {
-            //Check everything is in order
-            if (_settings.InputDir == "" || !Directory.Exists(_settings.InputDir))
-            {
-                MessageBox.Show("Check your input directory and try again");
-                return;
-            }
-            if (_settings.OutputDir == "" || !Directory.Exists(_settings.OutputDir))
-            {
-                MessageBox.Show("Check your output directory and try again");
-                return;
-            }
-            if (lstInputFolder.CheckedItems.Count == 0)
-            {
-                MessageBox.Show("No items checked");
-                return;
-            }
-            frmProgress progress = new frmProgress(lstInputFolder.CheckedItems.Count);
-            MethodInvoker increment = new MethodInvoker(progress.Increment);
-            MethodInvoker inc = new MethodInvoker(delegate() { progress.Invoke(increment); });
-            //Create an array of episode to process
-            Episode[] episodes = new Episode[lstInputFolder.CheckedItems.Count];
-            int i = 0;
-            foreach (ListViewItem item in lstInputFolder.CheckedItems)
-            {
-                episodes[i] = _files[lstInputFolder.CheckedItems[i].Text];
-                i++;
-            }
-            new Thread(new ThreadStart(delegate()
-            {
-                _fileHandler.RenameMove(inc, episodes);
-                progress.Close();
-            })).Start();
-            progress.ShowDialog();
-            UpdateFolderFilter();
-            //Refresh the directory again. - Todo: Only change things that have changed, don't force a full refresh.
-            btnRefresh_Click(sender, e);
+            SortEpisodes(SortAction.Move);
+        }
+
+        private void btnRenameCopy_Click(object sender, EventArgs e)
+        {
+            SortEpisodes(SortAction.Copy);
         }
 
         //Handles the rename only button
         private void btnRenameOnly_Click(object sender, EventArgs e)
         {
-            if (lstInputFolder.CheckedItems.Count == 0)
-            {
-                MessageBox.Show("No items checked");
-                return;
-            }
-            frmProgress progress = new frmProgress(lstInputFolder.CheckedItems.Count);
-            MethodInvoker increment = new MethodInvoker(progress.Increment);
-            MethodInvoker inc = new MethodInvoker(delegate() { progress.Invoke(increment); });
-            Episode[] episodes = new Episode[lstInputFolder.CheckedItems.Count];
-            int i = 0;
-            foreach (ListViewItem item in lstInputFolder.CheckedItems)
-            {
-                episodes[i] = _files[lstInputFolder.CheckedItems[i].Text];
-                i++;
-            }
-            new Thread(new ThreadStart(delegate()
-            {
-                _fileHandler.RenameOnly(inc, episodes);
-                progress.Close();
-            })).Start();
-            progress.ShowDialog();
-            btnRefresh_Click(sender, e);
+            SortEpisodes(SortAction.Rename);
         }
 
         //Handles the set show button
@@ -796,6 +793,7 @@ namespace TVSorter
             LoadSettings();
         }
         #endregion
+
         #endregion
     }
 }
