@@ -32,6 +32,7 @@
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tpgInputFolder = new System.Windows.Forms.TabPage();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.btnRenameCopy = new System.Windows.Forms.Button();
             this.cboFolderFilter = new System.Windows.Forms.ComboBox();
             this.btnSetShow = new System.Windows.Forms.Button();
             this.btnRefresh = new System.Windows.Forms.Button();
@@ -99,7 +100,6 @@
             this.tpgLog = new System.Windows.Forms.TabPage();
             this.lstLog = new System.Windows.Forms.ListBox();
             this.dlgFolderSelect = new System.Windows.Forms.FolderBrowserDialog();
-            this.btnRenameCopy = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tpgInputFolder.SuspendLayout();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -171,6 +171,16 @@
             this.splitContainer1.Size = new System.Drawing.Size(913, 498);
             this.splitContainer1.SplitterDistance = 30;
             this.splitContainer1.TabIndex = 1;
+            // 
+            // btnRenameCopy
+            // 
+            this.btnRenameCopy.Location = new System.Drawing.Point(222, 4);
+            this.btnRenameCopy.Name = "btnRenameCopy";
+            this.btnRenameCopy.Size = new System.Drawing.Size(100, 23);
+            this.btnRenameCopy.TabIndex = 7;
+            this.btnRenameCopy.Text = "Rename && Copy";
+            this.btnRenameCopy.UseVisualStyleBackColor = true;
+            this.btnRenameCopy.Click += new System.EventHandler(this.btnRenameCopy_Click);
             // 
             // cboFolderFilter
             // 
@@ -819,20 +829,11 @@
             // 
             this.lstLog.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lstLog.FormattingEnabled = true;
+            this.lstLog.HorizontalScrollbar = true;
             this.lstLog.Location = new System.Drawing.Point(3, 3);
             this.lstLog.Name = "lstLog";
             this.lstLog.Size = new System.Drawing.Size(913, 498);
             this.lstLog.TabIndex = 0;
-            // 
-            // btnRenameCopy
-            // 
-            this.btnRenameCopy.Location = new System.Drawing.Point(222, 4);
-            this.btnRenameCopy.Name = "btnRenameCopy";
-            this.btnRenameCopy.Size = new System.Drawing.Size(100, 23);
-            this.btnRenameCopy.TabIndex = 7;
-            this.btnRenameCopy.Text = "Rename && Copy";
-            this.btnRenameCopy.UseVisualStyleBackColor = true;
-            this.btnRenameCopy.Click += new System.EventHandler(this.btnRenameCopy_Click);
             // 
             // frmMain
             // 

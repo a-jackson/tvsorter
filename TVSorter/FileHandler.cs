@@ -233,7 +233,8 @@ namespace TVSorter
                 if (!_extensions.IsMatch(file.Extension))
                 {
                     //Increment the progress bar and move on if not.
-                    inc();
+                    if (inc != null)
+                        inc();
                     continue;
                 }
                 try
@@ -253,7 +254,8 @@ namespace TVSorter
                     MessageBox.Show("Error getting an episode from file \n" + file.FullName);
                 }
                 //Increment the progress bar
-                inc();
+                if (inc != null)
+                    inc();
             }
             //If the scan should be recursive then process each of the directories in this directory
             if (Properties.Settings.Default.RecurseSubDir)
@@ -318,7 +320,8 @@ namespace TVSorter
                 }
                 finally
                 {
-                    inc(); //Inc the progress bar
+                    if (inc != null)
+                        inc(); //Inc the progress bar
                 }
             }
         }
