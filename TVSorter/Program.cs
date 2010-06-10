@@ -57,7 +57,9 @@ namespace TVSorter
                                 (string)row["custom_format"],
                                 (string)row["folder_name"],
                                 (string)row["banner"],
-                                altNames);
+                                altNames,
+                                ((long)row["show_locked"] == 1 ? true : false),
+                                ((long)row["use_dvd_order"] == 1 ? true : false));
                             showList.Add(tvshow);
                         }
                         try

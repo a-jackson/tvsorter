@@ -19,6 +19,8 @@ namespace TVSorter
         private string _folderName;
         private string _banner;
         private string _altNames;
+        private bool _locked;
+        private bool _useDvdOrder;
 
         public TVShow(string id, string name, long updatetime,string banner,string folderName)
         {
@@ -31,10 +33,13 @@ namespace TVSorter
             _folderName = folderName;
             _banner = banner;
             _altNames = "";
+            _locked = false;
+            _useDvdOrder = false;
         }
 
         public TVShow(long databaseId, string tvdvId, string name, long updateTime, 
-            bool useDefaultFormat, string customFormat, string folderName,string banner,string altNames)
+            bool useDefaultFormat, string customFormat, string folderName,string banner,
+            string altNames, bool locked, bool dvdOrder)
         {
             _databaseId = databaseId;
             _tvdbid = tvdvId;
@@ -45,6 +50,8 @@ namespace TVSorter
             _folderName = folderName;
             _banner = banner;
             _altNames = altNames;
+            _locked = locked;
+            _useDvdOrder = dvdOrder;
         }
         /// <summary>
         /// Create a TVShow and attempt to fill in missing data from the database
@@ -76,6 +83,8 @@ namespace TVSorter
                 _customFormat = (string)results["custom_format"];
                 _folderName = (string)results["folder_name"];
                 _banner = (string)results["banner"];
+                _locked = ((long)results["show_locked"] == 1 ? true : false);
+                _useDvdOrder = ((long)results["use_dvd_order"] == 1 ? true : false);
                 //Get the altnames for this show
                 List<Dictionary<string, object>> altName = database.ExecuteResults
                     ("Select * From AltNames Where show_id = "
@@ -139,6 +148,16 @@ namespace TVSorter
         {
             get { return _altNames; }
             set { _altNames = value; }
+        }
+        public bool Locked
+        {
+            get { return _locked; }
+            set { _locked = value; }
+        }
+        public bool UseDvdOrder
+        {
+            get { return _useDvdOrder; }
+            set { _useDvdOrder = value; }
         }
     }
 }

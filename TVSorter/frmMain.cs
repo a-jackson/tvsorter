@@ -37,7 +37,9 @@ namespace TVSorter
             LoadSettings();
             UpdateTvShowList();
             grpShowCustomFormat.Enabled = false;
-            flShowControls.Enabled = false;
+            grpShowCustomNames.Enabled = false;
+            grpShowUpdateOptions.Enabled = false;
+            tsShowControls.Enabled = false;
             this.Text = "TV Sorter " + Program.VersionNumber;
             Log.Init(lstLog);
             Log.Add("Program started");
@@ -211,7 +213,9 @@ namespace TVSorter
                         (string)row["custom_format"],
                         (string)row["folder_name"],
                         (string)row["banner"],
-                        altNames);
+                        altNames,
+                        ((long)row["show_locked"] == 1 ? true : false),
+                        ((long)row["use_dvd_order"] == 1 ? true : false));
                     lstTVShows.Items.Add(show);
                 }
             }
@@ -222,8 +226,10 @@ namespace TVSorter
         /// </summary>
         private void LoadShowSettings()
         {
-            flShowControls.Enabled = true;
+            tsShowControls.Enabled = true;
             grpShowCustomFormat.Enabled = true;
+            grpShowUpdateOptions.Enabled = true;
+            grpShowCustomNames.Enabled = true;
             TVShow selectedShow = (TVShow)lstTVShows.SelectedItem;
             chkUseDefaultFormat.Checked = selectedShow.UseDefaultFormat;
             txtShowCustomFormat.Text = selectedShow.CustomFormat;
@@ -238,6 +244,17 @@ namespace TVSorter
                 txtShowExampleFileName.Text = 
                     Episode.ExampleEpiosde.FormatOutputPath(selectedShow.CustomFormat);
             }
+            if (selectedShow.Locked)
+            {
+                btnLockShow.Text = "Show Locked";
+                btnLockShow.BackColor = Color.Red;
+            }
+            else
+            {
+                btnLockShow.Text = "Show Unlocked";
+                btnLockShow.BackColor = Color.Green;
+            }
+            chkDvdOrder.Checked = selectedShow.UseDvdOrder;
         }
 
         /// <summary>
@@ -259,11 +276,15 @@ namespace TVSorter
                 txtShowExampleFileName.Text =
                     Episode.ExampleEpiosde.FormatOutputPath(selectedShow.CustomFormat);
             }
+            selectedShow.Locked = (btnLockShow.BackColor.Equals(Color.Red));
+            selectedShow.UseDvdOrder = chkDvdOrder.Checked;
             string query = "Update Shows Set " +
                 "use_default_format = "+(selectedShow.UseDefaultFormat?1:0)+
             ", custom_format = \""+selectedShow.CustomFormat.Replace("\"","\"\"") +
             "\", folder_name = \"" + selectedShow.FolderName.Replace("\"", "\"\"") + 
-            "\" Where id = "+selectedShow.DatabaseId+";";
+            "\", show_locked = "+(selectedShow.Locked?1:0)+
+            ", use_dvd_order = " + (selectedShow.UseDvdOrder?1:0) + 
+            " Where id = "+selectedShow.DatabaseId+";";
             _database.ExecuteQuery(query);
             //Process alternate names - delete existing ones and add everything again
             _database.ExecuteQuery("Delete From AltNames Where show_id = " + selectedShow.DatabaseId + ";");
@@ -282,6 +303,39 @@ namespace TVSorter
                 }
                 _database.ExecuteQuery(altNameQuery);
             }
+        }
+
+        /// <summary>
+        /// Updates the selected show
+        /// </summary>
+        /// <param name="force">Indicates if the update should be forced or not</param>
+        private void UpdateSelectedShow(bool force)
+        {
+            frmProgress progress = new frmProgress(1);
+            MethodInvoker inc = new MethodInvoker(progress.Increment);
+            TVShow selectedItem = (TVShow)lstTVShows.SelectedItem;
+            if (selectedItem == null)
+                return;
+            new Thread(new ThreadStart(delegate()
+            {
+                try
+                {
+                    TVDB.UpdateShow(selectedItem, force);
+                }
+                catch (Exception ex)
+                {
+                    progress.Abort();
+                    Log.Add("Update failed: " + ex.Message);
+                    return;
+                }
+                progress.Invoke(inc);
+                progress.Close();
+            })).Start();
+            if (progress.ShowDialog() == DialogResult.Abort)
+            {
+                MessageBox.Show("An error occured. Unable to update, check the log for details.");
+            }
+            this.lstTVShows_SelectedIndexChanged(this, null);
         }
 
         /// <summary>
@@ -527,6 +581,11 @@ namespace TVSorter
                 }
             }
         }
+
+        private void btnSort_ButtonClick(object sender, EventArgs e)
+        {
+            btnSort.ShowDropDown();
+        }
         #endregion
 
         #region TV Show Handlers
@@ -566,44 +625,24 @@ namespace TVSorter
                 lblLastUpdate.Text = "Last Update: ";
                 lblTvdbId.Text = "TVDB ID: ";
                 picShowPic.Image = null;
-                flShowControls.Enabled = false;
+                tsShowControls.Enabled = false;
                 grpShowCustomFormat.Enabled = false;
+                grpShowCustomNames.Enabled = false;
+                grpShowUpdateOptions.Enabled = false;
                 chkUseDefaultFormat.Checked = false;
                 txtShowCustomFormat.Text = "";
                 txtShowFolderName.Text = "";
                 txtShowExampleFileName.Text = "";
                 txtAltNames.Text = "";
+                btnLockShow.BackColor = Color.Transparent;
+                btnLockShow.Text = "Show Locked";
             }
         }
 
         //Handles the update selected button
         private void btnUpdateSelected_Click(object sender, EventArgs e)
         {
-            frmProgress progress = new frmProgress(1);
-            MethodInvoker inc = new MethodInvoker(progress.Increment);
-            TVShow selectedItem = (TVShow)lstTVShows.SelectedItem;
-            if (selectedItem == null)
-                return;
-            new Thread(new ThreadStart(delegate()
-            {
-                try
-                {
-                    TVDB.UpdateShow(selectedItem, false);
-                }
-                catch (Exception ex)
-                {
-                    progress.Abort();
-                    Log.Add("Update failed: " + ex.Message);
-                    return;
-                }
-                progress.Invoke(inc);
-                progress.Close();
-            })).Start();
-            if (progress.ShowDialog() == DialogResult.Abort)
-            {
-                MessageBox.Show("An error occured. Unable to update, check the log for details.");
-            }
-            this.lstTVShows_SelectedIndexChanged(this, null);
+            UpdateSelectedShow(false);
         }
 
         //Handles the update all button
@@ -737,6 +776,30 @@ namespace TVSorter
                 _database.ExecuteQuery(showRemove);
                 _database.ExecuteQuery(episodeRemove);
                 _database.ExecuteQuery(altNameQuery);
+            }
+        }
+
+        //Handles the force update selected show button
+        private void btnForceUpdateSelected_Click(object sender, EventArgs e)
+        {
+            UpdateSelectedShow(true);
+        }
+
+        //Handles the lock show button
+        private void btnLockShow_Click(object sender, EventArgs e)
+        {
+            TVShow show = (TVShow)lstTVShows.SelectedItem;
+            if (show == null)
+                return;
+            if (btnLockShow.BackColor.Equals(Color.Green))
+            {
+                btnLockShow.Text = "Show Locked";
+                btnLockShow.BackColor = Color.Red;
+            }
+            else
+            {
+                btnLockShow.Text = "Show Unlocked";
+                btnLockShow.BackColor = Color.Green;
             }
         }
         #endregion

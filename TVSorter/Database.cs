@@ -23,7 +23,7 @@ namespace TVSorter
         /// The current version of the database, used to detect older databases so they can
         /// be updated to new ones.
         /// </summary>
-        private const int DatabaseVersion = 2;
+        private const int DatabaseVersion = 3;
 
         public Database()
         {
@@ -44,6 +44,12 @@ namespace TVSorter
                     ExecuteQuery("Update Version Set version = 2 Where id = 1");
                 }
                 //Subsequent updates here e.g if (version < 3) should have already been updated to 2
+                if (version < 3)
+                {
+                    ExecuteQuery("Alter Table Shows Add Column show_locked Integer Default 0");
+                    ExecuteQuery("Alter Table Shows Add Column use_dvd_order Integer Default 0");
+                    ExecuteQuery("Update Version Set version = 3 Where id = 1");
+                }
             }
         }
 

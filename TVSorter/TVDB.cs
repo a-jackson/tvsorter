@@ -131,6 +131,11 @@ namespace TVSorter
         /// than checking if there are any updates</param>
         public static void UpdateShow(TVShow show, bool force)
         {
+            if (show.Locked)
+            {
+                Log.Add(show.Name + " is locked. Skipping.");
+                return;
+            }
             SetEnvironment();
             //Download banner.
             DownloadShowBanner(show);
@@ -188,9 +193,7 @@ namespace TVSorter
                 //Get each piece of data from the XML
                 string tvdb_id = episode.ChildNodes[0].InnerText;
                 string episode_name = episode.ChildNodes[9].InnerText;
-                int episode_num = int.Parse(episode.ChildNodes[10].InnerText);
                 string date = episode.ChildNodes[11].InnerText;
-                int season_num = int.Parse(episode.ChildNodes[18].InnerText);
                 long first_air;
                 if (date.Length > 0)
                 {
@@ -205,6 +208,25 @@ namespace TVSorter
                 else
                 {
                     first_air = 0;
+                }
+                int episode_num;
+                int season_num;
+                if (show.UseDvdOrder)
+                {
+                    string dvdE = episode.ChildNodes[5].InnerText;
+                    string dvdS = episode.ChildNodes[6].InnerText;
+                    if (dvdE == "" || dvdS == "")
+                    {
+                        dvdE = episode.ChildNodes[10].InnerText;
+                        dvdS = episode.ChildNodes[18].InnerText;
+                    }
+                    episode_num = int.Parse(dvdE);
+                    season_num = int.Parse(dvdS);
+                }
+                else
+                {
+                    episode_num = int.Parse(episode.ChildNodes[10].InnerText);
+                    season_num = int.Parse(episode.ChildNodes[18].InnerText);
                 }
                 //Build the query
                 query.Append("Insert Into Episodes (show_id, tvdb_id, episode_num, season_num," +

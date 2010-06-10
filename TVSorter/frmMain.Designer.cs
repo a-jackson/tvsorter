@@ -31,15 +31,6 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tpgInputFolder = new System.Windows.Forms.TabPage();
-            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.btnRenameCopy = new System.Windows.Forms.Button();
-            this.cboFolderFilter = new System.Windows.Forms.ComboBox();
-            this.btnSetShow = new System.Windows.Forms.Button();
-            this.btnRefresh = new System.Windows.Forms.Button();
-            this.btnDeselectAll = new System.Windows.Forms.Button();
-            this.btnSelectAll = new System.Windows.Forms.Button();
-            this.btnRenameMove = new System.Windows.Forms.Button();
-            this.btnRenameOnly = new System.Windows.Forms.Button();
             this.lstInputFolder = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -47,34 +38,55 @@
             this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.btnSort = new System.Windows.Forms.ToolStripSplitButton();
+            this.btnRenameOnly = new System.Windows.Forms.ToolStripMenuItem();
+            this.btnRenameMove = new System.Windows.Forms.ToolStripMenuItem();
+            this.btnRenameCopy = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.btnSetShow = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.btnSelectAll = new System.Windows.Forms.ToolStripButton();
+            this.btnDeselectAll = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
+            this.btnRefresh = new System.Windows.Forms.ToolStripButton();
+            this.cboFolderFilter = new System.Windows.Forms.ToolStripComboBox();
             this.tpgTVShows = new System.Windows.Forms.TabPage();
-            this.flShowControls = new System.Windows.Forms.FlowLayoutPanel();
-            this.btnSaveShowSettings = new System.Windows.Forms.Button();
-            this.btnResetShowSettings = new System.Windows.Forms.Button();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.tsShowControls = new System.Windows.Forms.ToolStrip();
+            this.btnSaveShowSettings = new System.Windows.Forms.ToolStripButton();
+            this.btnResetShowSettings = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.btnUpdateSelected = new System.Windows.Forms.ToolStripButton();
+            this.btnForceUpdateSelected = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            this.btnRemoveShow = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
+            this.grpShowUpdateOptions = new System.Windows.Forms.GroupBox();
+            this.chkDvdOrder = new System.Windows.Forms.CheckBox();
+            this.btnLockShow = new System.Windows.Forms.Button();
+            this.grpShowCustomNames = new System.Windows.Forms.GroupBox();
             this.label11 = new System.Windows.Forms.Label();
             this.txtAltNames = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
             this.txtShowFolderName = new System.Windows.Forms.TextBox();
             this.grpShowCustomFormat = new System.Windows.Forms.GroupBox();
+            this.txtShowCustomFormat = new System.Windows.Forms.TextBox();
             this.txtShowExampleFileName = new System.Windows.Forms.TextBox();
             this.label10 = new System.Windows.Forms.Label();
-            this.txtShowCustomFormat = new System.Windows.Forms.TextBox();
             this.label8 = new System.Windows.Forms.Label();
             this.chkUseDefaultFormat = new System.Windows.Forms.CheckBox();
-            this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
-            this.btnUpdateSelected = new System.Windows.Forms.Button();
-            this.btnUpdateAll = new System.Windows.Forms.Button();
-            this.btnForceUpdateAll = new System.Windows.Forms.Button();
-            this.btnAddShow = new System.Windows.Forms.Button();
-            this.btnRemoveShow = new System.Windows.Forms.Button();
-            this.btnSearchShows = new System.Windows.Forms.Button();
             this.lblLastUpdate = new System.Windows.Forms.Label();
             this.lblTvdbId = new System.Windows.Forms.Label();
             this.picShowPic = new System.Windows.Forms.PictureBox();
             this.lblSelectedShow = new System.Windows.Forms.Label();
             this.lstTVShows = new System.Windows.Forms.ListBox();
+            this.toolStrip2 = new System.Windows.Forms.ToolStrip();
+            this.btnUpdateAll = new System.Windows.Forms.ToolStripButton();
+            this.btnForceUpdateAll = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
+            this.btnAddShow = new System.Windows.Forms.ToolStripButton();
+            this.btnSearchShow = new System.Windows.Forms.ToolStripButton();
             this.tpgSettings = new System.Windows.Forms.TabPage();
             this.flowLayoutPanel2 = new System.Windows.Forms.FlowLayoutPanel();
             this.btnApply = new System.Windows.Forms.Button();
@@ -102,15 +114,14 @@
             this.dlgFolderSelect = new System.Windows.Forms.FolderBrowserDialog();
             this.tabControl1.SuspendLayout();
             this.tpgInputFolder.SuspendLayout();
-            this.splitContainer1.Panel1.SuspendLayout();
-            this.splitContainer1.Panel2.SuspendLayout();
-            this.splitContainer1.SuspendLayout();
+            this.toolStrip1.SuspendLayout();
             this.tpgTVShows.SuspendLayout();
-            this.flShowControls.SuspendLayout();
-            this.groupBox1.SuspendLayout();
+            this.tsShowControls.SuspendLayout();
+            this.grpShowUpdateOptions.SuspendLayout();
+            this.grpShowCustomNames.SuspendLayout();
             this.grpShowCustomFormat.SuspendLayout();
-            this.flowLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picShowPic)).BeginInit();
+            this.toolStrip2.SuspendLayout();
             this.tpgSettings.SuspendLayout();
             this.flowLayoutPanel2.SuspendLayout();
             this.grpShowNames.SuspendLayout();
@@ -134,7 +145,8 @@
             // 
             // tpgInputFolder
             // 
-            this.tpgInputFolder.Controls.Add(this.splitContainer1);
+            this.tpgInputFolder.Controls.Add(this.lstInputFolder);
+            this.tpgInputFolder.Controls.Add(this.toolStrip1);
             this.tpgInputFolder.Location = new System.Drawing.Point(4, 22);
             this.tpgInputFolder.Name = "tpgInputFolder";
             this.tpgInputFolder.Padding = new System.Windows.Forms.Padding(3);
@@ -142,114 +154,6 @@
             this.tpgInputFolder.TabIndex = 0;
             this.tpgInputFolder.Text = "Input folder";
             this.tpgInputFolder.UseVisualStyleBackColor = true;
-            // 
-            // splitContainer1
-            // 
-            this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
-            this.splitContainer1.IsSplitterFixed = true;
-            this.splitContainer1.Location = new System.Drawing.Point(3, 3);
-            this.splitContainer1.Name = "splitContainer1";
-            this.splitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
-            // 
-            // splitContainer1.Panel1
-            // 
-            this.splitContainer1.Panel1.Controls.Add(this.btnRenameCopy);
-            this.splitContainer1.Panel1.Controls.Add(this.cboFolderFilter);
-            this.splitContainer1.Panel1.Controls.Add(this.btnSetShow);
-            this.splitContainer1.Panel1.Controls.Add(this.btnRefresh);
-            this.splitContainer1.Panel1.Controls.Add(this.btnDeselectAll);
-            this.splitContainer1.Panel1.Controls.Add(this.btnSelectAll);
-            this.splitContainer1.Panel1.Controls.Add(this.btnRenameMove);
-            this.splitContainer1.Panel1.Controls.Add(this.btnRenameOnly);
-            this.splitContainer1.Panel1.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            // 
-            // splitContainer1.Panel2
-            // 
-            this.splitContainer1.Panel2.Controls.Add(this.lstInputFolder);
-            this.splitContainer1.Panel2.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.splitContainer1.Size = new System.Drawing.Size(913, 498);
-            this.splitContainer1.SplitterDistance = 30;
-            this.splitContainer1.TabIndex = 1;
-            // 
-            // btnRenameCopy
-            // 
-            this.btnRenameCopy.Location = new System.Drawing.Point(222, 4);
-            this.btnRenameCopy.Name = "btnRenameCopy";
-            this.btnRenameCopy.Size = new System.Drawing.Size(100, 23);
-            this.btnRenameCopy.TabIndex = 7;
-            this.btnRenameCopy.Text = "Rename && Copy";
-            this.btnRenameCopy.UseVisualStyleBackColor = true;
-            this.btnRenameCopy.Click += new System.EventHandler(this.btnRenameCopy_Click);
-            // 
-            // cboFolderFilter
-            // 
-            this.cboFolderFilter.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cboFolderFilter.FormattingEnabled = true;
-            this.cboFolderFilter.Location = new System.Drawing.Point(652, 5);
-            this.cboFolderFilter.Name = "cboFolderFilter";
-            this.cboFolderFilter.Size = new System.Drawing.Size(192, 21);
-            this.cboFolderFilter.TabIndex = 6;
-            // 
-            // btnSetShow
-            // 
-            this.btnSetShow.Location = new System.Drawing.Point(328, 4);
-            this.btnSetShow.Name = "btnSetShow";
-            this.btnSetShow.Size = new System.Drawing.Size(75, 23);
-            this.btnSetShow.TabIndex = 5;
-            this.btnSetShow.Text = "Set Show";
-            this.btnSetShow.UseVisualStyleBackColor = true;
-            this.btnSetShow.Click += new System.EventHandler(this.btnSetShow_Click);
-            // 
-            // btnRefresh
-            // 
-            this.btnRefresh.Location = new System.Drawing.Point(571, 4);
-            this.btnRefresh.Name = "btnRefresh";
-            this.btnRefresh.Size = new System.Drawing.Size(75, 23);
-            this.btnRefresh.TabIndex = 4;
-            this.btnRefresh.Text = "Refresh";
-            this.btnRefresh.UseVisualStyleBackColor = true;
-            this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
-            // 
-            // btnDeselectAll
-            // 
-            this.btnDeselectAll.Location = new System.Drawing.Point(490, 3);
-            this.btnDeselectAll.Name = "btnDeselectAll";
-            this.btnDeselectAll.Size = new System.Drawing.Size(75, 23);
-            this.btnDeselectAll.TabIndex = 3;
-            this.btnDeselectAll.Text = "Deselect All";
-            this.btnDeselectAll.UseVisualStyleBackColor = true;
-            this.btnDeselectAll.Click += new System.EventHandler(this.btnDeselectAll_Click);
-            // 
-            // btnSelectAll
-            // 
-            this.btnSelectAll.Location = new System.Drawing.Point(409, 4);
-            this.btnSelectAll.Name = "btnSelectAll";
-            this.btnSelectAll.Size = new System.Drawing.Size(75, 23);
-            this.btnSelectAll.TabIndex = 2;
-            this.btnSelectAll.Text = "Select All";
-            this.btnSelectAll.UseVisualStyleBackColor = true;
-            this.btnSelectAll.Click += new System.EventHandler(this.btnSelectAll_Click);
-            // 
-            // btnRenameMove
-            // 
-            this.btnRenameMove.Location = new System.Drawing.Point(102, 4);
-            this.btnRenameMove.Name = "btnRenameMove";
-            this.btnRenameMove.Size = new System.Drawing.Size(114, 23);
-            this.btnRenameMove.TabIndex = 1;
-            this.btnRenameMove.Text = "Rename && Move";
-            this.btnRenameMove.UseVisualStyleBackColor = true;
-            this.btnRenameMove.Click += new System.EventHandler(this.btnRenameMove_Click);
-            // 
-            // btnRenameOnly
-            // 
-            this.btnRenameOnly.Location = new System.Drawing.Point(5, 3);
-            this.btnRenameOnly.Name = "btnRenameOnly";
-            this.btnRenameOnly.Size = new System.Drawing.Size(91, 23);
-            this.btnRenameOnly.TabIndex = 0;
-            this.btnRenameOnly.Text = "Rename Only";
-            this.btnRenameOnly.UseVisualStyleBackColor = true;
-            this.btnRenameOnly.Click += new System.EventHandler(this.btnRenameOnly_Click);
             // 
             // lstInputFolder
             // 
@@ -262,10 +166,10 @@
             this.columnHeader5,
             this.columnHeader6});
             this.lstInputFolder.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lstInputFolder.Location = new System.Drawing.Point(0, 0);
+            this.lstInputFolder.Location = new System.Drawing.Point(3, 28);
             this.lstInputFolder.Name = "lstInputFolder";
-            this.lstInputFolder.Size = new System.Drawing.Size(913, 464);
-            this.lstInputFolder.TabIndex = 0;
+            this.lstInputFolder.Size = new System.Drawing.Size(913, 473);
+            this.lstInputFolder.TabIndex = 10;
             this.lstInputFolder.UseCompatibleStateImageBehavior = false;
             this.lstInputFolder.View = System.Windows.Forms.View.Details;
             // 
@@ -299,17 +203,132 @@
             this.columnHeader6.Text = "Output Path";
             this.columnHeader6.Width = 205;
             // 
+            // toolStrip1
+            // 
+            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.btnSort,
+            this.toolStripSeparator1,
+            this.btnSetShow,
+            this.toolStripSeparator2,
+            this.btnSelectAll,
+            this.btnDeselectAll,
+            this.toolStripSeparator7,
+            this.btnRefresh,
+            this.cboFolderFilter});
+            this.toolStrip1.Location = new System.Drawing.Point(3, 3);
+            this.toolStrip1.Name = "toolStrip1";
+            this.toolStrip1.Size = new System.Drawing.Size(913, 25);
+            this.toolStrip1.TabIndex = 9;
+            this.toolStrip1.Text = "toolStripInputFolder";
+            // 
+            // btnSort
+            // 
+            this.btnSort.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnSort.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.btnRenameOnly,
+            this.btnRenameMove,
+            this.btnRenameCopy});
+            this.btnSort.Image = ((System.Drawing.Image)(resources.GetObject("btnSort.Image")));
+            this.btnSort.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnSort.Name = "btnSort";
+            this.btnSort.Size = new System.Drawing.Size(44, 22);
+            this.btnSort.Text = "Sort";
+            this.btnSort.ButtonClick += new System.EventHandler(this.btnSort_ButtonClick);
+            // 
+            // btnRenameOnly
+            // 
+            this.btnRenameOnly.Name = "btnRenameOnly";
+            this.btnRenameOnly.Size = new System.Drawing.Size(163, 22);
+            this.btnRenameOnly.Text = "&Rename Only";
+            this.btnRenameOnly.Click += new System.EventHandler(this.btnRenameOnly_Click);
+            // 
+            // btnRenameMove
+            // 
+            this.btnRenameMove.Name = "btnRenameMove";
+            this.btnRenameMove.Size = new System.Drawing.Size(163, 22);
+            this.btnRenameMove.Text = "Rename && &Move";
+            this.btnRenameMove.Click += new System.EventHandler(this.btnRenameMove_Click);
+            // 
+            // btnRenameCopy
+            // 
+            this.btnRenameCopy.Name = "btnRenameCopy";
+            this.btnRenameCopy.Size = new System.Drawing.Size(163, 22);
+            this.btnRenameCopy.Text = "Rename && &Copy";
+            this.btnRenameCopy.Click += new System.EventHandler(this.btnRenameCopy_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
+            // 
+            // btnSetShow
+            // 
+            this.btnSetShow.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnSetShow.Image = ((System.Drawing.Image)(resources.GetObject("btnSetShow.Image")));
+            this.btnSetShow.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnSetShow.Name = "btnSetShow";
+            this.btnSetShow.Size = new System.Drawing.Size(59, 22);
+            this.btnSetShow.Text = "Set Show";
+            this.btnSetShow.Click += new System.EventHandler(this.btnSetShow_Click);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 25);
+            // 
+            // btnSelectAll
+            // 
+            this.btnSelectAll.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnSelectAll.Image = ((System.Drawing.Image)(resources.GetObject("btnSelectAll.Image")));
+            this.btnSelectAll.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnSelectAll.Name = "btnSelectAll";
+            this.btnSelectAll.Size = new System.Drawing.Size(59, 22);
+            this.btnSelectAll.Text = "Select All";
+            this.btnSelectAll.Click += new System.EventHandler(this.btnSelectAll_Click);
+            // 
+            // btnDeselectAll
+            // 
+            this.btnDeselectAll.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnDeselectAll.Image = ((System.Drawing.Image)(resources.GetObject("btnDeselectAll.Image")));
+            this.btnDeselectAll.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnDeselectAll.Name = "btnDeselectAll";
+            this.btnDeselectAll.Size = new System.Drawing.Size(72, 22);
+            this.btnDeselectAll.Text = "Deselect All";
+            this.btnDeselectAll.Click += new System.EventHandler(this.btnDeselectAll_Click);
+            // 
+            // toolStripSeparator7
+            // 
+            this.toolStripSeparator7.Name = "toolStripSeparator7";
+            this.toolStripSeparator7.Size = new System.Drawing.Size(6, 25);
+            // 
+            // btnRefresh
+            // 
+            this.btnRefresh.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnRefresh.Image = ((System.Drawing.Image)(resources.GetObject("btnRefresh.Image")));
+            this.btnRefresh.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnRefresh.Name = "btnRefresh";
+            this.btnRefresh.Size = new System.Drawing.Size(50, 22);
+            this.btnRefresh.Text = "Refresh";
+            this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
+            // 
+            // cboFolderFilter
+            // 
+            this.cboFolderFilter.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cboFolderFilter.Name = "cboFolderFilter";
+            this.cboFolderFilter.Size = new System.Drawing.Size(150, 25);
+            // 
             // tpgTVShows
             // 
-            this.tpgTVShows.Controls.Add(this.flShowControls);
-            this.tpgTVShows.Controls.Add(this.groupBox1);
+            this.tpgTVShows.Controls.Add(this.tsShowControls);
+            this.tpgTVShows.Controls.Add(this.grpShowUpdateOptions);
+            this.tpgTVShows.Controls.Add(this.grpShowCustomNames);
             this.tpgTVShows.Controls.Add(this.grpShowCustomFormat);
-            this.tpgTVShows.Controls.Add(this.flowLayoutPanel1);
             this.tpgTVShows.Controls.Add(this.lblLastUpdate);
             this.tpgTVShows.Controls.Add(this.lblTvdbId);
             this.tpgTVShows.Controls.Add(this.picShowPic);
             this.tpgTVShows.Controls.Add(this.lblSelectedShow);
             this.tpgTVShows.Controls.Add(this.lstTVShows);
+            this.tpgTVShows.Controls.Add(this.toolStrip2);
             this.tpgTVShows.Location = new System.Drawing.Point(4, 22);
             this.tpgTVShows.Name = "tpgTVShows";
             this.tpgTVShows.Padding = new System.Windows.Forms.Padding(3);
@@ -318,50 +337,136 @@
             this.tpgTVShows.Text = "TV Shows";
             this.tpgTVShows.UseVisualStyleBackColor = true;
             // 
-            // flShowControls
+            // tsShowControls
             // 
-            this.flShowControls.Controls.Add(this.btnSaveShowSettings);
-            this.flShowControls.Controls.Add(this.btnResetShowSettings);
-            this.flShowControls.Dock = System.Windows.Forms.DockStyle.Top;
-            this.flShowControls.Location = new System.Drawing.Point(212, 375);
-            this.flShowControls.Name = "flShowControls";
-            this.flShowControls.Size = new System.Drawing.Size(704, 32);
-            this.flShowControls.TabIndex = 9;
+            this.tsShowControls.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.btnSaveShowSettings,
+            this.btnResetShowSettings,
+            this.toolStripSeparator3,
+            this.btnUpdateSelected,
+            this.btnForceUpdateSelected,
+            this.toolStripSeparator4,
+            this.btnRemoveShow,
+            this.toolStripSeparator5});
+            this.tsShowControls.Location = new System.Drawing.Point(212, 442);
+            this.tsShowControls.Name = "tsShowControls";
+            this.tsShowControls.Size = new System.Drawing.Size(704, 25);
+            this.tsShowControls.TabIndex = 12;
             // 
             // btnSaveShowSettings
             // 
-            this.btnSaveShowSettings.Location = new System.Drawing.Point(3, 3);
+            this.btnSaveShowSettings.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnSaveShowSettings.Image = ((System.Drawing.Image)(resources.GetObject("btnSaveShowSettings.Image")));
+            this.btnSaveShowSettings.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btnSaveShowSettings.Name = "btnSaveShowSettings";
-            this.btnSaveShowSettings.Size = new System.Drawing.Size(75, 23);
-            this.btnSaveShowSettings.TabIndex = 1;
+            this.btnSaveShowSettings.Size = new System.Drawing.Size(35, 22);
             this.btnSaveShowSettings.Text = "Save";
-            this.btnSaveShowSettings.UseVisualStyleBackColor = true;
             this.btnSaveShowSettings.Click += new System.EventHandler(this.btnSaveShowSettings_Click);
             // 
             // btnResetShowSettings
             // 
-            this.btnResetShowSettings.Location = new System.Drawing.Point(84, 3);
+            this.btnResetShowSettings.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnResetShowSettings.Image = ((System.Drawing.Image)(resources.GetObject("btnResetShowSettings.Image")));
+            this.btnResetShowSettings.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btnResetShowSettings.Name = "btnResetShowSettings";
-            this.btnResetShowSettings.Size = new System.Drawing.Size(75, 23);
-            this.btnResetShowSettings.TabIndex = 2;
+            this.btnResetShowSettings.Size = new System.Drawing.Size(39, 22);
             this.btnResetShowSettings.Text = "Reset";
-            this.btnResetShowSettings.UseVisualStyleBackColor = true;
             this.btnResetShowSettings.Click += new System.EventHandler(this.btnResetShowSettings_Click);
             // 
-            // groupBox1
+            // toolStripSeparator3
             // 
-            this.groupBox1.Controls.Add(this.label11);
-            this.groupBox1.Controls.Add(this.txtAltNames);
-            this.groupBox1.Controls.Add(this.label4);
-            this.groupBox1.Controls.Add(this.label9);
-            this.groupBox1.Controls.Add(this.txtShowFolderName);
-            this.groupBox1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.groupBox1.Location = new System.Drawing.Point(212, 271);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(704, 104);
-            this.groupBox1.TabIndex = 10;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Custom Names";
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 25);
+            // 
+            // btnUpdateSelected
+            // 
+            this.btnUpdateSelected.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnUpdateSelected.Image = ((System.Drawing.Image)(resources.GetObject("btnUpdateSelected.Image")));
+            this.btnUpdateSelected.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnUpdateSelected.Name = "btnUpdateSelected";
+            this.btnUpdateSelected.Size = new System.Drawing.Size(49, 22);
+            this.btnUpdateSelected.Text = "Update";
+            this.btnUpdateSelected.Click += new System.EventHandler(this.btnUpdateSelected_Click);
+            // 
+            // btnForceUpdateSelected
+            // 
+            this.btnForceUpdateSelected.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnForceUpdateSelected.Image = ((System.Drawing.Image)(resources.GetObject("btnForceUpdateSelected.Image")));
+            this.btnForceUpdateSelected.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnForceUpdateSelected.Name = "btnForceUpdateSelected";
+            this.btnForceUpdateSelected.Size = new System.Drawing.Size(81, 22);
+            this.btnForceUpdateSelected.Text = "Force Update";
+            this.btnForceUpdateSelected.Click += new System.EventHandler(this.btnForceUpdateSelected_Click);
+            // 
+            // toolStripSeparator4
+            // 
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(6, 25);
+            // 
+            // btnRemoveShow
+            // 
+            this.btnRemoveShow.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnRemoveShow.Image = ((System.Drawing.Image)(resources.GetObject("btnRemoveShow.Image")));
+            this.btnRemoveShow.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnRemoveShow.Name = "btnRemoveShow";
+            this.btnRemoveShow.Size = new System.Drawing.Size(86, 22);
+            this.btnRemoveShow.Text = "Remove Show";
+            this.btnRemoveShow.Click += new System.EventHandler(this.btnRemoveShow_Click);
+            // 
+            // toolStripSeparator5
+            // 
+            this.toolStripSeparator5.Name = "toolStripSeparator5";
+            this.toolStripSeparator5.Size = new System.Drawing.Size(6, 25);
+            // 
+            // grpShowUpdateOptions
+            // 
+            this.grpShowUpdateOptions.Controls.Add(this.chkDvdOrder);
+            this.grpShowUpdateOptions.Controls.Add(this.btnLockShow);
+            this.grpShowUpdateOptions.Dock = System.Windows.Forms.DockStyle.Top;
+            this.grpShowUpdateOptions.Location = new System.Drawing.Point(212, 397);
+            this.grpShowUpdateOptions.Name = "grpShowUpdateOptions";
+            this.grpShowUpdateOptions.Size = new System.Drawing.Size(704, 45);
+            this.grpShowUpdateOptions.TabIndex = 13;
+            this.grpShowUpdateOptions.TabStop = false;
+            this.grpShowUpdateOptions.Text = "Update Options";
+            // 
+            // chkDvdOrder
+            // 
+            this.chkDvdOrder.AutoSize = true;
+            this.chkDvdOrder.Dock = System.Windows.Forms.DockStyle.Left;
+            this.chkDvdOrder.Location = new System.Drawing.Point(103, 16);
+            this.chkDvdOrder.Name = "chkDvdOrder";
+            this.chkDvdOrder.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
+            this.chkDvdOrder.Size = new System.Drawing.Size(110, 26);
+            this.chkDvdOrder.TabIndex = 1;
+            this.chkDvdOrder.Text = "Use DVD Order";
+            this.chkDvdOrder.UseVisualStyleBackColor = true;
+            // 
+            // btnLockShow
+            // 
+            this.btnLockShow.Dock = System.Windows.Forms.DockStyle.Left;
+            this.btnLockShow.Location = new System.Drawing.Point(3, 16);
+            this.btnLockShow.Name = "btnLockShow";
+            this.btnLockShow.Size = new System.Drawing.Size(100, 26);
+            this.btnLockShow.TabIndex = 0;
+            this.btnLockShow.Text = "Show Locked";
+            this.btnLockShow.UseVisualStyleBackColor = true;
+            this.btnLockShow.Click += new System.EventHandler(this.btnLockShow_Click);
+            // 
+            // grpShowCustomNames
+            // 
+            this.grpShowCustomNames.Controls.Add(this.label11);
+            this.grpShowCustomNames.Controls.Add(this.txtAltNames);
+            this.grpShowCustomNames.Controls.Add(this.label4);
+            this.grpShowCustomNames.Controls.Add(this.label9);
+            this.grpShowCustomNames.Controls.Add(this.txtShowFolderName);
+            this.grpShowCustomNames.Dock = System.Windows.Forms.DockStyle.Top;
+            this.grpShowCustomNames.Location = new System.Drawing.Point(212, 293);
+            this.grpShowCustomNames.Name = "grpShowCustomNames";
+            this.grpShowCustomNames.Size = new System.Drawing.Size(704, 104);
+            this.grpShowCustomNames.TabIndex = 10;
+            this.grpShowCustomNames.TabStop = false;
+            this.grpShowCustomNames.Text = "Custom Names";
             // 
             // label11
             // 
@@ -406,18 +511,25 @@
             // 
             // grpShowCustomFormat
             // 
+            this.grpShowCustomFormat.Controls.Add(this.txtShowCustomFormat);
             this.grpShowCustomFormat.Controls.Add(this.txtShowExampleFileName);
             this.grpShowCustomFormat.Controls.Add(this.label10);
-            this.grpShowCustomFormat.Controls.Add(this.txtShowCustomFormat);
             this.grpShowCustomFormat.Controls.Add(this.label8);
             this.grpShowCustomFormat.Controls.Add(this.chkUseDefaultFormat);
             this.grpShowCustomFormat.Dock = System.Windows.Forms.DockStyle.Top;
-            this.grpShowCustomFormat.Location = new System.Drawing.Point(212, 178);
+            this.grpShowCustomFormat.Location = new System.Drawing.Point(212, 200);
             this.grpShowCustomFormat.Name = "grpShowCustomFormat";
             this.grpShowCustomFormat.Size = new System.Drawing.Size(704, 93);
             this.grpShowCustomFormat.TabIndex = 8;
             this.grpShowCustomFormat.TabStop = false;
             this.grpShowCustomFormat.Text = "Custom Format";
+            // 
+            // txtShowCustomFormat
+            // 
+            this.txtShowCustomFormat.Location = new System.Drawing.Point(109, 36);
+            this.txtShowCustomFormat.Name = "txtShowCustomFormat";
+            this.txtShowCustomFormat.Size = new System.Drawing.Size(589, 20);
+            this.txtShowCustomFormat.TabIndex = 2;
             // 
             // txtShowExampleFileName
             // 
@@ -435,13 +547,6 @@
             this.label10.Size = new System.Drawing.Size(97, 13);
             this.label10.TabIndex = 5;
             this.label10.Text = "Example File Name";
-            // 
-            // txtShowCustomFormat
-            // 
-            this.txtShowCustomFormat.Location = new System.Drawing.Point(109, 36);
-            this.txtShowCustomFormat.Name = "txtShowCustomFormat";
-            this.txtShowCustomFormat.Size = new System.Drawing.Size(589, 20);
-            this.txtShowCustomFormat.TabIndex = 2;
             // 
             // label8
             // 
@@ -463,85 +568,11 @@
             this.chkUseDefaultFormat.UseVisualStyleBackColor = true;
             this.chkUseDefaultFormat.CheckedChanged += new System.EventHandler(this.chkUseDefaultFormat_CheckedChanged);
             // 
-            // flowLayoutPanel1
-            // 
-            this.flowLayoutPanel1.Controls.Add(this.btnUpdateSelected);
-            this.flowLayoutPanel1.Controls.Add(this.btnUpdateAll);
-            this.flowLayoutPanel1.Controls.Add(this.btnForceUpdateAll);
-            this.flowLayoutPanel1.Controls.Add(this.btnAddShow);
-            this.flowLayoutPanel1.Controls.Add(this.btnRemoveShow);
-            this.flowLayoutPanel1.Controls.Add(this.btnSearchShows);
-            this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(212, 470);
-            this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(704, 31);
-            this.flowLayoutPanel1.TabIndex = 6;
-            // 
-            // btnUpdateSelected
-            // 
-            this.btnUpdateSelected.Location = new System.Drawing.Point(3, 3);
-            this.btnUpdateSelected.Name = "btnUpdateSelected";
-            this.btnUpdateSelected.Size = new System.Drawing.Size(153, 23);
-            this.btnUpdateSelected.TabIndex = 5;
-            this.btnUpdateSelected.Text = "Update Selected Show";
-            this.btnUpdateSelected.UseVisualStyleBackColor = true;
-            this.btnUpdateSelected.Click += new System.EventHandler(this.btnUpdateSelected_Click);
-            // 
-            // btnUpdateAll
-            // 
-            this.btnUpdateAll.Location = new System.Drawing.Point(162, 3);
-            this.btnUpdateAll.Name = "btnUpdateAll";
-            this.btnUpdateAll.Size = new System.Drawing.Size(75, 23);
-            this.btnUpdateAll.TabIndex = 6;
-            this.btnUpdateAll.Text = "Update All";
-            this.btnUpdateAll.UseVisualStyleBackColor = true;
-            this.btnUpdateAll.Click += new System.EventHandler(this.btnUpdateAll_Click);
-            // 
-            // btnForceUpdateAll
-            // 
-            this.btnForceUpdateAll.Location = new System.Drawing.Point(243, 3);
-            this.btnForceUpdateAll.Name = "btnForceUpdateAll";
-            this.btnForceUpdateAll.Size = new System.Drawing.Size(107, 23);
-            this.btnForceUpdateAll.TabIndex = 10;
-            this.btnForceUpdateAll.Text = "Force Update All";
-            this.btnForceUpdateAll.UseVisualStyleBackColor = true;
-            this.btnForceUpdateAll.Click += new System.EventHandler(this.btnForceUpdateAll_Click);
-            // 
-            // btnAddShow
-            // 
-            this.btnAddShow.Location = new System.Drawing.Point(356, 3);
-            this.btnAddShow.Name = "btnAddShow";
-            this.btnAddShow.Size = new System.Drawing.Size(75, 23);
-            this.btnAddShow.TabIndex = 7;
-            this.btnAddShow.Text = "Add Show";
-            this.btnAddShow.UseVisualStyleBackColor = true;
-            this.btnAddShow.Click += new System.EventHandler(this.btnAddShow_Click);
-            // 
-            // btnRemoveShow
-            // 
-            this.btnRemoveShow.Location = new System.Drawing.Point(437, 3);
-            this.btnRemoveShow.Name = "btnRemoveShow";
-            this.btnRemoveShow.Size = new System.Drawing.Size(90, 23);
-            this.btnRemoveShow.TabIndex = 8;
-            this.btnRemoveShow.Text = "Remove Show";
-            this.btnRemoveShow.UseVisualStyleBackColor = true;
-            this.btnRemoveShow.Click += new System.EventHandler(this.btnRemoveShow_Click);
-            // 
-            // btnSearchShows
-            // 
-            this.btnSearchShows.Location = new System.Drawing.Point(533, 3);
-            this.btnSearchShows.Name = "btnSearchShows";
-            this.btnSearchShows.Size = new System.Drawing.Size(104, 23);
-            this.btnSearchShows.TabIndex = 9;
-            this.btnSearchShows.Text = "Search for Shows";
-            this.btnSearchShows.UseVisualStyleBackColor = true;
-            this.btnSearchShows.Click += new System.EventHandler(this.btnSearchShows_Click);
-            // 
             // lblLastUpdate
             // 
             this.lblLastUpdate.AutoSize = true;
             this.lblLastUpdate.Dock = System.Windows.Forms.DockStyle.Top;
-            this.lblLastUpdate.Location = new System.Drawing.Point(212, 165);
+            this.lblLastUpdate.Location = new System.Drawing.Point(212, 187);
             this.lblLastUpdate.Name = "lblLastUpdate";
             this.lblLastUpdate.Size = new System.Drawing.Size(68, 13);
             this.lblLastUpdate.TabIndex = 3;
@@ -551,7 +582,7 @@
             // 
             this.lblTvdbId.AutoSize = true;
             this.lblTvdbId.Dock = System.Windows.Forms.DockStyle.Top;
-            this.lblTvdbId.Location = new System.Drawing.Point(212, 152);
+            this.lblTvdbId.Location = new System.Drawing.Point(212, 174);
             this.lblTvdbId.Name = "lblTvdbId";
             this.lblTvdbId.Size = new System.Drawing.Size(56, 13);
             this.lblTvdbId.TabIndex = 2;
@@ -560,9 +591,9 @@
             // picShowPic
             // 
             this.picShowPic.Dock = System.Windows.Forms.DockStyle.Top;
-            this.picShowPic.Location = new System.Drawing.Point(212, 23);
+            this.picShowPic.Location = new System.Drawing.Point(212, 48);
             this.picShowPic.Name = "picShowPic";
-            this.picShowPic.Size = new System.Drawing.Size(704, 129);
+            this.picShowPic.Size = new System.Drawing.Size(704, 126);
             this.picShowPic.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.picShowPic.TabIndex = 7;
             this.picShowPic.TabStop = false;
@@ -572,7 +603,7 @@
             this.lblSelectedShow.AutoSize = true;
             this.lblSelectedShow.Dock = System.Windows.Forms.DockStyle.Top;
             this.lblSelectedShow.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblSelectedShow.Location = new System.Drawing.Point(212, 3);
+            this.lblSelectedShow.Location = new System.Drawing.Point(212, 28);
             this.lblSelectedShow.Name = "lblSelectedShow";
             this.lblSelectedShow.Size = new System.Drawing.Size(150, 20);
             this.lblSelectedShow.TabIndex = 1;
@@ -582,11 +613,70 @@
             // 
             this.lstTVShows.Dock = System.Windows.Forms.DockStyle.Left;
             this.lstTVShows.FormattingEnabled = true;
-            this.lstTVShows.Location = new System.Drawing.Point(3, 3);
+            this.lstTVShows.Location = new System.Drawing.Point(3, 28);
             this.lstTVShows.Name = "lstTVShows";
-            this.lstTVShows.Size = new System.Drawing.Size(209, 498);
+            this.lstTVShows.Size = new System.Drawing.Size(209, 473);
             this.lstTVShows.TabIndex = 0;
             this.lstTVShows.SelectedIndexChanged += new System.EventHandler(this.lstTVShows_SelectedIndexChanged);
+            // 
+            // toolStrip2
+            // 
+            this.toolStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.btnUpdateAll,
+            this.btnForceUpdateAll,
+            this.toolStripSeparator6,
+            this.btnAddShow,
+            this.btnSearchShow});
+            this.toolStrip2.Location = new System.Drawing.Point(3, 3);
+            this.toolStrip2.Name = "toolStrip2";
+            this.toolStrip2.Size = new System.Drawing.Size(913, 25);
+            this.toolStrip2.TabIndex = 11;
+            this.toolStrip2.Text = "toolStrip2";
+            // 
+            // btnUpdateAll
+            // 
+            this.btnUpdateAll.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnUpdateAll.Image = ((System.Drawing.Image)(resources.GetObject("btnUpdateAll.Image")));
+            this.btnUpdateAll.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnUpdateAll.Name = "btnUpdateAll";
+            this.btnUpdateAll.Size = new System.Drawing.Size(66, 22);
+            this.btnUpdateAll.Text = "Update All";
+            this.btnUpdateAll.Click += new System.EventHandler(this.btnUpdateAll_Click);
+            // 
+            // btnForceUpdateAll
+            // 
+            this.btnForceUpdateAll.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnForceUpdateAll.Image = ((System.Drawing.Image)(resources.GetObject("btnForceUpdateAll.Image")));
+            this.btnForceUpdateAll.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnForceUpdateAll.Name = "btnForceUpdateAll";
+            this.btnForceUpdateAll.Size = new System.Drawing.Size(98, 22);
+            this.btnForceUpdateAll.Text = "Force Update All";
+            this.btnForceUpdateAll.Click += new System.EventHandler(this.btnForceUpdateAll_Click);
+            // 
+            // toolStripSeparator6
+            // 
+            this.toolStripSeparator6.Name = "toolStripSeparator6";
+            this.toolStripSeparator6.Size = new System.Drawing.Size(6, 25);
+            // 
+            // btnAddShow
+            // 
+            this.btnAddShow.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnAddShow.Image = ((System.Drawing.Image)(resources.GetObject("btnAddShow.Image")));
+            this.btnAddShow.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnAddShow.Name = "btnAddShow";
+            this.btnAddShow.Size = new System.Drawing.Size(65, 22);
+            this.btnAddShow.Text = "Add Show";
+            this.btnAddShow.Click += new System.EventHandler(this.btnAddShow_Click);
+            // 
+            // btnSearchShow
+            // 
+            this.btnSearchShow.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnSearchShow.Image = ((System.Drawing.Image)(resources.GetObject("btnSearchShow.Image")));
+            this.btnSearchShow.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnSearchShow.Name = "btnSearchShow";
+            this.btnSearchShow.Size = new System.Drawing.Size(101, 22);
+            this.btnSearchShow.Text = "Search for Shows";
+            this.btnSearchShow.Click += new System.EventHandler(this.btnSearchShows_Click);
             // 
             // tpgSettings
             // 
@@ -846,18 +936,22 @@
             this.Load += new System.EventHandler(this.frmMain_Load);
             this.tabControl1.ResumeLayout(false);
             this.tpgInputFolder.ResumeLayout(false);
-            this.splitContainer1.Panel1.ResumeLayout(false);
-            this.splitContainer1.Panel2.ResumeLayout(false);
-            this.splitContainer1.ResumeLayout(false);
+            this.tpgInputFolder.PerformLayout();
+            this.toolStrip1.ResumeLayout(false);
+            this.toolStrip1.PerformLayout();
             this.tpgTVShows.ResumeLayout(false);
             this.tpgTVShows.PerformLayout();
-            this.flShowControls.ResumeLayout(false);
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
+            this.tsShowControls.ResumeLayout(false);
+            this.tsShowControls.PerformLayout();
+            this.grpShowUpdateOptions.ResumeLayout(false);
+            this.grpShowUpdateOptions.PerformLayout();
+            this.grpShowCustomNames.ResumeLayout(false);
+            this.grpShowCustomNames.PerformLayout();
             this.grpShowCustomFormat.ResumeLayout(false);
             this.grpShowCustomFormat.PerformLayout();
-            this.flowLayoutPanel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.picShowPic)).EndInit();
+            this.toolStrip2.ResumeLayout(false);
+            this.toolStrip2.PerformLayout();
             this.tpgSettings.ResumeLayout(false);
             this.flowLayoutPanel2.ResumeLayout(false);
             this.grpShowNames.ResumeLayout(false);
@@ -874,27 +968,10 @@
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tpgInputFolder;
         private System.Windows.Forms.TabPage tpgTVShows;
-        private System.Windows.Forms.ListView lstInputFolder;
         private System.Windows.Forms.Label lblSelectedShow;
         private System.Windows.Forms.ListBox lstTVShows;
-        private System.Windows.Forms.SplitContainer splitContainer1;
-        private System.Windows.Forms.Button btnRenameMove;
-        private System.Windows.Forms.Button btnRenameOnly;
-        private System.Windows.Forms.Button btnDeselectAll;
-        private System.Windows.Forms.Button btnSelectAll;
-        private System.Windows.Forms.ColumnHeader columnHeader1;
-        private System.Windows.Forms.ColumnHeader columnHeader2;
-        private System.Windows.Forms.ColumnHeader columnHeader3;
-        private System.Windows.Forms.ColumnHeader columnHeader4;
-        private System.Windows.Forms.ColumnHeader columnHeader5;
         private System.Windows.Forms.Label lblLastUpdate;
         private System.Windows.Forms.Label lblTvdbId;
-        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
-        private System.Windows.Forms.Button btnUpdateSelected;
-        private System.Windows.Forms.Button btnUpdateAll;
-        private System.Windows.Forms.Button btnAddShow;
-        private System.Windows.Forms.Button btnRemoveShow;
-        private System.Windows.Forms.Button btnSearchShows;
         private System.Windows.Forms.TabPage tpgSettings;
         private System.Windows.Forms.GroupBox grpShowNames;
         private System.Windows.Forms.GroupBox grpDirectories;
@@ -925,23 +1002,52 @@
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.TextBox txtShowFolderName;
         private System.Windows.Forms.Label label9;
-        private System.Windows.Forms.FlowLayoutPanel flShowControls;
-        private System.Windows.Forms.Button btnSaveShowSettings;
-        private System.Windows.Forms.Button btnResetShowSettings;
-        private System.Windows.Forms.Button btnRefresh;
-        private System.Windows.Forms.ColumnHeader columnHeader6;
-        private System.Windows.Forms.Button btnSetShow;
-        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.GroupBox grpShowCustomNames;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.TextBox txtAltNames;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Button btnForceUpdateAll;
         private System.Windows.Forms.Button btnRevert;
         private System.Windows.Forms.TabPage tpgLog;
         private System.Windows.Forms.ListBox lstLog;
-        private System.Windows.Forms.ComboBox cboFolderFilter;
         private System.Windows.Forms.CheckBox chkDeleteEmpty;
-        private System.Windows.Forms.Button btnRenameCopy;
+        private System.Windows.Forms.ListView lstInputFolder;
+        private System.Windows.Forms.ColumnHeader columnHeader1;
+        private System.Windows.Forms.ColumnHeader columnHeader2;
+        private System.Windows.Forms.ColumnHeader columnHeader3;
+        private System.Windows.Forms.ColumnHeader columnHeader4;
+        private System.Windows.Forms.ColumnHeader columnHeader5;
+        private System.Windows.Forms.ColumnHeader columnHeader6;
+        private System.Windows.Forms.ToolStrip toolStrip1;
+        private System.Windows.Forms.ToolStripSplitButton btnSort;
+        private System.Windows.Forms.ToolStripMenuItem btnRenameOnly;
+        private System.Windows.Forms.ToolStripMenuItem btnRenameMove;
+        private System.Windows.Forms.ToolStripMenuItem btnRenameCopy;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripButton btnSetShow;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripButton btnSelectAll;
+        private System.Windows.Forms.ToolStripButton btnDeselectAll;
+        private System.Windows.Forms.ToolStripButton btnRefresh;
+        private System.Windows.Forms.ToolStripComboBox cboFolderFilter;
+        private System.Windows.Forms.ToolStrip tsShowControls;
+        private System.Windows.Forms.ToolStripButton btnSaveShowSettings;
+        private System.Windows.Forms.ToolStripButton btnResetShowSettings;
+        private System.Windows.Forms.ToolStrip toolStrip2;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.ToolStripButton btnUpdateSelected;
+        private System.Windows.Forms.ToolStripButton btnForceUpdateSelected;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
+        private System.Windows.Forms.ToolStripButton btnRemoveShow;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
+        private System.Windows.Forms.ToolStripButton btnUpdateAll;
+        private System.Windows.Forms.ToolStripButton btnForceUpdateAll;
+        private System.Windows.Forms.ToolStripButton btnAddShow;
+        private System.Windows.Forms.ToolStripButton btnSearchShow;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
+        private System.Windows.Forms.GroupBox grpShowUpdateOptions;
+        private System.Windows.Forms.CheckBox chkDvdOrder;
+        private System.Windows.Forms.Button btnLockShow;
     }
 }
 
