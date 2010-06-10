@@ -220,8 +220,8 @@ namespace TVSorter
                         dvdE = episode.ChildNodes[10].InnerText;
                         dvdS = episode.ChildNodes[18].InnerText;
                     }
-                    episode_num = int.Parse(dvdE);
-                    season_num = int.Parse(dvdS);
+                    episode_num = (int)float.Parse(dvdE);
+                    season_num = (int)float.Parse(dvdS);
                 }
                 else
                 {
