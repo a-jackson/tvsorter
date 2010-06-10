@@ -5,6 +5,7 @@ using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using System.Text;
 
 namespace TVSorter
 {
@@ -179,7 +180,9 @@ namespace TVSorter
             }
             //Get all the episodes and add to the database
             XmlNodeList episodes = showDoc.GetElementsByTagName("Episode");
-            string query = "";
+            StringBuilder query = new StringBuilder();
+            int count = 0;
+            int eps = 0;
             foreach (XmlNode episode in episodes)
             {
                 //Get each piece of data from the XML
@@ -204,19 +207,28 @@ namespace TVSorter
                     first_air = 0;
                 }
                 //Build the query
-                query += "Insert Into Episodes (show_id, tvdb_id, episode_num, season_num," +
+                query.Append("Insert Into Episodes (show_id, tvdb_id, episode_num, season_num," +
                     "first_air, episode_name) Values (" +
                     show.DatabaseId + ", '" +
                     tvdb_id + "', " +
                     episode_num + ", " +
                     season_num + ", " +
                     first_air + ", \"" +
-                    episode_name.Replace("\"", "\"\"") + "\");";  
-                //TODO - with lots of episodes, the query could get too long, check for that.
-                //works fine with The Daily Show at over 1600 episodes though so no immediate issue
+                    episode_name.Replace("\"", "\"\"") + "\");");
+                count++;
+                //Only run 1000 eps at a time
+                if (count == 1000)
+                {
+                    eps += _database.ExecuteQuery("Begin;"+query.ToString()+"Commit;");
+                    count = 0;
+                    query.Remove(0, query.Length);
+                }
             }
-            //Execute the query
-            int eps = _database.ExecuteQuery(query);
+            if (query.Length > 0)
+            {
+                //Execute the query
+                eps += _database.ExecuteQuery("Begin;" + query.ToString() + "Commit;");
+            }
             //Refresh the update time
             string showquery = "Update Shows Set update_time = " + ServerTime +
                 ", banner = '" + show.Banner + "' Where id = " +
