@@ -172,7 +172,7 @@ namespace TVSorter
                     TVShow selected = results.GetSelected();
                     if (selected == null)
                     {
-                        return; 
+                        continue; 
                     }
                     show = selected;
                 }
