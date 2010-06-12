@@ -311,11 +311,11 @@ namespace TVSorter
                     {
                         RecuriveDelete(ep.FileInfo.Directory);
                     }
-                    Log.Add("Move complete");
+                    Log.Add(action.ToString() + " complete");
                 }
                 catch (Exception e)
                 {
-                    Log.Add("Failed to move " + ep.FileInfo.FullName + " to " +
+                    Log.Add("Failed to " + action.ToString() + " " + ep.FileInfo.FullName + " to " +
                         newName + " " + e.Message);
                 }
                 finally

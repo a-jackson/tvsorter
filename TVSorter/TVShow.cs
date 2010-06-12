@@ -60,31 +60,28 @@ namespace TVSorter
         public TVShow(string showName)
         {
             Database database = new Database();
-            Dictionary<string, object> results;
+            List<Dictionary<string, object>> results;
             //See if the show is in the database. Check the name against the show name, folder name 
             //and all alt names
-            if ((long)database.ExecuteScalar("Select Count(*) From Shows Where name Like \"" + showName 
-                + "\" Or folder_name Like \""+showName
-                + "\" Or Upper(\""+showName+"\") In (Select Trim(Upper(alt_name)) From AltNames"
-                + " Where AltNames.show_id = Shows.id);") > 0)
-            {
-                //Get the first show that matches
-                results =
-                    database.ExecuteResults("Select * From Shows Where name Like \"" + showName
+            results = database.ExecuteResults("Select * From Shows Where name Like \"" + showName
                 + "\" Or folder_name Like \"" + showName
                 + "\" Or Upper(\"" + showName + "\") In (Select Trim(Upper(alt_name)) From AltNames"
-                + " Where AltNames.show_id = Shows.id);")[0];
+                + " Where AltNames.show_id = Shows.id);");
+            if (results.Count > 0)
+            {
+                //Get the first show that matches
+                Dictionary<string, object> result = results[0];
                 //Set the values using the results in the database
-                _databaseId = (long)results["id"];
-                _tvdbid = (string)results["tvdb_id"];
-                _name = (string)results["name"];
-                _updateTime = (long)results["update_time"];
-                _useDefaultFormat = ((long)results["use_default_format"] == 1 ? true : false);
-                _customFormat = (string)results["custom_format"];
-                _folderName = (string)results["folder_name"];
-                _banner = (string)results["banner"];
-                _locked = ((long)results["show_locked"] == 1 ? true : false);
-                _useDvdOrder = ((long)results["use_dvd_order"] == 1 ? true : false);
+                _databaseId = (long)result["id"];
+                _tvdbid = (string)result["tvdb_id"];
+                _name = (string)result["name"];
+                _updateTime = (long)result["update_time"];
+                _useDefaultFormat = ((long)result["use_default_format"] == 1 ? true : false);
+                _customFormat = (string)result["custom_format"];
+                _folderName = (string)result["folder_name"];
+                _banner = (string)result["banner"];
+                _locked = ((long)result["show_locked"] == 1 ? true : false);
+                _useDvdOrder = ((long)result["use_dvd_order"] == 1 ? true : false);
                 //Get the altnames for this show
                 List<Dictionary<string, object>> altName = database.ExecuteResults
                     ("Select * From AltNames Where show_id = "
@@ -99,6 +96,58 @@ namespace TVSorter
             {
                 _name = showName;
                 _databaseId = -1;
+            }
+        }
+
+        /// <summary>
+        /// Saves the show to the database, if it exists it updates, else inserts
+        /// </summary>
+        public void SaveToDatabase()
+        {
+            Database database = new Database();
+            if (DatabaseId != -1)
+            {
+                string query = "Update Shows Set " +
+                "use_default_format = " + (UseDefaultFormat ? 1 : 0) +
+                ", custom_format = \"" + CustomFormat.Replace("\"", "\"\"") +
+                "\", folder_name = \"" + FolderName.Replace("\"", "\"\"") +
+                "\", show_locked = " + (Locked ? 1 : 0) +
+                ", use_dvd_order = " + (UseDvdOrder ? 1 : 0) +
+                ", update_time = " + UpdateTime +
+                ", banner = '" + Banner + "'" +
+                " Where id = " + DatabaseId + ";";
+                database.ExecuteQuery(query);
+                //Process alternate names - delete existing ones and add everything again
+                database.ExecuteQuery("Delete From AltNames Where show_id = " + DatabaseId + ";");
+                string[] altNames = AltNames.Split(',');
+                if (altNames.Length > 0)
+                {
+                    string altNameQuery = "";
+                    foreach (string altName in altNames)
+                    {
+                        if (altName.Length > 0)
+                        {
+                            altNameQuery += "Insert Into AltNames (show_id, alt_name) Values ("
+                                + DatabaseId + ", \""
+                                + altName.Replace("\"", "\"\"") + "\");";
+                        }
+                    }
+                    database.ExecuteQuery(altNameQuery);
+                }
+            }
+            else //New show
+            {
+                string query = "Insert Into Shows " +
+                       "(tvdb_id, name, update_time, use_default_format, custom_format, folder_name, banner) " +
+                       "Values (\"" + 
+                       TvdbId + "\", \"" + 
+                       Name.Replace("\"", "\"\"") + "\", " +
+                       UpdateTime + ", " +
+                       (UseDefaultFormat ? 1 : 0) + ", \"" +
+                       CustomFormat + "\", \"" + 
+                       FolderName + "\", \"" +
+                       Banner + "\");";
+                database.ExecuteQuery(query);
             }
         }
 
@@ -158,6 +207,43 @@ namespace TVSorter
         {
             get { return _useDvdOrder; }
             set { _useDvdOrder = value; }
+        }
+
+        /// <summary>
+        /// Returns a list of all the shows in the database
+        /// </summary>
+        /// <returns></returns>
+        public static List<TVShow> GetAllShows()
+        {
+            Database database = new Database();
+            //Get all the tv shows
+            List<Dictionary<string, object>> shows =
+                database.ExecuteResults("SELECT * FROM shows ORDER BY name");
+            List<TVShow> showList = new List<TVShow>();
+            foreach (Dictionary<string, object> row in shows)
+            {
+                List<Dictionary<string, object>> altName =
+                    database.ExecuteResults("Select * From AltNames Where show_id = "
+                    + (long)row["id"] + ";");
+                string altNames = "";
+                foreach (Dictionary<string, object> altNameRow in altName)
+                    altNames += (string)altNameRow["alt_name"] + ",";
+                if (altNames.EndsWith(","))
+                    altNames = altNames.Substring(0, altNames.Length - 1);
+                //Create the TVShow object with the data in the database
+                TVShow tvshow = new TVShow((long)row["id"],
+                    (string)row["tvdb_id"], (string)row["name"],
+                    (long)row["update_time"],
+                    ((long)row["use_default_format"] == 1 ? true : false),
+                    (string)row["custom_format"],
+                    (string)row["folder_name"],
+                    (string)row["banner"],
+                    altNames,
+                    ((long)row["show_locked"] == 1 ? true : false),
+                    ((long)row["use_dvd_order"] == 1 ? true : false));
+                showList.Add(tvshow);
+            }
+            return showList;
         }
     }
 }

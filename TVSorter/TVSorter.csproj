@@ -53,6 +53,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommandLine.cs" />
     <Compile Include="Database.cs" />
     <Compile Include="Episode.cs" />
     <Compile Include="FileHandler.cs" />
@@ -61,6 +62,12 @@
     </Compile>
     <Compile Include="frmAddShow.Designer.cs">
       <DependentUpon>frmAddShow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmCmdLog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmCmdLog.Designer.cs">
+      <DependentUpon>frmCmdLog.cs</DependentUpon>
     </Compile>
     <Compile Include="frmProgress.cs">
       <SubType>Form</SubType>
@@ -92,6 +99,9 @@
     <EmbeddedResource Include="frmAddShow.resx">
       <DependentUpon>frmAddShow.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmCmdLog.resx">
+      <DependentUpon>frmCmdLog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmProgress.resx">
       <DependentUpon>frmProgress.cs</DependentUpon>

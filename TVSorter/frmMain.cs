@@ -160,30 +160,24 @@ namespace TVSorter
             foreach (KeyValuePair<string, List<TVShow>> kvPair in shows)
             {
                 //If there is just one result, use that
+                TVShow show=null;
                 if (kvPair.Value.Count == 1)
                 {
-                    _database.ExecuteQuery("Insert Into Shows " +
-                        "(tvdb_id, name, update_time, use_default_format, custom_format, folder_name, banner) " +
-                        "Values ('" + kvPair.Value[0].TvdbId + "', \"" + kvPair.Value[0].Name.Replace("\"","\"\"") + "\", " +
-                         kvPair.Value[0].UpdateTime + ", " 
-                         + (kvPair.Value[0].UseDefaultFormat ? 1 : 0) + ", '" +
-                          kvPair.Value[0].CustomFormat + "', '"+kvPair.Key+"', '"+kvPair.Value[0].Banner+"');");
+                    show = kvPair.Value[0];
                 }
                 else //Else show the possibilities to the user
                 {
                     frmShowResults results = new frmShowResults(kvPair.Value, kvPair.Key);
                     results.ShowDialog();
                     TVShow selected = results.GetSelected();
-                    if (selected != null)
+                    if (selected == null)
                     {
-                        _database.ExecuteQuery("Insert Into Shows " +
-                            "(tvdb_id, name, update_time, use_default_format, custom_format, folder_name,banner) " +
-                            "Values ('" + selected.TvdbId + "', \"" + kvPair.Value[0].Name.Replace("\"","\"\"") + "\", " +
-                             selected.UpdateTime + ", "
-                             + (selected.UseDefaultFormat ? 1 : 0) + ", '" +
-                              selected.CustomFormat + "', '" + kvPair.Key + "','"+selected.Banner+"');");
+                        return; 
                     }
+                    show = selected;
                 }
+                show.FolderName = kvPair.Key;
+                show.SaveToDatabase();
             }
             UpdateTvShowList();
         }
@@ -194,31 +188,8 @@ namespace TVSorter
         private void UpdateTvShowList()
         {
             lstTVShows.Items.Clear();
-            List<Dictionary<string, object>> shows = _database.ExecuteResults("SELECT * FROM shows ORDER BY name");
-            if (shows.Count > 0)
-            {
-                foreach (Dictionary<string, object> row in shows)
-                {
-                    List<Dictionary<string, object>> altName = _database.ExecuteResults("Select * From AltNames Where show_id = " 
-                        + (long)row["id"] + ";");
-                    string altNames = "";
-                    foreach (Dictionary<string, object> altNameRow in altName)
-                        altNames += (string)altNameRow["alt_name"] + ",";
-                    if (altNames.EndsWith(","))
-                        altNames = altNames.Substring(0, altNames.Length - 1);
-                    TVShow show = new TVShow((long)row["id"],
-                        (string)row["tvdb_id"], (string)row["name"],
-                        (long)row["update_time"],
-                        ((long)row["use_default_format"]==1?true:false),
-                        (string)row["custom_format"],
-                        (string)row["folder_name"],
-                        (string)row["banner"],
-                        altNames,
-                        ((long)row["show_locked"] == 1 ? true : false),
-                        ((long)row["use_dvd_order"] == 1 ? true : false));
-                    lstTVShows.Items.Add(show);
-                }
-            }
+            List<TVShow> shows = TVShow.GetAllShows();
+            lstTVShows.Items.AddRange(shows.ToArray());
         }
 
         /// <summary>
@@ -278,31 +249,7 @@ namespace TVSorter
             }
             selectedShow.Locked = (btnLockShow.BackColor.Equals(Color.Red));
             selectedShow.UseDvdOrder = chkDvdOrder.Checked;
-            string query = "Update Shows Set " +
-                "use_default_format = "+(selectedShow.UseDefaultFormat?1:0)+
-            ", custom_format = \""+selectedShow.CustomFormat.Replace("\"","\"\"") +
-            "\", folder_name = \"" + selectedShow.FolderName.Replace("\"", "\"\"") + 
-            "\", show_locked = "+(selectedShow.Locked?1:0)+
-            ", use_dvd_order = " + (selectedShow.UseDvdOrder?1:0) + 
-            " Where id = "+selectedShow.DatabaseId+";";
-            _database.ExecuteQuery(query);
-            //Process alternate names - delete existing ones and add everything again
-            _database.ExecuteQuery("Delete From AltNames Where show_id = " + selectedShow.DatabaseId + ";");
-            string[] altNames = selectedShow.AltNames.Split(',');
-            if (altNames.Length > 0)
-            {
-                string altNameQuery = "";
-                foreach (string altName in altNames)
-                {
-                    if (altName.Length > 0)
-                    {
-                        altNameQuery += "Insert Into AltNames (show_id, alt_name) Values ("
-                            + selectedShow.DatabaseId + ", \""
-                            + altName.Replace("\"", "\"\"") + "\");";
-                    }
-                }
-                _database.ExecuteQuery(altNameQuery);
-            }
+            selectedShow.SaveToDatabase();
         }
 
         /// <summary>
@@ -746,13 +693,7 @@ namespace TVSorter
             if (addShow.ShowDialog() == DialogResult.OK)
             {
                 TVShow show = addShow.newShow;
-                _database.ExecuteQuery("Insert Into Shows " +
-                       "(tvdb_id, name, update_time, use_default_format, custom_format, folder_name, banner) " +
-                       "Values (\"" + show.TvdbId + "\", \"" + show.Name.Replace("\"","\"\"") + "\", " +
-                       show.UpdateTime + ", "
-                        + (show.UseDefaultFormat ? 1 : 0) + ", \"" +
-                         show.CustomFormat + "\", \"" + show.FolderName + "\", \""
-                         + show.Banner + "\");");
+                show.SaveToDatabase();
                 //Create a new TV show so that it gets the newly added show from the database
                 //and therefore changes can be made to it - Issue ID 1.
                 lstTVShows.Items.Add(new TVShow(show.Name));

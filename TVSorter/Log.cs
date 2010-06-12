@@ -10,15 +10,18 @@ namespace TVSorter
     {
         private static ListBox _listBox;
         private static bool logToGui;
+        private static frmCmdLog _cmdLog;
+
         public static void Init(ListBox listBox)
         {
             _listBox = listBox;
             logToGui = true;
         }
 
-        public static void Init()
+        public static void Init(frmCmdLog cmdLog)
         {
             logToGui = false;
+            _cmdLog = cmdLog;
         }
 
 
@@ -32,7 +35,8 @@ namespace TVSorter
             }
             else
             {
-                Console.WriteLine(entry);
+                MethodInvoker log = new MethodInvoker(delegate() { _cmdLog.Append(entry); });
+                _cmdLog.Invoke(log);
             }
         }
     }

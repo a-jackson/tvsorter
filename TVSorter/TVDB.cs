@@ -162,10 +162,8 @@ namespace TVSorter
                 //If the show doesn't need updating, refresh its update time and return
                 if (!shouldUpdate)
                 {
-                    string show_query = "Update Shows Set update_time = " + ServerTime + " Where id = " +
-                        show.DatabaseId + ";";
-                    _database.ExecuteQuery(show_query);
                     show.UpdateTime = ServerTime;
+                    show.SaveToDatabase();
                     Log.Add("No updates for " + show.Name + " refreshed update time");
                     return;
                 }
@@ -186,7 +184,6 @@ namespace TVSorter
             //Get all the episodes and add to the database
             XmlNodeList episodes = showDoc.GetElementsByTagName("Episode");
             StringBuilder query = new StringBuilder();
-            int count = 0;
             int eps = 0;
             foreach (XmlNode episode in episodes)
             {
@@ -237,26 +234,15 @@ namespace TVSorter
                     season_num + ", " +
                     first_air + ", \"" +
                     episode_name.Replace("\"", "\"\"") + "\");");
-                count++;
-                //Only run 1000 eps at a time
-                if (count == 1000)
-                {
-                    eps += _database.ExecuteQuery("Begin;"+query.ToString()+"Commit;");
-                    count = 0;
-                    query.Remove(0, query.Length);
-                }
             }
             if (query.Length > 0)
             {
                 //Execute the query
-                eps += _database.ExecuteQuery("Begin;" + query.ToString() + "Commit;");
+                eps = _database.ExecuteQuery("Begin;" + query.ToString() + "Commit;");
             }
             //Refresh the update time
-            string showquery = "Update Shows Set update_time = " + ServerTime +
-                ", banner = '" + show.Banner + "' Where id = " +
-                show.DatabaseId + ";";
             show.UpdateTime = ServerTime;
-            _database.ExecuteQuery(showquery);
+            show.SaveToDatabase();
             Log.Add("Updated " + show.Name + " has " + eps + " episodes");
         }
     }

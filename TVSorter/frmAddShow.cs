@@ -12,6 +12,7 @@ namespace TVSorter
     public partial class frmAddShow : Form
     {
         public TVShow newShow;
+        private List<TVShow> results;
 
         public frmAddShow()
         {
@@ -22,25 +23,30 @@ namespace TVSorter
         {
             try
             {
-                int showid = int.Parse(txtTvdbId.Text);
-                newShow = TVDB.GetShow(showid);
-                if (newShow == null)
-                    return;
-                txtShowName.Text = newShow.Name;
-                txtFolderName.Text = newShow.FolderName;
+                string showName = txtName.Text;
+                results = TVDB.SearchShow(showName);
+                foreach (TVShow show in results)
+                    lstResults.Items.Add(
+                        new ListViewItem(new string[] { show.Name, show.TvdbId.ToString() }));
             }
             catch { }
         }
 
         private void btnAdd_Click(object sender, EventArgs e)
         {
+            if (lstResults.SelectedItems.Count == 0)
+            {
+                MessageBox.Show("You must select a show");
+                return;
+            }
+            newShow = results[lstResults.SelectedIndices[0]];
             if (newShow == null)
             {
                 MessageBox.Show("No new show found");
             }
             else
             {
-                newShow.FolderName = txtFolderName.Text;
+                newShow.FolderName = txtName.Text;
                 DialogResult = DialogResult.OK;
                 this.Close();
             }
