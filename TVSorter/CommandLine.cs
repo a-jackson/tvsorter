@@ -22,12 +22,12 @@ namespace TVSorter
         }
 
         public void run()
-        {
+        {               
+            Database database = new Database();
+            Log.Init(_log);
+            Log.Add("Program started");
             foreach (string arg in _args)
             {
-                Database database = new Database();
-                Log.Init(_log);
-                Log.Add("Program started");
                 if (arg == "-update_all") //Update the database
                 {
                     List<TVShow> showList = TVShow.GetAllShows();
@@ -85,8 +85,15 @@ namespace TVSorter
                     episodes.Values.CopyTo(episodeArr, 0);
                     fileHandler.SortEpisodes(null, episodeArr, action);
                 }
+                else
+                {
+                    //Probably a log file but might not be valid filename
+                    FileInfo log = new FileInfo(arg);
+                    Log.SetSaveLocation(log);
+                }
             }
             Log.Add("Program completed. Exiting...");
+            Log.Save();
             //Sleep briefly to allow reading time
             Thread.Sleep(3000);
             Environment.Exit(0);

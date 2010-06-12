@@ -558,7 +558,14 @@ namespace TVSorter
                 "\\TVSorter2\\" + selected.Banner.Replace('/', '\\');
                 if (File.Exists(image))
                 {
-                    picShowPic.Image = Image.FromFile(image);
+                    try
+                    {
+                        picShowPic.Image = Image.FromFile(image);
+                    }
+                    catch
+                    {
+                        picShowPic.Image = null;
+                    }
                 }
                 else
                 {

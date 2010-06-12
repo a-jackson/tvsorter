@@ -133,7 +133,6 @@ namespace TVSorter
         {
             if (show.Locked)
             {
-                Log.Add(show.Name + " is locked. Skipping.");
                 return;
             }
             SetEnvironment();

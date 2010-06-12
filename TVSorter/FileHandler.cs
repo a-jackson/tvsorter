@@ -297,7 +297,6 @@ namespace TVSorter
                     //Create the directory if it doesn't exist
                     if (!newFile.Directory.Exists)
                         newFile.Directory.Create();
-                    Log.Add(action.ToString() + " file: " + ep.FileInfo.FullName + " to " + newName);
                     //Move/copy the file and delete the directory it was in if it is now empty
                     if (action == SortAction.Copy)
                     {
@@ -311,12 +310,12 @@ namespace TVSorter
                     {
                         RecuriveDelete(ep.FileInfo.Directory);
                     }
-                    Log.Add(action.ToString() + " complete");
+                    Log.Add(action.ToString() + " file: " + ep.FileInfo.FullName + " -> " + newName);
                 }
                 catch (Exception e)
                 {
-                    Log.Add("Failed to " + action.ToString() + " " + ep.FileInfo.FullName + " to " +
-                        newName + " " + e.Message);
+                    Log.Add("Failed " + action.ToString() + ": " + ep.FileInfo.FullName + " -> " +
+                        newName + " -- " + e.Message);
                 }
                 finally
                 {
