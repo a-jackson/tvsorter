@@ -612,11 +612,14 @@
             // lstTVShows
             // 
             this.lstTVShows.Dock = System.Windows.Forms.DockStyle.Left;
+            this.lstTVShows.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
             this.lstTVShows.FormattingEnabled = true;
+            this.lstTVShows.ItemHeight = 20;
             this.lstTVShows.Location = new System.Drawing.Point(3, 28);
             this.lstTVShows.Name = "lstTVShows";
             this.lstTVShows.Size = new System.Drawing.Size(209, 473);
             this.lstTVShows.TabIndex = 0;
+            this.lstTVShows.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.lstTVShows_DrawItem);
             this.lstTVShows.SelectedIndexChanged += new System.EventHandler(this.lstTVShows_SelectedIndexChanged);
             // 
             // toolStrip2

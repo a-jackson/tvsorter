@@ -45,7 +45,7 @@ namespace TVSorter
             Log.Add("Program started");
         }
 
-        /// <summary>
+         /// <summary>
         /// Set the controls to match the settings
         /// </summary>
         private void LoadSettings()
@@ -250,6 +250,7 @@ namespace TVSorter
             selectedShow.Locked = (btnLockShow.BackColor.Equals(Color.Red));
             selectedShow.UseDvdOrder = chkDvdOrder.Checked;
             selectedShow.SaveToDatabase();
+            lstTVShows.Refresh();
         }
 
         /// <summary>
@@ -749,6 +750,44 @@ namespace TVSorter
                 btnLockShow.Text = "Show Unlocked";
                 btnLockShow.BackColor = Color.Green;
             }
+        }
+
+        //Draws the tv show list
+        void lstTVShows_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            if (e.Index < 0 || e.Index >= lstTVShows.Items.Count)
+                return;
+            TVShow show = (TVShow)lstTVShows.Items[e.Index];
+            if (show == null)
+                return;
+
+            // Draw the background color depending on 
+            // if the item is selected or not.
+            Color textColour;
+            if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
+            {
+                // The item is selected.
+                // We want a highlight color background. This should match the user's theme
+                e.Graphics.FillRectangle(new SolidBrush(Color.FromKnownColor(KnownColor.Highlight)), e.Bounds);
+                textColour = Color.FromKnownColor(KnownColor.HighlightText);
+            }
+            else
+            {
+                // The item is NOT selected.
+                // We want a white background color.
+                e.Graphics.FillRectangle(new SolidBrush(Color.FromKnownColor(KnownColor.Window)), e.Bounds);
+                textColour = Color.FromKnownColor(KnownColor.WindowText);
+            }
+            if (show.Locked)
+            {
+                e.Graphics.DrawImage(Properties.Resources._lock,
+                    new PointF(5, 2 + e.Bounds.Y + (e.Bounds.Height - 20) / 2));
+            }
+
+            SizeF stringSize = e.Graphics.MeasureString(show.Name, e.Font);
+            //Draw the text, X is 25 if locked to allow for padlock else 5
+            e.Graphics.DrawString(show.Name, e.Font, new SolidBrush(textColour),
+                new PointF(show.Locked?25:5, e.Bounds.Y + (e.Bounds.Height - stringSize.Height) / 2));
         }
         #endregion
 
