@@ -22,8 +22,6 @@ namespace TVSorter
         const string TimeAddress = SiteAddress + "/api/Updates.php?type=none";
         static Database _database = new Database();
 
-        static string AppData = Environment
-            .GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\TVSorter2\\";
         static string MirrorAddress;
         public static long ServerTime;
 
@@ -40,8 +38,8 @@ namespace TVSorter
                 return;
             }
             //Create the appdata folder if needed
-            if (!Directory.Exists(AppData))
-                Directory.CreateDirectory(AppData);
+            if (!Directory.Exists("Data"))
+                Directory.CreateDirectory("Data");
 
             //Set the mirror address
                 XmlDocument mirrorDoc = new XmlDocument();
@@ -112,15 +110,13 @@ namespace TVSorter
         /// <param name="show">The show to download the banner for</param>
         private static void DownloadShowBanner(TVShow show)
         {
-            SetEnvironment();
-            if (show.Banner == "")
+            if (show.Banner == "" || File.Exists("Data\\"+show.TvdbId))
                 return;
+            SetEnvironment();
             WebClient client = new WebClient();
             string address = MirrorAddress + "/banners/" + show.Banner;
-            string save = AppData + show.Banner.Replace('/', '\\');
-            Directory.CreateDirectory(save.Substring(0, save.LastIndexOf('\\')));
-            if (!File.Exists(save))
-                client.DownloadFile(address, save);
+            string save = "Data\\" + show.TvdbId;
+            client.DownloadFile(address, save);
         }
 
         /// <summary>

@@ -153,12 +153,12 @@ namespace TVSorter
 
         public override string ToString()
         {
-            return _name;
+            return (_name ?? "").Trim();
         }
 
         public string Name
         {
-            get { return _name; }
+            get { return (_name ?? "").Trim(); }
         }
         public string TvdbId
         {
@@ -185,7 +185,7 @@ namespace TVSorter
         }
         public string FolderName
         {
-            get { return _folderName; }
+            get { return (_folderName ?? "").Trim(); }
             set { _folderName = value; }
         }
         public string Banner

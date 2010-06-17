@@ -8,7 +8,6 @@ using System.Windows.Forms;
 
 namespace TVSorter
 {
-    public delegate Episode NameHandler(Match match, FileInfo file);
 
     public enum SortAction { Move, Copy, Rename };
 
@@ -18,43 +17,16 @@ namespace TVSorter
     class FileHandler
     {
         private const char SeperatorChar = ' ';
-
-        private Dictionary<Regex, NameHandler> _regexMethods;
-
+        
         private Dictionary<string, Episode> _files;
 
         //File extensions to look at. Anything else will be ignored
-        public static Regex _extensions = new Regex("[.](avi|mkv|mpg|wmv)", RegexOptions.IgnoreCase);
+        public static Regex _extensions = new Regex("[.](avi|mkv|mpg|wmv|tbn|nfo)", RegexOptions.IgnoreCase);
 
         private Dictionary<string, int> _months;
 
         public FileHandler()
         {
-            //Add the regular expressions to test as keys with the handler function as a value
-            _regexMethods = new Dictionary<Regex, NameHandler>();
-            //S01E02
-            _regexMethods.Add(new Regex("s([0-9]+)e([0-9]+)",
-                RegexOptions.IgnoreCase),
-                new NameHandler(SnEnHandler));
-            //2010.12.31
-            _regexMethods.Add(new Regex("(19|20)(\\d\\d)[.](0[1-9]|1[012])[.](0[1-9]|[12][0-9]|3[01])"),
-                new NameHandler(YmdHandler));
-            //Dec.31.2010
-            _regexMethods.Add(new Regex("(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\.(\\d\\d)\\.(20\\d\\d)",
-                RegexOptions.IgnoreCase), new NameHandler(MMMddyyyHandler));
-            //1x02
-            _regexMethods.Add(new Regex("([0-9]+)x([0-9]+)",
-                RegexOptions.IgnoreCase),
-                new NameHandler(SnEnHandler));
-            //0102
-            _regexMethods.Add(new Regex("([0-9][0-9])([0-9][0-9])"),
-                new NameHandler(SnEnHandler));
-            //102
-            _regexMethods.Add(new Regex("([0-9])([0-9][0-9])"),
-                new NameHandler(SnEnHandler));
-            //S01.E02
-            _regexMethods.Add(new Regex("s([0-9]+)[.]e([0-9]+)", RegexOptions.IgnoreCase),
-                new NameHandler(SnEnHandler));
             //A dictionary of filepath and episode objects
             _files = new Dictionary<string, Episode>();
             //The months and their number equivalent
@@ -63,6 +35,12 @@ namespace TVSorter
             _months.Add("Apr", 4); _months.Add("May", 5); _months.Add("Jun", 6);
             _months.Add("Jul", 7); _months.Add("Aug", 8); _months.Add("Sep", 9);
             _months.Add("Oct", 10); _months.Add("Nov", 11); _months.Add("Dec", 12);
+            _months.Add("January", 1); _months.Add("February", 2); 
+            _months.Add("March", 3); _months.Add("April", 4); 
+            _months.Add("June", 6); _months.Add("July", 7); 
+            _months.Add("August", 8); _months.Add("September", 9);
+            _months.Add("October", 10); _months.Add("November", 11); 
+            _months.Add("December", 12);
         }
 
         /// <summary>
@@ -75,13 +53,20 @@ namespace TVSorter
         private Episode GetEpisode(FileInfo file)
         {
             //Test each of the regexp
-            foreach (Regex regex in _regexMethods.Keys)
+            foreach (string regexp in Settings.FileRegex)
             {
-                Match match = regex.Match(file.Name);
+                Match match = Regex.Match(file.Name, regexp, RegexOptions.IgnoreCase);
                 //If a match is found then call the appropriate handler for the matching regexp
                 if (match.Success)
                 {
-                    return _regexMethods[regex](match, file);
+                    try
+                    {
+                        return ProcessEpisode(match, file);
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Add(e.Message + " - " + regexp);
+                    }
                 }
             }
             //No match, not a TV show.
@@ -151,55 +136,45 @@ namespace TVSorter
         }
 
         /// <summary>
-        /// Handler for names with the episode number in
-        /// the format Name.(Season)(Episode) 
-        /// Doesn't matter what is inbetween the numbers, the regex handles it.
+        /// Gets the necessary info from the file name and return the episode object
         /// </summary>
-        /// <param name="match">The Regex match</param>
-        /// <param name="file">The file that matched</param>
-        /// <returns>The TVShow object</returns>
-        private Episode SnEnHandler(Match match, FileInfo file)
+        /// <param name="match">The regexp match</param>
+        /// <param name="file">The file</param>
+        /// <returns>The episode object</returns>
+        private Episode ProcessEpisode(Match match, FileInfo file)
         {
+            //Determine if the match was a season/episode or a date.
+            Group season = match.Groups["S"];
+            Group episode = match.Groups["E"];
+            Group year = match.Groups["Y"];
+            Group month = match.Groups["M"];
+            Group day = match.Groups["D"];
+            if ((!(season.Success && episode.Success)) && 
+                (!(year.Success && month.Success && day.Success)))
+            {
+                throw new Exception("Invalid regular expression.");
+            }
             string showName = parseShowName(file.Name, match.Index);
-            string strSeasonNum = match.Groups[1].ToString();
-            string strEpisodeNum = match.Groups[2].ToString();
-            return new Episode(showName, int.Parse(strEpisodeNum), int.Parse(strSeasonNum), file);
-        }
-
-        /// <summary>
-        /// Handles shows that are dates. The regex should have 4 groups.
-        /// (yy)(yy)(mm)(dd)
-        /// </summary>
-        /// <param name="match">The regex match</param>
-        /// <param name="file">The file that was matched</param>
-        /// <returns>The TVShow object</returns>
-        private Episode YmdHandler(Match match, FileInfo file)
-        {
-            string showName = parseShowName(file.Name, match.Index);
-            //want year/month/day numbers
-            string yearStr = match.Groups[1].ToString() + match.Groups[2].ToString();
-            int year = int.Parse(yearStr);
-            int month = int.Parse(match.Groups[3].ToString());
-            int day = int.Parse(match.Groups[4].ToString());
-            DateTime date = new DateTime(year, month, day);
-
-            return new Episode(showName, date, file);
-        }
-
-        /// <summary>
-        /// Handler function for dates in the format Dec.31.2010
-        /// </summary>
-        /// <param name="match">The regexp's match object</param>
-        /// <param name="file">The file that was matched</param>
-        /// <returns></returns>
-        private Episode MMMddyyyHandler(Match match, FileInfo file)
-        {
-            string showName = parseShowName(file.Name, match.Index);
-            string month = match.Groups[1].Value;
-            string day = match.Groups[2].Value;
-            string year = match.Groups[3].Value;
-            int monthNum = _months[month];
-            return new Episode(showName, new DateTime(int.Parse(year), monthNum, int.Parse(day)), file);
+            if (season.Success && episode.Success)
+            {
+                return new Episode(showName, int.Parse(episode.ToString()),
+                    int.Parse(season.ToString()), file);
+            }
+            else
+            {
+                DateTime date;
+                int monthNum;
+                if (int.TryParse(month.ToString(), out monthNum))
+                {
+                    date = new DateTime(int.Parse(year.ToString()), monthNum, int.Parse(day.ToString()));
+                }
+                else
+                {
+                    date = new DateTime(int.Parse(year.ToString()), _months[month.ToString()],
+                        int.Parse(day.ToString()));
+                }
+                return new Episode(showName, date, file);
+            }
         }
 
         /// <summary>
@@ -245,7 +220,7 @@ namespace TVSorter
                     {
                         //Add the file if one is found
                         _files.Add(
-                            file.FullName.Replace(Properties.Settings.Default.InputDir, ""),
+                            file.FullName.Replace(Settings.InputDir, ""),
                             episode);
                     }
                 }
@@ -258,7 +233,7 @@ namespace TVSorter
                     inc();
             }
             //If the scan should be recursive then process each of the directories in this directory
-            if (Properties.Settings.Default.RecurseSubDir)
+            if (Settings.RecurseSubDir)
             {
                 foreach (DirectoryInfo subdir in dir.GetDirectories())
                 {
@@ -287,7 +262,7 @@ namespace TVSorter
                 try
                 {
                     //Get the new path
-                    newName = Properties.Settings.Default.OutputDir + ep.FormatOutputPath();
+                    newName = Settings.OutputDir + ep.FormatOutputPath();
                     if (action == SortAction.Rename)
                     {
                         newName = newName.Substring(newName.LastIndexOf('\\') + 1);
@@ -306,7 +281,7 @@ namespace TVSorter
                     {
                         File.Move(ep.FileInfo.FullName, newName);
                     }
-                    if (Properties.Settings.Default.DeleteEmpty)
+                    if (Settings.DeleteEmpty)
                     {
                         RecuriveDelete(ep.FileInfo.Directory);
                     }
@@ -335,7 +310,7 @@ namespace TVSorter
         private void RecuriveDelete(DirectoryInfo directory)
         {
             //Determine if this is the input directory
-            DirectoryInfo inputDir = new DirectoryInfo(Properties.Settings.Default.InputDir);
+            DirectoryInfo inputDir = new DirectoryInfo(Settings.InputDir);
             //Get the paths
             string inputDirPath = inputDir.FullName;
             string dirPath = directory.FullName;

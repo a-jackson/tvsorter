@@ -142,7 +142,7 @@ namespace TVSorter
 
         public string EpisodeName
         {
-            get { return _episodeName; }
+            get { return (_episodeName ?? "").Trim(); }
         }
         public long EpisodeNum
         {
@@ -167,7 +167,7 @@ namespace TVSorter
             //then use the default format
             if (_show == null || _show.DatabaseId == -1 || _show.UseDefaultFormat)
             {
-                return FormatOutputPath(Properties.Settings.Default.FileNameFormat);
+                return FormatOutputPath(Settings.FileNameFormat);
             }
             else
             {

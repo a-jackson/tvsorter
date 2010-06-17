@@ -15,7 +15,6 @@ namespace TVSorter
 {
     public partial class frmMain : Form
     {
-        Properties.Settings _settings;
         Database _database;
         FileHandler _fileHandler;
         Dictionary<string, Episode> _files;
@@ -31,30 +30,31 @@ namespace TVSorter
         /// </summary>
         private void Init()
         {
-            _settings = Properties.Settings.Default;
+            Log.Init(lstLog);
             _database = new Database();
             _fileHandler = new FileHandler();
             LoadSettings();
+            LoadRegexpSettings();
             UpdateTvShowList();
             grpShowCustomFormat.Enabled = false;
             grpShowCustomNames.Enabled = false;
             grpShowUpdateOptions.Enabled = false;
             tsShowControls.Enabled = false;
             this.Text = "TV Sorter " + Program.VersionNumber;
-            Log.Init(lstLog);
             Log.Add("Program started");
         }
 
-         /// <summary>
+        /// <summary>
         /// Set the controls to match the settings
         /// </summary>
         private void LoadSettings()
         {
-            this.txtInputFolder.Text = _settings.InputDir;
-            this.txtOutputFolder.Text = _settings.OutputDir;
-            this.chkRecurse.Checked = _settings.RecurseSubDir;
-            this.txtNameFormat.Text = _settings.FileNameFormat;
-            this.chkDeleteEmpty.Checked = _settings.DeleteEmpty;
+            Settings.LoadSettings();
+            this.txtInputFolder.Text = Settings.InputDir;
+            this.txtOutputFolder.Text = Settings.OutputDir;
+            this.chkRecurse.Checked = Settings.RecurseSubDir;
+            this.txtNameFormat.Text = Settings.FileNameFormat;
+            this.chkDeleteEmpty.Checked = Settings.DeleteEmpty;
             UpdateExampleOutput();
             UpdateFolderFilter();
         }
@@ -64,11 +64,11 @@ namespace TVSorter
         /// </summary>
         private void ApplySettings()
         {
-            _settings.InputDir = this.txtInputFolder.Text;
-            _settings.OutputDir = this.txtOutputFolder.Text;
-            _settings.RecurseSubDir = this.chkRecurse.Checked;
-            _settings.FileNameFormat = this.txtNameFormat.Text;
-            _settings.DeleteEmpty = this.chkDeleteEmpty.Checked;
+            Settings.InputDir = this.txtInputFolder.Text;
+            Settings.OutputDir = this.txtOutputFolder.Text;
+            Settings.RecurseSubDir = this.chkRecurse.Checked;
+            Settings.FileNameFormat = this.txtNameFormat.Text;
+            Settings.DeleteEmpty = this.chkDeleteEmpty.Checked;
             UpdateExampleOutput();
             UpdateFolderFilter();
         }
@@ -79,7 +79,7 @@ namespace TVSorter
         private void SaveSettings()
         {
             ApplySettings();
-            _settings.Save();
+            Settings.SaveSettings();
         }
 
         /// <summary>
@@ -98,9 +98,9 @@ namespace TVSorter
             string selected = (string)cboFolderFilter.SelectedItem;
             cboFolderFilter.Items.Clear();
             cboFolderFilter.Items.Add("Subfolder filter (All)");
-            if (_settings.InputDir.Length > 0)
+            if (Settings.InputDir.Length > 0)
             {
-                DirectoryInfo dirInfo = new DirectoryInfo(_settings.InputDir);
+                DirectoryInfo dirInfo = new DirectoryInfo(Settings.InputDir);
                 if (dirInfo.Exists)
                 {
                     foreach (DirectoryInfo subdirInfo in dirInfo.GetDirectories())
@@ -126,19 +126,20 @@ namespace TVSorter
         private void SearchNewShows()
         {
             frmProgress progress =
-                new frmProgress(Directory.GetDirectories(_settings.OutputDir).Length);
-            SortedDictionary<string, List<TVShow>> shows = new SortedDictionary<string,List<TVShow>>();
+                new frmProgress(Directory.GetDirectories(Settings.OutputDir).Length);
+            SortedDictionary<string, List<TVShow>> shows = new SortedDictionary<string, List<TVShow>>();
             MethodInvoker inc = new MethodInvoker(progress.Increment);
             Thread addShows = new Thread(new ThreadStart(delegate()
             {
-                foreach (string dir in Directory.GetDirectories(_settings.OutputDir))
+                foreach (string dir in Directory.GetDirectories(Settings.OutputDir))
                 {
                     //Check if the show has already been added.
-                    string name = dir.Substring(dir.LastIndexOf('\\') + 1).Replace("\"","\"\"");
-                    if ((long)_database.ExecuteScalar("SELECT COUNT(*) FROM shows WHERE folder_name=\"" 
+                    string name = dir.Substring(dir.LastIndexOf('\\') + 1).Replace("\"", "\"\"");
+                    if ((long)_database.ExecuteScalar("SELECT COUNT(*) FROM shows WHERE folder_name=\""
                         + name + "\"") == 0)
                     {
-                        try{                        
+                        try
+                        {
                             //Search for the show and add the results
                             List<TVShow> results = TVDB.SearchShow(name);
                             shows.Add(name, results);
@@ -160,7 +161,7 @@ namespace TVSorter
             foreach (KeyValuePair<string, List<TVShow>> kvPair in shows)
             {
                 //If there is just one result, use that
-                TVShow show=null;
+                TVShow show = null;
                 if (kvPair.Value.Count == 1)
                 {
                     show = kvPair.Value[0];
@@ -172,7 +173,7 @@ namespace TVSorter
                     TVShow selected = results.GetSelected();
                     if (selected == null)
                     {
-                        continue; 
+                        continue;
                     }
                     show = selected;
                 }
@@ -212,7 +213,7 @@ namespace TVSorter
             }
             else
             {
-                txtShowExampleFileName.Text = 
+                txtShowExampleFileName.Text =
                     Episode.ExampleEpiosde.FormatOutputPath(selectedShow.CustomFormat);
             }
             if (selectedShow.Locked)
@@ -298,7 +299,7 @@ namespace TVSorter
             FileInfo[] files = dir.GetFiles();
             max += files.Length;
             //Only check subdirectories if the option is enabled
-            if (_settings.RecurseSubDir)
+            if (Settings.RecurseSubDir)
             {
                 foreach (DirectoryInfo subdir in dir.GetDirectories())
                 {
@@ -338,7 +339,7 @@ namespace TVSorter
         private void SortEpisodes(SortAction action)
         {
             //Check everything is in order
-            if (_settings.InputDir == "" || !Directory.Exists(_settings.InputDir))
+            if (Settings.InputDir == "" || !Directory.Exists(Settings.InputDir))
             {
                 MessageBox.Show("Check your input directory and try again");
                 return;
@@ -346,7 +347,7 @@ namespace TVSorter
             //Don't need the output folder if only renaming
             if (action != SortAction.Rename)
             {
-                if (_settings.OutputDir == "" || !Directory.Exists(_settings.OutputDir))
+                if (Settings.OutputDir == "" || !Directory.Exists(Settings.OutputDir))
                 {
                     MessageBox.Show("Check your output directory and try again");
                     return;
@@ -370,13 +371,53 @@ namespace TVSorter
             }
             new Thread(new ThreadStart(delegate()
             {
-                _fileHandler.SortEpisodes(inc, episodes,action);
+                _fileHandler.SortEpisodes(inc, episodes, action);
                 progress.Close();
             })).Start();
             progress.ShowDialog();
             UpdateFolderFilter();
             //Refresh the directory again. - Todo: Only change things that have changed, don't force a full refresh.
             btnRefresh_Click(this, null);
+        }
+
+        /// <summary>
+        /// Sets all of the shows to either locked or unlocked
+        /// </summary>
+        /// <param name="shouldLock">If they should be locked or not</param>
+        private void SetShowLocks(bool shouldLock)
+        {
+            foreach (object item in lstTVShows.Items)
+            {
+                TVShow show = (TVShow)item;
+                show.Locked = shouldLock;
+                show.SaveToDatabase();
+            }
+            lstTVShows.Refresh();
+        }
+
+        private void LoadRegexpSettings()
+        {
+            Settings.LoadFileRegexp();
+            lstRegexp.Items.Clear();
+            foreach (string regexp in Settings.FileRegex)
+            {
+                lstRegexp.Items.Add(regexp);
+            }
+        }
+
+        private void ApplyRegexpSettings()
+        {
+            Settings.FileRegex.Clear();
+            foreach (string regexp in lstRegexp.Items)
+            {
+                Settings.FileRegex.Add(regexp);
+            }
+        }
+
+        private void SaveRegexpSettings()
+        {
+            ApplyRegexpSettings();
+            Settings.SaveFileRegexp();
         }
 
         #region Event Handlers
@@ -398,10 +439,10 @@ namespace TVSorter
                 if (_onSettings)
                 {
                     //Have just left settings - check for changes
-                    if (txtInputFolder.Text != _settings.InputDir ||
-                        txtOutputFolder.Text != _settings.OutputDir ||
-                        chkRecurse.Checked != _settings.RecurseSubDir ||
-                        txtNameFormat.Text != _settings.FileNameFormat)
+                    if (txtInputFolder.Text != Settings.InputDir ||
+                        txtOutputFolder.Text != Settings.OutputDir ||
+                        chkRecurse.Checked != Settings.RecurseSubDir ||
+                        txtNameFormat.Text != Settings.FileNameFormat)
                     {
                         if (MessageBox.Show("You have changed settings but not applied them.\n" +
                             "Do you want to apply them now?", "Changed settings",
@@ -419,7 +460,7 @@ namespace TVSorter
         //Handles pressing the refresh button
         private void btnRefresh_Click(object sender, EventArgs e)
         {
-            if (_settings.InputDir == "" || !Directory.Exists(_settings.InputDir))
+            if (Settings.InputDir == "" || !Directory.Exists(Settings.InputDir))
             {
                 MessageBox.Show("Check your input directory and try again");
                 return;
@@ -427,11 +468,11 @@ namespace TVSorter
             string inputDir;
             if (cboFolderFilter.SelectedIndex == 0)
             {
-                inputDir = _settings.InputDir;
+                inputDir = Settings.InputDir;
             }
             else
             {
-                inputDir = _settings.InputDir + "\\" + cboFolderFilter.SelectedItem;
+                inputDir = Settings.InputDir + "\\" + cboFolderFilter.SelectedItem;
             }
             int numFiles = GetMaxFiles(new DirectoryInfo(inputDir));
             if (numFiles == 0)
@@ -450,7 +491,7 @@ namespace TVSorter
             progress.ShowDialog();
             _files = _fileHandler.Files;
             //Show in list view
-            string inputFolder = Properties.Settings.Default.InputDir;
+            string inputFolder = Settings.InputDir;
             lstInputFolder.Items.Clear();
             foreach (KeyValuePair<string, Episode> episode in _files)
             {
@@ -554,9 +595,7 @@ namespace TVSorter
                 DateTime update = ConvertFromUnixTimestamp(selected.UpdateTime);
                 lblLastUpdate.Text = "Last Update: " + update.ToString();
                 lblSelectedShow.Text = selected.Name;
-                string image = Environment
-                .GetFolderPath(Environment.SpecialFolder.LocalApplicationData) +
-                "\\TVSorter2\\" + selected.Banner.Replace('/', '\\');
+                string image = "Data\\" + selected.TvdbId;
                 if (File.Exists(image))
                 {
                     try
@@ -566,6 +605,8 @@ namespace TVSorter
                     catch
                     {
                         picShowPic.Image = null;
+                        //Delete it so a new one can be downloaded next update
+                        File.Delete(image);
                     }
                 }
                 else
@@ -787,11 +828,25 @@ namespace TVSorter
             SizeF stringSize = e.Graphics.MeasureString(show.Name, e.Font);
             //Draw the text, X is 25 if locked to allow for padlock else 5
             e.Graphics.DrawString(show.Name, e.Font, new SolidBrush(textColour),
-                new PointF(show.Locked?25:5, e.Bounds.Y + (e.Bounds.Height - stringSize.Height) / 2));
+                new PointF(show.Locked ? 25 : 5, e.Bounds.Y + (e.Bounds.Height - stringSize.Height) / 2));
+        }
+
+        //Handles the Lock all button click event
+        private void btnLockAll_Click(object sender, EventArgs e)
+        {
+            SetShowLocks(true);
+        }
+
+        //Handles the Unlock all button click event
+        private void btnUnlockAll_Click(object sender, EventArgs e)
+        {
+            SetShowLocks(false);
         }
         #endregion
 
         #region Settings Handlers
+
+        #region General Settings
         //Handles the browse button for the input folder
         private void btnBrowseInputFolder_Click(object sender, EventArgs e)
         {
@@ -824,12 +879,6 @@ namespace TVSorter
             SaveSettings();
         }
 
-        //Handles the reset settings button
-        private void btnReset_Click(object sender, EventArgs e)
-        {
-            LoadSettings();
-        }
-
         //Handles the apply settings button
         private void btnApply_Click(object sender, EventArgs e)
         {
@@ -839,11 +888,81 @@ namespace TVSorter
         //Handles the revert settings button
         private void btnRevert_Click(object sender, EventArgs e)
         {
-            _settings.Reload();
             LoadSettings();
         }
         #endregion
 
+        #region Regular Expressions
+
+        //Handles the Add regexp button
+        private void btnAddRegexp_Click(object sender, EventArgs e)
+        {
+            if (txtRegexp.Text.Length > 0)
+                lstRegexp.Items.Add(txtRegexp.Text);
+        }
+
+        //Handles the apply regexp button
+        private void btnApplyRegexp_Click(object sender, EventArgs e)
+        {
+            ApplyRegexpSettings();
+        }
+
+        //Handles the save regexp button
+        private void btnSaveRegexp_Click(object sender, EventArgs e)
+        {
+            SaveRegexpSettings();
+        }
+
+        //Handles the revert regexp button
+        private void btnRevertRegexp_Click(object sender, EventArgs e)
+        {
+            LoadRegexpSettings();
+        }
+
+        //Handles the moveup regexp button
+        private void btnMoveUpRegexp_Click(object sender, EventArgs e)
+        {
+            if (lstRegexp.SelectedIndex == -1)
+            {
+                return;
+            }
+            int index = lstRegexp.SelectedIndex;
+            if (index == 0)
+                return;
+            string regexp = (string)lstRegexp.Items[index];
+            lstRegexp.Items.RemoveAt(lstRegexp.SelectedIndex);
+            lstRegexp.Items.Insert(index - 1, regexp);
+            lstRegexp.SelectedIndex = index - 1;
+        }
+
+        //Handles the movedown regexp button
+        private void btnMoveDownRegexp_Click(object sender, EventArgs e)
+        {
+            if (lstRegexp.SelectedIndex == -1)
+            {
+                return;
+            }
+            int index = lstRegexp.SelectedIndex;
+            if (index == lstRegexp.Items.Count - 1)
+                return;
+            string regexp = (string)lstRegexp.Items[index];
+            lstRegexp.Items.RemoveAt(lstRegexp.SelectedIndex);
+            lstRegexp.Items.Insert(index + 1, regexp);
+            lstRegexp.SelectedIndex = index + 1;
+        }
+
+        //Handles the remove regexp button
+        private void btnRemoveRegexp_Click(object sender, EventArgs e)
+        {
+            if (lstRegexp.SelectedIndex == -1)
+            {
+                return;
+            }
+            lstRegexp.Items.RemoveAt(lstRegexp.SelectedIndex);
+        }
+
+        #endregion
+        #endregion
         #endregion
     }
 }

@@ -24,8 +24,14 @@ namespace TVSorter
         public void run()
         {               
             Database database = new Database();
+            Settings.LoadSettings();
             Log.Init(_log);
             Log.Add("Program started");
+            Log.Add("Input directory: " + Settings.InputDir);
+            Log.Add("Output directory: " + Settings.OutputDir);
+            Log.Add("Recurse subdirs: " + Settings.RecurseSubDir);
+            Log.Add("Delete empty dir: " + Settings.DeleteEmpty);
+            Log.Add("Output file format: " + Settings.FileNameFormat);
             foreach (string arg in _args)
             {
                 if (arg == "-update_all") //Update the database
@@ -66,20 +72,19 @@ namespace TVSorter
                         continue; //Invalid arg, ignore
                     }
                     //Check the directories are valid
-                    Properties.Settings settings = Properties.Settings.Default;
-                    if (settings.InputDir == "" || !Directory.Exists(settings.InputDir))
+                    if (Settings.InputDir == "" || !Directory.Exists(Settings.InputDir))
                     {
                         Log.Add("Input directory not set");
                         continue;
                     }
                     if ((action != SortAction.Rename) &&
-                        (settings.OutputDir == "" || !Directory.Exists(settings.OutputDir)))
+                        (Settings.OutputDir == "" || !Directory.Exists(Settings.OutputDir)))
                     {
                         Log.Add("Output directory not set");
                     }
                     //Refresh the episodes and the sort them
                     FileHandler fileHandler = new FileHandler();
-                    fileHandler.RefreshEpisodes(null, settings.InputDir);
+                    fileHandler.RefreshEpisodes(null, Settings.InputDir);
                     Dictionary<string, Episode> episodes = fileHandler.Files;
                     Episode[] episodeArr = new Episode[episodes.Count];
                     episodes.Values.CopyTo(episodeArr, 0);

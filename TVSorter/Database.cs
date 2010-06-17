@@ -15,9 +15,7 @@ namespace TVSorter
     /// </summary>
     public class Database
     {
-        private static string DatabaseFile = Environment
-            .GetFolderPath(Environment.SpecialFolder.LocalApplicationData) +
-            "\\TVSorter2\\data.db";
+        private static string DatabaseFile = "Data\\data.db";
         private static string connectionString = "Data Source=" + DatabaseFile + ";Version=3;";
         /// <summary>
         /// The current version of the database, used to detect older databases so they can
@@ -58,13 +56,9 @@ namespace TVSorter
         /// </summary>
         private void CreateDatabase()
         {
-            if (!Directory.Exists(Environment
-            .GetFolderPath(Environment.SpecialFolder.LocalApplicationData) +
-            "\\TVSorter2"))
+            if (!Directory.Exists("Data"))
             {
-                Directory.CreateDirectory(Environment
-            .GetFolderPath(Environment.SpecialFolder.LocalApplicationData) +
-            "\\TVSorter2");
+                Directory.CreateDirectory("Data");
             }
             SQLiteConnection.CreateFile(DatabaseFile);
             //Create the table for the version number, shows, and episodes

@@ -87,11 +87,15 @@
             this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
             this.btnAddShow = new System.Windows.Forms.ToolStripButton();
             this.btnSearchShow = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
+            this.btnLockAll = new System.Windows.Forms.ToolStripButton();
+            this.btnUnlockAll = new System.Windows.Forms.ToolStripButton();
             this.tpgSettings = new System.Windows.Forms.TabPage();
+            this.settingsSubTabs = new System.Windows.Forms.TabControl();
+            this.generalSettings = new System.Windows.Forms.TabPage();
             this.flowLayoutPanel2 = new System.Windows.Forms.FlowLayoutPanel();
             this.btnApply = new System.Windows.Forms.Button();
             this.btnSave = new System.Windows.Forms.Button();
-            this.btnReset = new System.Windows.Forms.Button();
             this.btnRevert = new System.Windows.Forms.Button();
             this.grpShowNames = new System.Windows.Forms.GroupBox();
             this.label7 = new System.Windows.Forms.Label();
@@ -109,6 +113,23 @@
             this.chkRecurse = new System.Windows.Forms.CheckBox();
             this.txtOutputFolder = new System.Windows.Forms.TextBox();
             this.btnBrowseOutputFolder = new System.Windows.Forms.Button();
+            this.regularExpressionsTabPage = new System.Windows.Forms.TabPage();
+            this.toolStrip4 = new System.Windows.Forms.ToolStrip();
+            this.btnApplyRegexp = new System.Windows.Forms.ToolStripButton();
+            this.btnSaveRegexp = new System.Windows.Forms.ToolStripButton();
+            this.btnRevertRegexp = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator9 = new System.Windows.Forms.ToolStripSeparator();
+            this.btnMoveUpRegexp = new System.Windows.Forms.ToolStripButton();
+            this.btnMoveDownRegexp = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator10 = new System.Windows.Forms.ToolStripSeparator();
+            this.btnRemoveRegexp = new System.Windows.Forms.ToolStripButton();
+            this.lstRegexp = new System.Windows.Forms.ListBox();
+            this.grpAddRegexp = new System.Windows.Forms.GroupBox();
+            this.toolStrip3 = new System.Windows.Forms.ToolStrip();
+            this.btnAddRegexp = new System.Windows.Forms.ToolStripButton();
+            this.txtRegexp = new System.Windows.Forms.TextBox();
+            this.grpRegexpInfo = new System.Windows.Forms.GroupBox();
+            this.label12 = new System.Windows.Forms.Label();
             this.tpgLog = new System.Windows.Forms.TabPage();
             this.lstLog = new System.Windows.Forms.ListBox();
             this.dlgFolderSelect = new System.Windows.Forms.FolderBrowserDialog();
@@ -123,9 +144,16 @@
             ((System.ComponentModel.ISupportInitialize)(this.picShowPic)).BeginInit();
             this.toolStrip2.SuspendLayout();
             this.tpgSettings.SuspendLayout();
+            this.settingsSubTabs.SuspendLayout();
+            this.generalSettings.SuspendLayout();
             this.flowLayoutPanel2.SuspendLayout();
             this.grpShowNames.SuspendLayout();
             this.grpDirectories.SuspendLayout();
+            this.regularExpressionsTabPage.SuspendLayout();
+            this.toolStrip4.SuspendLayout();
+            this.grpAddRegexp.SuspendLayout();
+            this.toolStrip3.SuspendLayout();
+            this.grpRegexpInfo.SuspendLayout();
             this.tpgLog.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -139,7 +167,7 @@
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(927, 530);
+            this.tabControl1.Size = new System.Drawing.Size(944, 530);
             this.tabControl1.TabIndex = 0;
             this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
             // 
@@ -150,7 +178,7 @@
             this.tpgInputFolder.Location = new System.Drawing.Point(4, 22);
             this.tpgInputFolder.Name = "tpgInputFolder";
             this.tpgInputFolder.Padding = new System.Windows.Forms.Padding(3);
-            this.tpgInputFolder.Size = new System.Drawing.Size(919, 504);
+            this.tpgInputFolder.Size = new System.Drawing.Size(936, 504);
             this.tpgInputFolder.TabIndex = 0;
             this.tpgInputFolder.Text = "Input folder";
             this.tpgInputFolder.UseVisualStyleBackColor = true;
@@ -168,7 +196,7 @@
             this.lstInputFolder.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lstInputFolder.Location = new System.Drawing.Point(3, 28);
             this.lstInputFolder.Name = "lstInputFolder";
-            this.lstInputFolder.Size = new System.Drawing.Size(913, 473);
+            this.lstInputFolder.Size = new System.Drawing.Size(930, 473);
             this.lstInputFolder.TabIndex = 10;
             this.lstInputFolder.UseCompatibleStateImageBehavior = false;
             this.lstInputFolder.View = System.Windows.Forms.View.Details;
@@ -217,7 +245,7 @@
             this.cboFolderFilter});
             this.toolStrip1.Location = new System.Drawing.Point(3, 3);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(913, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(930, 25);
             this.toolStrip1.TabIndex = 9;
             this.toolStrip1.Text = "toolStripInputFolder";
             // 
@@ -332,7 +360,7 @@
             this.tpgTVShows.Location = new System.Drawing.Point(4, 22);
             this.tpgTVShows.Name = "tpgTVShows";
             this.tpgTVShows.Padding = new System.Windows.Forms.Padding(3);
-            this.tpgTVShows.Size = new System.Drawing.Size(919, 504);
+            this.tpgTVShows.Size = new System.Drawing.Size(936, 504);
             this.tpgTVShows.TabIndex = 1;
             this.tpgTVShows.Text = "TV Shows";
             this.tpgTVShows.UseVisualStyleBackColor = true;
@@ -350,7 +378,7 @@
             this.toolStripSeparator5});
             this.tsShowControls.Location = new System.Drawing.Point(212, 442);
             this.tsShowControls.Name = "tsShowControls";
-            this.tsShowControls.Size = new System.Drawing.Size(704, 25);
+            this.tsShowControls.Size = new System.Drawing.Size(721, 25);
             this.tsShowControls.TabIndex = 12;
             // 
             // btnSaveShowSettings
@@ -425,7 +453,7 @@
             this.grpShowUpdateOptions.Dock = System.Windows.Forms.DockStyle.Top;
             this.grpShowUpdateOptions.Location = new System.Drawing.Point(212, 397);
             this.grpShowUpdateOptions.Name = "grpShowUpdateOptions";
-            this.grpShowUpdateOptions.Size = new System.Drawing.Size(704, 45);
+            this.grpShowUpdateOptions.Size = new System.Drawing.Size(721, 45);
             this.grpShowUpdateOptions.TabIndex = 13;
             this.grpShowUpdateOptions.TabStop = false;
             this.grpShowUpdateOptions.Text = "Update Options";
@@ -463,7 +491,7 @@
             this.grpShowCustomNames.Dock = System.Windows.Forms.DockStyle.Top;
             this.grpShowCustomNames.Location = new System.Drawing.Point(212, 293);
             this.grpShowCustomNames.Name = "grpShowCustomNames";
-            this.grpShowCustomNames.Size = new System.Drawing.Size(704, 104);
+            this.grpShowCustomNames.Size = new System.Drawing.Size(721, 104);
             this.grpShowCustomNames.TabIndex = 10;
             this.grpShowCustomNames.TabStop = false;
             this.grpShowCustomNames.Text = "Custom Names";
@@ -519,7 +547,7 @@
             this.grpShowCustomFormat.Dock = System.Windows.Forms.DockStyle.Top;
             this.grpShowCustomFormat.Location = new System.Drawing.Point(212, 200);
             this.grpShowCustomFormat.Name = "grpShowCustomFormat";
-            this.grpShowCustomFormat.Size = new System.Drawing.Size(704, 93);
+            this.grpShowCustomFormat.Size = new System.Drawing.Size(721, 93);
             this.grpShowCustomFormat.TabIndex = 8;
             this.grpShowCustomFormat.TabStop = false;
             this.grpShowCustomFormat.Text = "Custom Format";
@@ -593,7 +621,7 @@
             this.picShowPic.Dock = System.Windows.Forms.DockStyle.Top;
             this.picShowPic.Location = new System.Drawing.Point(212, 48);
             this.picShowPic.Name = "picShowPic";
-            this.picShowPic.Size = new System.Drawing.Size(704, 126);
+            this.picShowPic.Size = new System.Drawing.Size(721, 126);
             this.picShowPic.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.picShowPic.TabIndex = 7;
             this.picShowPic.TabStop = false;
@@ -629,10 +657,13 @@
             this.btnForceUpdateAll,
             this.toolStripSeparator6,
             this.btnAddShow,
-            this.btnSearchShow});
+            this.btnSearchShow,
+            this.toolStripSeparator8,
+            this.btnLockAll,
+            this.btnUnlockAll});
             this.toolStrip2.Location = new System.Drawing.Point(3, 3);
             this.toolStrip2.Name = "toolStrip2";
-            this.toolStrip2.Size = new System.Drawing.Size(913, 25);
+            this.toolStrip2.Size = new System.Drawing.Size(930, 25);
             this.toolStrip2.TabIndex = 11;
             this.toolStrip2.Text = "toolStrip2";
             // 
@@ -681,30 +712,76 @@
             this.btnSearchShow.Text = "Search for Shows";
             this.btnSearchShow.Click += new System.EventHandler(this.btnSearchShows_Click);
             // 
+            // toolStripSeparator8
+            // 
+            this.toolStripSeparator8.Name = "toolStripSeparator8";
+            this.toolStripSeparator8.Size = new System.Drawing.Size(6, 25);
+            // 
+            // btnLockAll
+            // 
+            this.btnLockAll.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnLockAll.Image = ((System.Drawing.Image)(resources.GetObject("btnLockAll.Image")));
+            this.btnLockAll.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnLockAll.Name = "btnLockAll";
+            this.btnLockAll.Size = new System.Drawing.Size(53, 22);
+            this.btnLockAll.Text = "Lock All";
+            this.btnLockAll.Click += new System.EventHandler(this.btnLockAll_Click);
+            // 
+            // btnUnlockAll
+            // 
+            this.btnUnlockAll.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnUnlockAll.Image = ((System.Drawing.Image)(resources.GetObject("btnUnlockAll.Image")));
+            this.btnUnlockAll.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnUnlockAll.Name = "btnUnlockAll";
+            this.btnUnlockAll.Size = new System.Drawing.Size(65, 22);
+            this.btnUnlockAll.Text = "Unlock All";
+            this.btnUnlockAll.Click += new System.EventHandler(this.btnUnlockAll_Click);
+            // 
             // tpgSettings
             // 
             this.tpgSettings.AutoScroll = true;
-            this.tpgSettings.Controls.Add(this.flowLayoutPanel2);
-            this.tpgSettings.Controls.Add(this.grpShowNames);
-            this.tpgSettings.Controls.Add(this.grpDirectories);
+            this.tpgSettings.Controls.Add(this.settingsSubTabs);
             this.tpgSettings.Location = new System.Drawing.Point(4, 22);
             this.tpgSettings.Name = "tpgSettings";
-            this.tpgSettings.Size = new System.Drawing.Size(919, 504);
+            this.tpgSettings.Size = new System.Drawing.Size(936, 504);
             this.tpgSettings.TabIndex = 2;
             this.tpgSettings.Text = "Settings";
             this.tpgSettings.UseVisualStyleBackColor = true;
+            // 
+            // settingsSubTabs
+            // 
+            this.settingsSubTabs.Controls.Add(this.generalSettings);
+            this.settingsSubTabs.Controls.Add(this.regularExpressionsTabPage);
+            this.settingsSubTabs.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.settingsSubTabs.Location = new System.Drawing.Point(0, 0);
+            this.settingsSubTabs.Name = "settingsSubTabs";
+            this.settingsSubTabs.SelectedIndex = 0;
+            this.settingsSubTabs.Size = new System.Drawing.Size(936, 504);
+            this.settingsSubTabs.TabIndex = 11;
+            // 
+            // generalSettings
+            // 
+            this.generalSettings.Controls.Add(this.flowLayoutPanel2);
+            this.generalSettings.Controls.Add(this.grpShowNames);
+            this.generalSettings.Controls.Add(this.grpDirectories);
+            this.generalSettings.Location = new System.Drawing.Point(4, 22);
+            this.generalSettings.Name = "generalSettings";
+            this.generalSettings.Padding = new System.Windows.Forms.Padding(3);
+            this.generalSettings.Size = new System.Drawing.Size(928, 478);
+            this.generalSettings.TabIndex = 0;
+            this.generalSettings.Text = "General Settings";
+            this.generalSettings.UseVisualStyleBackColor = true;
             // 
             // flowLayoutPanel2
             // 
             this.flowLayoutPanel2.Controls.Add(this.btnApply);
             this.flowLayoutPanel2.Controls.Add(this.btnSave);
-            this.flowLayoutPanel2.Controls.Add(this.btnReset);
             this.flowLayoutPanel2.Controls.Add(this.btnRevert);
             this.flowLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Top;
-            this.flowLayoutPanel2.Location = new System.Drawing.Point(0, 262);
+            this.flowLayoutPanel2.Location = new System.Drawing.Point(3, 265);
             this.flowLayoutPanel2.Name = "flowLayoutPanel2";
-            this.flowLayoutPanel2.Size = new System.Drawing.Size(919, 30);
-            this.flowLayoutPanel2.TabIndex = 10;
+            this.flowLayoutPanel2.Size = new System.Drawing.Size(922, 30);
+            this.flowLayoutPanel2.TabIndex = 13;
             // 
             // btnApply
             // 
@@ -714,7 +791,6 @@
             this.btnApply.TabIndex = 0;
             this.btnApply.Text = "Apply";
             this.btnApply.UseVisualStyleBackColor = true;
-            this.btnApply.Click += new System.EventHandler(this.btnApply_Click);
             // 
             // btnSave
             // 
@@ -724,27 +800,15 @@
             this.btnSave.TabIndex = 1;
             this.btnSave.Text = "Save";
             this.btnSave.UseVisualStyleBackColor = true;
-            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
-            // 
-            // btnReset
-            // 
-            this.btnReset.Location = new System.Drawing.Point(165, 3);
-            this.btnReset.Name = "btnReset";
-            this.btnReset.Size = new System.Drawing.Size(75, 23);
-            this.btnReset.TabIndex = 2;
-            this.btnReset.Text = "Reset";
-            this.btnReset.UseVisualStyleBackColor = true;
-            this.btnReset.Click += new System.EventHandler(this.btnReset_Click);
             // 
             // btnRevert
             // 
-            this.btnRevert.Location = new System.Drawing.Point(246, 3);
+            this.btnRevert.Location = new System.Drawing.Point(165, 3);
             this.btnRevert.Name = "btnRevert";
             this.btnRevert.Size = new System.Drawing.Size(106, 23);
             this.btnRevert.TabIndex = 3;
             this.btnRevert.Text = "Revert To Saved";
             this.btnRevert.UseVisualStyleBackColor = true;
-            this.btnRevert.Click += new System.EventHandler(this.btnRevert_Click);
             // 
             // grpShowNames
             // 
@@ -755,10 +819,10 @@
             this.grpShowNames.Controls.Add(this.txtNameFormat);
             this.grpShowNames.Controls.Add(this.label1);
             this.grpShowNames.Dock = System.Windows.Forms.DockStyle.Top;
-            this.grpShowNames.Location = new System.Drawing.Point(0, 113);
+            this.grpShowNames.Location = new System.Drawing.Point(3, 116);
             this.grpShowNames.Name = "grpShowNames";
-            this.grpShowNames.Size = new System.Drawing.Size(919, 149);
-            this.grpShowNames.TabIndex = 9;
+            this.grpShowNames.Size = new System.Drawing.Size(922, 149);
+            this.grpShowNames.TabIndex = 12;
             this.grpShowNames.TabStop = false;
             this.grpShowNames.Text = "Default File Name Format";
             // 
@@ -826,10 +890,10 @@
             this.grpDirectories.Controls.Add(this.txtOutputFolder);
             this.grpDirectories.Controls.Add(this.btnBrowseOutputFolder);
             this.grpDirectories.Dock = System.Windows.Forms.DockStyle.Top;
-            this.grpDirectories.Location = new System.Drawing.Point(0, 0);
+            this.grpDirectories.Location = new System.Drawing.Point(3, 3);
             this.grpDirectories.Name = "grpDirectories";
-            this.grpDirectories.Size = new System.Drawing.Size(919, 113);
-            this.grpDirectories.TabIndex = 8;
+            this.grpDirectories.Size = new System.Drawing.Size(922, 113);
+            this.grpDirectories.TabIndex = 11;
             this.grpDirectories.TabStop = false;
             this.grpDirectories.Text = "Directories";
             // 
@@ -868,7 +932,6 @@
             this.btnBrowseInputFolder.TabIndex = 2;
             this.btnBrowseInputFolder.Text = "Browse";
             this.btnBrowseInputFolder.UseVisualStyleBackColor = true;
-            this.btnBrowseInputFolder.Click += new System.EventHandler(this.btnBrowseInputFolder_Click);
             // 
             // label3
             // 
@@ -905,7 +968,176 @@
             this.btnBrowseOutputFolder.TabIndex = 5;
             this.btnBrowseOutputFolder.Text = "Browse";
             this.btnBrowseOutputFolder.UseVisualStyleBackColor = true;
-            this.btnBrowseOutputFolder.Click += new System.EventHandler(this.btnBrowseOutputFolder_Click);
+            // 
+            // regularExpressionsTabPage
+            // 
+            this.regularExpressionsTabPage.Controls.Add(this.toolStrip4);
+            this.regularExpressionsTabPage.Controls.Add(this.lstRegexp);
+            this.regularExpressionsTabPage.Controls.Add(this.grpAddRegexp);
+            this.regularExpressionsTabPage.Controls.Add(this.grpRegexpInfo);
+            this.regularExpressionsTabPage.Location = new System.Drawing.Point(4, 22);
+            this.regularExpressionsTabPage.Name = "regularExpressionsTabPage";
+            this.regularExpressionsTabPage.Padding = new System.Windows.Forms.Padding(3);
+            this.regularExpressionsTabPage.Size = new System.Drawing.Size(928, 478);
+            this.regularExpressionsTabPage.TabIndex = 1;
+            this.regularExpressionsTabPage.Text = "Regular Expressions";
+            this.regularExpressionsTabPage.UseVisualStyleBackColor = true;
+            // 
+            // toolStrip4
+            // 
+            this.toolStrip4.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.btnApplyRegexp,
+            this.btnSaveRegexp,
+            this.btnRevertRegexp,
+            this.toolStripSeparator9,
+            this.btnMoveUpRegexp,
+            this.btnMoveDownRegexp,
+            this.toolStripSeparator10,
+            this.btnRemoveRegexp});
+            this.toolStrip4.Location = new System.Drawing.Point(3, 371);
+            this.toolStrip4.Name = "toolStrip4";
+            this.toolStrip4.Size = new System.Drawing.Size(922, 25);
+            this.toolStrip4.TabIndex = 3;
+            this.toolStrip4.Text = "toolStrip4";
+            // 
+            // btnApplyRegexp
+            // 
+            this.btnApplyRegexp.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnApplyRegexp.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnApplyRegexp.Name = "btnApplyRegexp";
+            this.btnApplyRegexp.Size = new System.Drawing.Size(42, 22);
+            this.btnApplyRegexp.Text = "Apply";
+            this.btnApplyRegexp.Click += new System.EventHandler(this.btnApplyRegexp_Click);
+            // 
+            // btnSaveRegexp
+            // 
+            this.btnSaveRegexp.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnSaveRegexp.Image = ((System.Drawing.Image)(resources.GetObject("btnSaveRegexp.Image")));
+            this.btnSaveRegexp.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnSaveRegexp.Name = "btnSaveRegexp";
+            this.btnSaveRegexp.Size = new System.Drawing.Size(35, 22);
+            this.btnSaveRegexp.Text = "Save";
+            this.btnSaveRegexp.Click += new System.EventHandler(this.btnSaveRegexp_Click);
+            // 
+            // btnRevertRegexp
+            // 
+            this.btnRevertRegexp.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnRevertRegexp.Image = ((System.Drawing.Image)(resources.GetObject("btnRevertRegexp.Image")));
+            this.btnRevertRegexp.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnRevertRegexp.Name = "btnRevertRegexp";
+            this.btnRevertRegexp.Size = new System.Drawing.Size(44, 22);
+            this.btnRevertRegexp.Text = "Revert";
+            this.btnRevertRegexp.Click += new System.EventHandler(this.btnRevertRegexp_Click);
+            // 
+            // toolStripSeparator9
+            // 
+            this.toolStripSeparator9.Name = "toolStripSeparator9";
+            this.toolStripSeparator9.Size = new System.Drawing.Size(6, 25);
+            // 
+            // btnMoveUpRegexp
+            // 
+            this.btnMoveUpRegexp.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnMoveUpRegexp.Image = ((System.Drawing.Image)(resources.GetObject("btnMoveUpRegexp.Image")));
+            this.btnMoveUpRegexp.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnMoveUpRegexp.Name = "btnMoveUpRegexp";
+            this.btnMoveUpRegexp.Size = new System.Drawing.Size(59, 22);
+            this.btnMoveUpRegexp.Text = "Move Up";
+            this.btnMoveUpRegexp.Click += new System.EventHandler(this.btnMoveUpRegexp_Click);
+            // 
+            // btnMoveDownRegexp
+            // 
+            this.btnMoveDownRegexp.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnMoveDownRegexp.Image = ((System.Drawing.Image)(resources.GetObject("btnMoveDownRegexp.Image")));
+            this.btnMoveDownRegexp.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnMoveDownRegexp.Name = "btnMoveDownRegexp";
+            this.btnMoveDownRegexp.Size = new System.Drawing.Size(75, 22);
+            this.btnMoveDownRegexp.Text = "Move Down";
+            this.btnMoveDownRegexp.Click += new System.EventHandler(this.btnMoveDownRegexp_Click);
+            // 
+            // toolStripSeparator10
+            // 
+            this.toolStripSeparator10.Name = "toolStripSeparator10";
+            this.toolStripSeparator10.Size = new System.Drawing.Size(6, 25);
+            // 
+            // btnRemoveRegexp
+            // 
+            this.btnRemoveRegexp.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnRemoveRegexp.Image = ((System.Drawing.Image)(resources.GetObject("btnRemoveRegexp.Image")));
+            this.btnRemoveRegexp.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnRemoveRegexp.Name = "btnRemoveRegexp";
+            this.btnRemoveRegexp.Size = new System.Drawing.Size(54, 22);
+            this.btnRemoveRegexp.Text = "Remove";
+            this.btnRemoveRegexp.Click += new System.EventHandler(this.btnRemoveRegexp_Click);
+            // 
+            // lstRegexp
+            // 
+            this.lstRegexp.Dock = System.Windows.Forms.DockStyle.Top;
+            this.lstRegexp.FormattingEnabled = true;
+            this.lstRegexp.Location = new System.Drawing.Point(3, 224);
+            this.lstRegexp.Name = "lstRegexp";
+            this.lstRegexp.Size = new System.Drawing.Size(922, 147);
+            this.lstRegexp.TabIndex = 2;
+            // 
+            // grpAddRegexp
+            // 
+            this.grpAddRegexp.Controls.Add(this.toolStrip3);
+            this.grpAddRegexp.Controls.Add(this.txtRegexp);
+            this.grpAddRegexp.Dock = System.Windows.Forms.DockStyle.Top;
+            this.grpAddRegexp.Location = new System.Drawing.Point(3, 159);
+            this.grpAddRegexp.Name = "grpAddRegexp";
+            this.grpAddRegexp.Size = new System.Drawing.Size(922, 65);
+            this.grpAddRegexp.TabIndex = 1;
+            this.grpAddRegexp.TabStop = false;
+            this.grpAddRegexp.Text = "Add Regular Expression";
+            // 
+            // toolStrip3
+            // 
+            this.toolStrip3.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.btnAddRegexp});
+            this.toolStrip3.Location = new System.Drawing.Point(3, 36);
+            this.toolStrip3.Name = "toolStrip3";
+            this.toolStrip3.Size = new System.Drawing.Size(916, 25);
+            this.toolStrip3.TabIndex = 1;
+            this.toolStrip3.Text = "toolStrip3";
+            // 
+            // btnAddRegexp
+            // 
+            this.btnAddRegexp.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnAddRegexp.Image = ((System.Drawing.Image)(resources.GetObject("btnAddRegexp.Image")));
+            this.btnAddRegexp.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnAddRegexp.Name = "btnAddRegexp";
+            this.btnAddRegexp.Size = new System.Drawing.Size(33, 22);
+            this.btnAddRegexp.Text = "Add";
+            this.btnAddRegexp.Click += new System.EventHandler(this.btnAddRegexp_Click);
+            // 
+            // txtRegexp
+            // 
+            this.txtRegexp.Dock = System.Windows.Forms.DockStyle.Top;
+            this.txtRegexp.Location = new System.Drawing.Point(3, 16);
+            this.txtRegexp.Name = "txtRegexp";
+            this.txtRegexp.Size = new System.Drawing.Size(916, 20);
+            this.txtRegexp.TabIndex = 0;
+            // 
+            // grpRegexpInfo
+            // 
+            this.grpRegexpInfo.Controls.Add(this.label12);
+            this.grpRegexpInfo.Dock = System.Windows.Forms.DockStyle.Top;
+            this.grpRegexpInfo.Location = new System.Drawing.Point(3, 3);
+            this.grpRegexpInfo.Name = "grpRegexpInfo";
+            this.grpRegexpInfo.Size = new System.Drawing.Size(922, 156);
+            this.grpRegexpInfo.TabIndex = 0;
+            this.grpRegexpInfo.TabStop = false;
+            this.grpRegexpInfo.Text = "Regular Expression Information";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Dock = System.Windows.Forms.DockStyle.Top;
+            this.label12.Location = new System.Drawing.Point(3, 16);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(739, 130);
+            this.label12.TabIndex = 0;
+            this.label12.Text = resources.GetString("label12.Text");
             // 
             // tpgLog
             // 
@@ -913,7 +1145,7 @@
             this.tpgLog.Location = new System.Drawing.Point(4, 22);
             this.tpgLog.Name = "tpgLog";
             this.tpgLog.Padding = new System.Windows.Forms.Padding(3);
-            this.tpgLog.Size = new System.Drawing.Size(919, 504);
+            this.tpgLog.Size = new System.Drawing.Size(936, 504);
             this.tpgLog.TabIndex = 3;
             this.tpgLog.Text = "Log";
             this.tpgLog.UseVisualStyleBackColor = true;
@@ -925,14 +1157,14 @@
             this.lstLog.HorizontalScrollbar = true;
             this.lstLog.Location = new System.Drawing.Point(3, 3);
             this.lstLog.Name = "lstLog";
-            this.lstLog.Size = new System.Drawing.Size(913, 498);
+            this.lstLog.Size = new System.Drawing.Size(930, 498);
             this.lstLog.TabIndex = 0;
             // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(927, 530);
+            this.ClientSize = new System.Drawing.Size(944, 530);
             this.Controls.Add(this.tabControl1);
             this.Name = "frmMain";
             this.Text = "TV Sorter";
@@ -956,11 +1188,23 @@
             this.toolStrip2.ResumeLayout(false);
             this.toolStrip2.PerformLayout();
             this.tpgSettings.ResumeLayout(false);
+            this.settingsSubTabs.ResumeLayout(false);
+            this.generalSettings.ResumeLayout(false);
             this.flowLayoutPanel2.ResumeLayout(false);
             this.grpShowNames.ResumeLayout(false);
             this.grpShowNames.PerformLayout();
             this.grpDirectories.ResumeLayout(false);
             this.grpDirectories.PerformLayout();
+            this.regularExpressionsTabPage.ResumeLayout(false);
+            this.regularExpressionsTabPage.PerformLayout();
+            this.toolStrip4.ResumeLayout(false);
+            this.toolStrip4.PerformLayout();
+            this.grpAddRegexp.ResumeLayout(false);
+            this.grpAddRegexp.PerformLayout();
+            this.toolStrip3.ResumeLayout(false);
+            this.toolStrip3.PerformLayout();
+            this.grpRegexpInfo.ResumeLayout(false);
+            this.grpRegexpInfo.PerformLayout();
             this.tpgLog.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -976,25 +1220,6 @@
         private System.Windows.Forms.Label lblLastUpdate;
         private System.Windows.Forms.Label lblTvdbId;
         private System.Windows.Forms.TabPage tpgSettings;
-        private System.Windows.Forms.GroupBox grpShowNames;
-        private System.Windows.Forms.GroupBox grpDirectories;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox txtInputFolder;
-        private System.Windows.Forms.Button btnBrowseInputFolder;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.CheckBox chkRecurse;
-        private System.Windows.Forms.TextBox txtOutputFolder;
-        private System.Windows.Forms.Button btnBrowseOutputFolder;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.TextBox txtExampleName;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.TextBox txtNameFormat;
-        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel2;
-        private System.Windows.Forms.Button btnApply;
-        private System.Windows.Forms.Button btnSave;
-        private System.Windows.Forms.Button btnReset;
-        private System.Windows.Forms.Label label7;
         private System.Windows.Forms.FolderBrowserDialog dlgFolderSelect;
         private System.Windows.Forms.PictureBox picShowPic;
         private System.Windows.Forms.GroupBox grpShowCustomFormat;
@@ -1009,10 +1234,8 @@
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.TextBox txtAltNames;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Button btnRevert;
         private System.Windows.Forms.TabPage tpgLog;
         private System.Windows.Forms.ListBox lstLog;
-        private System.Windows.Forms.CheckBox chkDeleteEmpty;
         private System.Windows.Forms.ListView lstInputFolder;
         private System.Windows.Forms.ColumnHeader columnHeader1;
         private System.Windows.Forms.ColumnHeader columnHeader2;
@@ -1051,6 +1274,48 @@
         private System.Windows.Forms.GroupBox grpShowUpdateOptions;
         private System.Windows.Forms.CheckBox chkDvdOrder;
         private System.Windows.Forms.Button btnLockShow;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator8;
+        private System.Windows.Forms.ToolStripButton btnLockAll;
+        private System.Windows.Forms.ToolStripButton btnUnlockAll;
+        private System.Windows.Forms.TabControl settingsSubTabs;
+        private System.Windows.Forms.TabPage generalSettings;
+        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel2;
+        private System.Windows.Forms.Button btnApply;
+        private System.Windows.Forms.Button btnSave;
+        private System.Windows.Forms.Button btnRevert;
+        private System.Windows.Forms.GroupBox grpShowNames;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.TextBox txtExampleName;
+        private System.Windows.Forms.TextBox txtNameFormat;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.GroupBox grpDirectories;
+        private System.Windows.Forms.CheckBox chkDeleteEmpty;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TextBox txtInputFolder;
+        private System.Windows.Forms.Button btnBrowseInputFolder;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.CheckBox chkRecurse;
+        private System.Windows.Forms.TextBox txtOutputFolder;
+        private System.Windows.Forms.Button btnBrowseOutputFolder;
+        private System.Windows.Forms.TabPage regularExpressionsTabPage;
+        private System.Windows.Forms.GroupBox grpRegexpInfo;
+        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.ToolStrip toolStrip4;
+        private System.Windows.Forms.ToolStripButton btnApplyRegexp;
+        private System.Windows.Forms.ToolStripButton btnSaveRegexp;
+        private System.Windows.Forms.ToolStripButton btnRevertRegexp;
+        private System.Windows.Forms.ListBox lstRegexp;
+        private System.Windows.Forms.GroupBox grpAddRegexp;
+        private System.Windows.Forms.ToolStrip toolStrip3;
+        private System.Windows.Forms.ToolStripButton btnAddRegexp;
+        private System.Windows.Forms.TextBox txtRegexp;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator9;
+        private System.Windows.Forms.ToolStripButton btnMoveUpRegexp;
+        private System.Windows.Forms.ToolStripButton btnMoveDownRegexp;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator10;
+        private System.Windows.Forms.ToolStripButton btnRemoveRegexp;
     }
 }
 
