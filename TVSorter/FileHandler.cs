@@ -224,9 +224,9 @@ namespace TVSorter
                             episode);
                     }
                 }
-                catch
+                catch (Exception e)
                 {
-                    MessageBox.Show("Error getting an episode from file \n" + file.FullName);
+                    MessageBox.Show("Error getting an episode from file \n" + file.FullName + "\n" + e.Message);
                 }
                 //Increment the progress bar
                 if (inc != null)

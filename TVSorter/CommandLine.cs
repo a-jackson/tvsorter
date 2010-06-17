@@ -25,6 +25,7 @@ namespace TVSorter
         {               
             Database database = new Database();
             Settings.LoadSettings();
+            Settings.LoadFileRegexp();
             Log.Init(_log);
             Log.Add("Program started");
             Log.Add("Input directory: " + Settings.InputDir);
