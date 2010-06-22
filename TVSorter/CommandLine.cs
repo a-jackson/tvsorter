@@ -27,7 +27,7 @@ namespace TVSorter
             Settings.LoadSettings();
             Settings.LoadFileRegexp();
             Log.Init(_log);
-            Log.Add("Program started");
+            Log.Add("Program started on " + DateTime.Now.ToLongDateString());
             Log.Add("Input directory: " + Settings.InputDir);
             Log.Add("Output directory: " + Settings.OutputDir);
             Log.Add("Recurse subdirs: " + Settings.RecurseSubDir);
