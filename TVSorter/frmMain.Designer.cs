@@ -666,6 +666,7 @@
             this.toolStrip2.Size = new System.Drawing.Size(930, 25);
             this.toolStrip2.TabIndex = 11;
             this.toolStrip2.Text = "toolStrip2";
+            this.toolStrip2.Click += new System.EventHandler(this.btnUpdateAll_Click);
             // 
             // btnUpdateAll
             // 
@@ -791,6 +792,7 @@
             this.btnApply.TabIndex = 0;
             this.btnApply.Text = "Apply";
             this.btnApply.UseVisualStyleBackColor = true;
+            this.btnApply.Click += new System.EventHandler(this.btnApply_Click);
             // 
             // btnSave
             // 
@@ -800,6 +802,7 @@
             this.btnSave.TabIndex = 1;
             this.btnSave.Text = "Save";
             this.btnSave.UseVisualStyleBackColor = true;
+            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
             // btnRevert
             // 
@@ -809,6 +812,7 @@
             this.btnRevert.TabIndex = 3;
             this.btnRevert.Text = "Revert To Saved";
             this.btnRevert.UseVisualStyleBackColor = true;
+            this.btnRevert.Click += new System.EventHandler(this.btnRevert_Click);
             // 
             // grpShowNames
             // 
@@ -932,6 +936,7 @@
             this.btnBrowseInputFolder.TabIndex = 2;
             this.btnBrowseInputFolder.Text = "Browse";
             this.btnBrowseInputFolder.UseVisualStyleBackColor = true;
+            this.btnBrowseInputFolder.Click += new System.EventHandler(this.btnBrowseInputFolder_Click);
             // 
             // label3
             // 
@@ -968,6 +973,7 @@
             this.btnBrowseOutputFolder.TabIndex = 5;
             this.btnBrowseOutputFolder.Text = "Browse";
             this.btnBrowseOutputFolder.UseVisualStyleBackColor = true;
+            this.btnBrowseOutputFolder.Click += new System.EventHandler(this.btnBrowseOutputFolder_Click);
             // 
             // regularExpressionsTabPage
             // 

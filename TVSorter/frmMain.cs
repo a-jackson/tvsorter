@@ -501,8 +501,11 @@ namespace TVSorter
                 string episodeNum = episode.Value.EpisodeNum.ToString();
                 string name = episode.Value.EpisodeName;
                 string outputPath = episode.Value.FormatOutputPath();
-                lstInputFolder.Items.Add(new ListViewItem(
-                    new string[] { path, show, seasonNum, episodeNum, name, outputPath }));
+                ListViewItem item = new ListViewItem(
+                    new string[] { path, show, seasonNum, episodeNum, name, outputPath });
+                if (!episode.Value.IsComplete)
+                    item.BackColor = Color.Red;
+                lstInputFolder.Items.Add(item);
             }
         }
 
@@ -567,6 +570,14 @@ namespace TVSorter
                     item.SubItems[3].Text = episodeNum;
                     item.SubItems[4].Text = name;
                     item.SubItems[5].Text = outputPath;
+                    if (!ep.IsComplete)
+                    {
+                        item.BackColor = Color.Red;
+                    }
+                    else
+                    {
+                        item.BackColor = Color.Transparent;
+                    }
                 }
             }
         }
@@ -745,8 +756,15 @@ namespace TVSorter
                 show.SaveToDatabase();
                 //Create a new TV show so that it gets the newly added show from the database
                 //and therefore changes can be made to it - Issue ID 1.
-                lstTVShows.Items.Add(new TVShow(show.Name));
-
+                show = TVShow.GetTVShow(show.Name);
+                if (show != null)
+                {
+                    lstTVShows.Items.Add(show);
+                }
+                else
+                {
+                    Log.Add("Error adding show " + addShow.newShow.Name);
+                }
             }
         }
 

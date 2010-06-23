@@ -258,6 +258,13 @@ namespace TVSorter
             //Process each episode
             foreach (Episode ep in episodes)
             {
+                //Skip anything that isn't complete in cli mode so files don't end
+                //up in the wrong place.
+                if (Program.CurrentMode == RunMode.Cli && !ep.IsComplete)
+                {
+                    Log.Add("Skipping file: " + ep.FileInfo.FullName + " not enough data");
+                    continue;
+                }
                 string newName = "";
                 try
                 {
