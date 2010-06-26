@@ -666,7 +666,6 @@
             this.toolStrip2.Size = new System.Drawing.Size(930, 25);
             this.toolStrip2.TabIndex = 11;
             this.toolStrip2.Text = "toolStrip2";
-            this.toolStrip2.Click += new System.EventHandler(this.btnUpdateAll_Click);
             // 
             // btnUpdateAll
             // 

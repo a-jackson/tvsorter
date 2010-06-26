@@ -163,8 +163,6 @@ namespace TVSorter
                     return;
                 }
             }
-            //Clear all episode data for this show
-            _database.ExecuteQuery("Delete From Episodes Where show_id = " + show.DatabaseId + ";");
             string showAddress = MirrorAddress + ApiLoc + "/series/" + show.TvdbId +
                 "/all/en.xml";
             XmlDocument showDoc = new XmlDocument();
@@ -178,8 +176,8 @@ namespace TVSorter
             }
             //Get all the episodes and add to the database
             XmlNodeList episodes = showDoc.GetElementsByTagName("Episode");
-            StringBuilder query = new StringBuilder();
-            int eps = 0;
+            ProcessXMLFile(show, episodes);        }        private static void ProcessXMLFile(TVShow show, XmlNodeList episodes)        {            StringBuilder query = new StringBuilder();
+            //Clear all episode data for this show            query.Append("Delete From Episodes Where show_id = " + show.DatabaseId + ";");            int eps = 0;
             foreach (XmlNode episode in episodes)
             {
                 //Get each piece of data from the XML
@@ -230,11 +228,8 @@ namespace TVSorter
                     first_air + ", \"" +
                     episode_name.Replace("\"", "\"\"") + "\");");
             }
-            if (query.Length > 0)
-            {
-                //Execute the query
-                eps = _database.ExecuteQuery("Begin;" + query.ToString() + "Commit;");
-            }
+            //Execute the query
+            eps = _database.ExecuteQuery("Begin;" + query.ToString() + "Commit;");
             //Refresh the update time
             show.UpdateTime = ServerTime;
             show.SaveToDatabase();
