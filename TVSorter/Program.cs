@@ -6,7 +6,7 @@ namespace TVSorter
     public enum RunMode { Gui, Cli };
     static class Program
     {
-        public static string VersionNumber = "0.3";
+        public static string VersionNumber = "0.4";
         public static RunMode CurrentMode;
         /// <summary>
         /// The main entry point for the application.

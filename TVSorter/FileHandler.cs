@@ -25,6 +25,9 @@ namespace TVSorter
 
         private Dictionary<string, int> _months;
 
+        private event Increment Increment;
+        private event ProgressError Abort;
+
         public FileHandler()
         {
             //A dictionary of filepath and episode objects
@@ -41,6 +44,18 @@ namespace TVSorter
             _months.Add("August", 8); _months.Add("September", 9);
             _months.Add("October", 10); _months.Add("November", 11); 
             _months.Add("December", 12);
+        }
+
+        public void SetEvents(Increment inc, ProgressError error)
+        {
+            Increment += inc;
+            Abort += error;
+        }
+
+        public void ClearEvents(Increment inc, ProgressError error)
+        {
+            Increment -= inc;
+            Abort -= error;
         }
 
         /// <summary>
@@ -180,9 +195,8 @@ namespace TVSorter
         /// <summary>
         /// Refreshes the file list
         /// </summary>
-        /// <param name="inc">Delegate to the increment method, called after each file is processed</param>
         /// <param name="inputFolder">The input directory</param>
-        public void RefreshEpisodes(MethodInvoker inc, string inputFolder)
+        public void RefreshEpisodes(string inputFolder)
         {
             Log.Add("Refresh of directory: " + inputFolder);
             DirectoryInfo dir = new DirectoryInfo(inputFolder);
@@ -190,7 +204,7 @@ namespace TVSorter
             if (!dir.Exists)
                 return;
             //Start the recursive function that processes a directory
-            ProcessFiles(dir, inc);
+            ProcessFiles(dir);
         }
 
         /// <summary>
@@ -198,8 +212,7 @@ namespace TVSorter
         /// get all the episode in it.
         /// </summary>
         /// <param name="dir">The directory to process</param>
-        /// <param name="inc">Delegate for the increment function</param>
-        private void ProcessFiles(DirectoryInfo dir, MethodInvoker inc)
+        private void ProcessFiles(DirectoryInfo dir)
         {
             //Process each file in the directory
             foreach (FileInfo file in dir.GetFiles())
@@ -208,8 +221,7 @@ namespace TVSorter
                 if (!_extensions.IsMatch(file.Extension))
                 {
                     //Increment the progress bar and move on if not.
-                    if (inc != null)
-                        inc();
+                    Increment();
                     continue;
                 }
                 try
@@ -226,18 +238,17 @@ namespace TVSorter
                 }
                 catch (Exception e)
                 {
-                    MessageBox.Show("Error getting an episode from file \n" + file.FullName + "\n" + e.Message);
+                    Log.Add("Error getting an episode from file \n" + file.FullName + "\n" + e.Message);
                 }
                 //Increment the progress bar
-                if (inc != null)
-                    inc();
+                Increment();
             }
             //If the scan should be recursive then process each of the directories in this directory
             if (Settings.RecurseSubDir)
             {
                 foreach (DirectoryInfo subdir in dir.GetDirectories())
                 {
-                    ProcessFiles(subdir, inc);
+                    ProcessFiles(subdir);
                 }
             }
         }
@@ -250,10 +261,9 @@ namespace TVSorter
         /// <summary>
         /// Renames and moves/copies the files
         /// </summary>
-        /// <param name="inc">Delegate for the increment function</param>
         /// <param name="episodes">The array of episodes to move</param>
         /// <param name="action">The type of sorting to do</param>
-        internal void SortEpisodes(MethodInvoker inc, Episode[] episodes, SortAction action)
+        internal void SortEpisodes(Episode[] episodes, SortAction action)
         {
             //Process each episode
             foreach (Episode ep in episodes)
@@ -301,8 +311,7 @@ namespace TVSorter
                 }
                 finally
                 {
-                    if (inc != null)
-                        inc(); //Inc the progress bar
+                    Increment(); //Inc the progress bar
                 }
             }
         }

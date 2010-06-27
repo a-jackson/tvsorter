@@ -43,7 +43,7 @@ namespace TVSorter
                         //Update each show
                         foreach (TVShow show in showList)
                         {
-                            TVDB.UpdateShow(show, false);
+                            TVDB.Instance.UpdateShow(show, false);
                         }
                     }
                     catch (WebException e)
@@ -85,11 +85,11 @@ namespace TVSorter
                     }
                     //Refresh the episodes and the sort them
                     FileHandler fileHandler = new FileHandler();
-                    fileHandler.RefreshEpisodes(null, Settings.InputDir);
+                    fileHandler.RefreshEpisodes(Settings.InputDir);
                     Dictionary<string, Episode> episodes = fileHandler.Files;
                     Episode[] episodeArr = new Episode[episodes.Count];
                     episodes.Values.CopyTo(episodeArr, 0);
-                    fileHandler.SortEpisodes(null, episodeArr, action);
+                    fileHandler.SortEpisodes(episodeArr, action);
                 }
                 else
                 {

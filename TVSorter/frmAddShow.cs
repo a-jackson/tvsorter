@@ -24,7 +24,7 @@ namespace TVSorter
             try
             {
                 string showName = txtName.Text;
-                results = TVDB.SearchShow(showName);
+                results = TVDB.Instance.SearchShow(showName);
                 foreach (TVShow show in results)
                     lstResults.Items.Add(
                         new ListViewItem(new string[] { show.Name, show.TvdbId.ToString() }));

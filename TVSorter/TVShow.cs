@@ -249,5 +249,28 @@ namespace TVSorter
                 return new TVShow(-1, "0", showName, -1, true, "", showName, "", "", false, false);
             }
         }
+
+        /// <summary>
+        /// Convert a unix timestamp into a datetime object
+        /// </summary>
+        /// <param name="timestamp">The timestamp to convert</param>
+        /// <returns>The DateTime object</returns>
+        public static DateTime ConvertFromUnixTimestamp(double timestamp)
+        {
+            DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+            return origin.AddSeconds(timestamp);
+        }
+
+        /// <summary>
+        /// Converts a DateTime object into a unix timestamp
+        /// </summary>
+        /// <param name="date">The DateTime object to convert</param>
+        /// <returns>The timestamp</returns>
+        public static long ConvertToUnixTimestamp(DateTime date)
+        {
+            DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+            TimeSpan diff = date - origin;
+            return (long)Math.Floor(diff.TotalSeconds);
+        }
     }
 }
