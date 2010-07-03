@@ -29,8 +29,8 @@ namespace TVSorter
         static Database _database = new Database();
 
         //Events
-        public event Increment Increment;
-        public event ProgressError Abort;
+        public event Increment Increment = delegate { };
+        public event ProgressError Abort = delegate { };
 
         private string MirrorAddress;
         private long ServerTime;
@@ -149,17 +149,18 @@ namespace TVSorter
             {
                 try
                 {
+                    Log.Add("Update started");
                     foreach (TVShow show in shows)
                     {
                         UpdateShow(show, force);
                         Increment();
                     }
+                    Log.Add("Update complete");
                 }
                 catch (Exception ex)
                 {
                     Abort(ex.Message);
                     Log.Add("Update failed: " + ex.Message);
-                    return;
                 }
             })).Start();
         }
@@ -170,7 +171,7 @@ namespace TVSorter
         /// <param name="show">The show to update</param>
         /// <param name="force">If the update should be forced rather
         /// than checking if there are any updates</param>
-        public void UpdateShow(TVShow show, bool force)
+        private void UpdateShow(TVShow show, bool force)
         {
             if (show.Locked)
             {
@@ -281,9 +282,14 @@ namespace TVSorter
                     first_air + ", \"" +
                     episode_name.Replace("\"", "\"\"") + "\");");
             }
+            //Get the current number of episodes
+            long currEps = (long)_database.ExecuteScalar("Select Count(*) From Episodes Where show_id = " + show.DatabaseId);
             //Execute the query
-            int eps = _database.ExecuteQuery("Begin;" + query.ToString() + "Commit;");
+            long eps = _database.ExecuteQuery("Begin;" + query.ToString() + "Commit;");
+            //Eps includes the delete query. Need to remove that many from it.
+            eps -= currEps;
             //Refresh the update time
+            UpdateServerTime();
             show.UpdateTime = ServerTime;
             show.SaveToDatabase();
             Log.Add("Updated " + show.Name + " has " + eps + " episodes");

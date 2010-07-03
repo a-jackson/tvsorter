@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.IO;
 using System.Windows.Forms;
+using System.Threading;
 
 namespace TVSorter
 {
@@ -25,8 +26,8 @@ namespace TVSorter
 
         private Dictionary<string, int> _months;
 
-        private event Increment Increment;
-        private event ProgressError Abort;
+        private event Increment Increment = delegate { };
+        private event ProgressError Abort = delegate { };
 
         public FileHandler()
         {
@@ -265,55 +266,59 @@ namespace TVSorter
         /// <param name="action">The type of sorting to do</param>
         internal void SortEpisodes(Episode[] episodes, SortAction action)
         {
-            //Process each episode
-            foreach (Episode ep in episodes)
+            new Thread(new ThreadStart(delegate()
             {
-                //Skip anything that isn't complete in cli mode so files don't end
-                //up in the wrong place.
-                if (Program.CurrentMode == RunMode.Cli && !ep.IsComplete)
+                //Process each episode
+                foreach (Episode ep in episodes)
                 {
-                    Log.Add("Skipping file: " + ep.FileInfo.FullName + " not enough data");
-                    continue;
-                }
-                string newName = "";
-                try
-                {
-                    //Get the new path
-                    newName = Settings.OutputDir + ep.FormatOutputPath();
-                    if (action == SortAction.Rename)
+                    //Skip anything that isn't complete in cli mode so files don't end
+                    //up in the wrong place.
+                    if (Program.CurrentMode == RunMode.Cli && !ep.IsComplete)
                     {
-                        newName = newName.Substring(newName.LastIndexOf('\\') + 1);
-                        newName = ep.FileInfo.DirectoryName + "\\" + newName;
+                        Log.Add("Skipping file: " + ep.FileInfo.FullName + " not enough data");
+                        Increment();
+                        continue;
                     }
-                    FileInfo newFile = new FileInfo(newName);
-                    //Create the directory if it doesn't exist
-                    if (!newFile.Directory.Exists)
-                        newFile.Directory.Create();
-                    //Move/copy the file and delete the directory it was in if it is now empty
-                    if (action == SortAction.Copy)
+                    string newName = "";
+                    try
                     {
-                        File.Copy(ep.FileInfo.FullName, newName);
+                        //Get the new path
+                        newName = Settings.OutputDir + ep.FormatOutputPath();
+                        if (action == SortAction.Rename)
+                        {
+                            newName = newName.Substring(newName.LastIndexOf('\\') + 1);
+                            newName = ep.FileInfo.DirectoryName + "\\" + newName;
+                        }
+                        FileInfo newFile = new FileInfo(newName);
+                        //Create the directory if it doesn't exist
+                        if (!newFile.Directory.Exists)
+                            newFile.Directory.Create();
+                        //Move/copy the file and delete the directory it was in if it is now empty
+                        if (action == SortAction.Copy)
+                        {
+                            File.Copy(ep.FileInfo.FullName, newName);
+                        }
+                        else
+                        {
+                            File.Move(ep.FileInfo.FullName, newName);
+                        }
+                        if (Settings.DeleteEmpty)
+                        {
+                            RecuriveDelete(ep.FileInfo.Directory);
+                        }
+                        Log.Add(action.ToString() + " file: " + ep.FileInfo.FullName + " -> " + newName);
                     }
-                    else
+                    catch (Exception e)
                     {
-                        File.Move(ep.FileInfo.FullName, newName);
+                        Log.Add("Failed " + action.ToString() + ": " + ep.FileInfo.FullName + " -> " +
+                            newName + " -- " + e.Message);
                     }
-                    if (Settings.DeleteEmpty)
+                    finally
                     {
-                        RecuriveDelete(ep.FileInfo.Directory);
+                        Increment(); //Inc the progress bar
                     }
-                    Log.Add(action.ToString() + " file: " + ep.FileInfo.FullName + " -> " + newName);
                 }
-                catch (Exception e)
-                {
-                    Log.Add("Failed " + action.ToString() + ": " + ep.FileInfo.FullName + " -> " +
-                        newName + " -- " + e.Message);
-                }
-                finally
-                {
-                    Increment(); //Inc the progress bar
-                }
-            }
+            })).Start();
         }
 
         /// <summary>

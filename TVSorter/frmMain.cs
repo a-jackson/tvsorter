@@ -306,10 +306,7 @@ namespace TVSorter
             }
 
             _fileHandler.SetEvents(progress.Increment, progress.Abort);
-            new Thread(new ThreadStart(delegate()
-            {
-                _fileHandler.SortEpisodes(episodes, action);
-            })).Start();
+            _fileHandler.SortEpisodes(episodes, action);
             progress.ShowDialog();
             _fileHandler.ClearEvents(progress.Increment, progress.Abort);
 
