@@ -127,36 +127,11 @@ namespace TVSorter
         {
             frmProgress progress =
                 new frmProgress(Directory.GetDirectories(Settings.OutputDir).Length);
-            SortedDictionary<string, List<TVShow>> shows = new SortedDictionary<string, List<TVShow>>();
-            MethodInvoker inc = new MethodInvoker(progress.Increment);
-            Thread addShows = new Thread(new ThreadStart(delegate()
-            {
-                foreach (string dir in Directory.GetDirectories(Settings.OutputDir))
-                {
-                    //Check if the show has already been added.
-                    string name = dir.Substring(dir.LastIndexOf('\\') + 1).Replace("\"", "\"\"");
-                    if ((long)_database.ExecuteScalar("SELECT COUNT(*) FROM shows WHERE folder_name=\""
-                        + name + "\"") == 0)
-                    {
-                        try
-                        {
-                            //Search for the show and add the results
-                            List<TVShow> results = TVDB.SearchShow(name);
-                            shows.Add(name, results);
-                        }
-                        catch
-                        {
-                            MessageBox.Show("The TVDB is down, unable to search for shows.");
-                            progress.Abort();
-                            return;
-                        }
-                    }
-                    progress.Invoke(inc);
-                }
-            }));
-            addShows.Start();
+            TVDB.Instance.SetEvents(progress.Increment, progress.Abort);
+            SortedDictionary<string, List<TVShow>> shows = TVDB.Instance.SearchNewShows();
             if (progress.ShowDialog() == DialogResult.Abort)
                 return;
+            TVDB.Instance.ClearEvents(progress.Increment, progress.Abort);
             //Process the results
             foreach (KeyValuePair<string, List<TVShow>> kvPair in shows)
             {
@@ -254,37 +229,24 @@ namespace TVSorter
             lstTVShows.Refresh();
         }
 
-        /// <summary>
-        /// Updates the selected show
-        /// </summary>
-        /// <param name="force">Indicates if the update should be forced or not</param>
-        private void UpdateSelectedShow(bool force)
+        private void UpdateShows(bool force, params TVShow[] shows)
         {
-            frmProgress progress = new frmProgress(1);
-            MethodInvoker inc = new MethodInvoker(progress.Increment);
-            TVShow selectedItem = (TVShow)lstTVShows.SelectedItem;
-            if (selectedItem == null)
-                return;
-            new Thread(new ThreadStart(delegate()
+            try
             {
-                try
+                frmProgress progress = new frmProgress(shows.Length);
+                TVDB.Instance.SetEvents(progress.Increment, progress.Abort);
+                TVDB.Instance.UpdateShows(force, shows);
+                if (progress.ShowDialog() == DialogResult.Abort)
                 {
-                    TVDB.UpdateShow(selectedItem, force);
+                    MessageBox.Show("An error occured. Unable to update, check the log for details.");
                 }
-                catch (Exception ex)
-                {
-                    progress.Abort();
-                    Log.Add("Update failed: " + ex.Message);
-                    return;
-                }
-                progress.Invoke(inc);
-                progress.Close();
-            })).Start();
-            if (progress.ShowDialog() == DialogResult.Abort)
-            {
-                MessageBox.Show("An error occured. Unable to update, check the log for details.");
+                TVDB.Instance.ClearEvents(progress.Increment, progress.Abort);
+                this.lstTVShows_SelectedIndexChanged(this, null);
             }
-            this.lstTVShows_SelectedIndexChanged(this, null);
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
+            }
         }
 
         /// <summary>
@@ -307,29 +269,6 @@ namespace TVSorter
                 }
             }
             return max;
-        }
-
-        /// <summary>
-        /// Convert a unix timestamp into a datetime object
-        /// </summary>
-        /// <param name="timestamp">The timestamp to convert</param>
-        /// <returns>The DateTime object</returns>
-        public static DateTime ConvertFromUnixTimestamp(double timestamp)
-        {
-            DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
-            return origin.AddSeconds(timestamp);
-        }
-
-        /// <summary>
-        /// Converts a DateTime object into a unix timestamp
-        /// </summary>
-        /// <param name="date">The DateTime object to convert</param>
-        /// <returns>The timestamp</returns>
-        public static long ConvertToUnixTimestamp(DateTime date)
-        {
-            DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
-            TimeSpan diff = date - origin;
-            return (long)Math.Floor(diff.TotalSeconds);
         }
 
         /// <summary>
@@ -359,22 +298,18 @@ namespace TVSorter
                 return;
             }
             frmProgress progress = new frmProgress(lstInputFolder.CheckedItems.Count);
-            MethodInvoker increment = new MethodInvoker(progress.Increment);
-            MethodInvoker inc = new MethodInvoker(delegate() { progress.Invoke(increment); });
             //Create an array of episode to process
             Episode[] episodes = new Episode[lstInputFolder.CheckedItems.Count];
-            int i = 0;
-            foreach (ListViewItem item in lstInputFolder.CheckedItems)
+            for (int i = 0; i < episodes.Length; i++)
             {
                 episodes[i] = _files[lstInputFolder.CheckedItems[i].Text];
-                i++;
             }
-            new Thread(new ThreadStart(delegate()
-            {
-                _fileHandler.SortEpisodes(inc, episodes, action);
-                progress.Close();
-            })).Start();
+
+            _fileHandler.SetEvents(progress.Increment, progress.Abort);
+            _fileHandler.SortEpisodes(episodes, action);
             progress.ShowDialog();
+            _fileHandler.ClearEvents(progress.Increment, progress.Abort);
+
             UpdateFolderFilter();
             //Refresh the directory again. - Todo: Only change things that have changed, don't force a full refresh.
             btnRefresh_Click(this, null);
@@ -481,14 +416,13 @@ namespace TVSorter
                 return;
             }
             frmProgress progress = new frmProgress(numFiles);
-            MethodInvoker increment = new MethodInvoker(progress.Increment);
-            MethodInvoker inc = new MethodInvoker(delegate() { progress.Invoke(increment); });
+            _fileHandler.SetEvents(progress.Increment, progress.Abort);
             new Thread(new ThreadStart(delegate()
             {
-                _fileHandler.RefreshEpisodes(inc, inputDir);
-                progress.Close();
+                _fileHandler.RefreshEpisodes(inputDir);
             })).Start();
             progress.ShowDialog();
+            _fileHandler.ClearEvents(progress.Increment, progress.Abort);
             _files = _fileHandler.Files;
             //Show in list view
             string inputFolder = Settings.InputDir;
@@ -501,8 +435,11 @@ namespace TVSorter
                 string episodeNum = episode.Value.EpisodeNum.ToString();
                 string name = episode.Value.EpisodeName;
                 string outputPath = episode.Value.FormatOutputPath();
-                lstInputFolder.Items.Add(new ListViewItem(
-                    new string[] { path, show, seasonNum, episodeNum, name, outputPath }));
+                ListViewItem item = new ListViewItem(
+                    new string[] { path, show, seasonNum, episodeNum, name, outputPath });
+                if (!episode.Value.IsComplete)
+                    item.BackColor = Color.Red;
+                lstInputFolder.Items.Add(item);
             }
         }
 
@@ -567,6 +504,14 @@ namespace TVSorter
                     item.SubItems[3].Text = episodeNum;
                     item.SubItems[4].Text = name;
                     item.SubItems[5].Text = outputPath;
+                    if (!ep.IsComplete)
+                    {
+                        item.BackColor = Color.Red;
+                    }
+                    else
+                    {
+                        item.BackColor = Color.Transparent;
+                    }
                 }
             }
         }
@@ -592,7 +537,7 @@ namespace TVSorter
             if (selected != null)
             {
                 lblTvdbId.Text = "TVDB ID: " + selected.TvdbId;
-                DateTime update = ConvertFromUnixTimestamp(selected.UpdateTime);
+                DateTime update = TVShow.ConvertFromUnixTimestamp(selected.UpdateTime);
                 lblLastUpdate.Text = "Last Update: " + update.ToString();
                 lblSelectedShow.Text = selected.Name;
                 string image = "Data\\" + selected.TvdbId;
@@ -638,7 +583,9 @@ namespace TVSorter
         //Handles the update selected button
         private void btnUpdateSelected_Click(object sender, EventArgs e)
         {
-            UpdateSelectedShow(false);
+            if (lstTVShows.SelectedIndex == -1)
+                return;
+            UpdateShows(false, (TVShow)lstTVShows.SelectedItem);
         }
 
         //Handles the update all button
@@ -646,34 +593,10 @@ namespace TVSorter
         {
             if (lstTVShows.Items.Count == 0)
                 return;
-            frmProgress progress = new frmProgress(lstTVShows.Items.Count);
-            MethodInvoker inc = new MethodInvoker(progress.Increment);
             TVShow[] shows = new TVShow[lstTVShows.Items.Count];
             for (int i = 0; i < shows.Length; i++)
                 shows[i] = (TVShow)lstTVShows.Items[i];
-            new Thread(new ThreadStart(delegate()
-            {
-                foreach (TVShow show in shows)
-                {
-                    try
-                    {
-                        TVDB.UpdateShow(show, false);
-                    }
-                    catch (Exception ex)
-                    {
-                        progress.Abort();
-                        Log.Add("Update failed: " + ex.Message);
-                        return;
-                    }
-                    progress.Invoke(inc);
-                }
-                progress.Close();
-            })).Start();
-            if (progress.ShowDialog() == DialogResult.Abort)
-            {
-                MessageBox.Show("An error occured. Unable to update, check the log for details.");
-            }
-            this.lstTVShows_SelectedIndexChanged(this, null);
+            UpdateShows(false, shows);
         }
 
         //Handles the force update all button
@@ -687,34 +610,10 @@ namespace TVSorter
             {
                 return;
             }
-            frmProgress progress = new frmProgress(lstTVShows.Items.Count);
-            MethodInvoker inc = new MethodInvoker(progress.Increment);
             TVShow[] shows = new TVShow[lstTVShows.Items.Count];
             for (int i = 0; i < shows.Length; i++)
                 shows[i] = (TVShow)lstTVShows.Items[i];
-            new Thread(new ThreadStart(delegate()
-            {
-                foreach (TVShow show in shows)
-                {
-                    try
-                    {
-                        TVDB.UpdateShow(show, true);
-                    }
-                    catch (Exception ex)
-                    {
-                        progress.Abort();
-                        Log.Add("Update failed: " + ex.Message);
-                        return;
-                    }
-                    progress.Invoke(inc);
-                }
-                progress.Close();
-            })).Start();
-            if (progress.ShowDialog() == DialogResult.Abort)
-            {
-                MessageBox.Show("An error occured. Unable to update, check the log for details.");
-            }
-            this.lstTVShows_SelectedIndexChanged(this, null);
+            UpdateShows(true, shows);
         }
 
         //Handles the save settings button for TV shows
@@ -745,8 +644,15 @@ namespace TVSorter
                 show.SaveToDatabase();
                 //Create a new TV show so that it gets the newly added show from the database
                 //and therefore changes can be made to it - Issue ID 1.
-                lstTVShows.Items.Add(new TVShow(show.Name));
-
+                show = TVShow.GetTVShow(show.Name);
+                if (show != null)
+                {
+                    lstTVShows.Items.Add(show);
+                }
+                else
+                {
+                    Log.Add("Error adding show " + addShow.newShow.Name);
+                }
             }
         }
 
@@ -772,7 +678,9 @@ namespace TVSorter
         //Handles the force update selected show button
         private void btnForceUpdateSelected_Click(object sender, EventArgs e)
         {
-            UpdateSelectedShow(true);
+            if (lstTVShows.SelectedIndex == -1)
+                return;
+            UpdateShows(true, (TVShow)lstTVShows.SelectedItem);
         }
 
         //Handles the lock show button

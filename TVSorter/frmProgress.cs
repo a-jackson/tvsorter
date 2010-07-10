@@ -10,6 +10,9 @@ using System.Threading;
 
 namespace TVSorter
 {
+    public delegate void Increment();
+    public delegate void ProgressError(string error);
+
     public partial class frmProgress : Form
     {
         private bool _created;
@@ -33,39 +36,56 @@ namespace TVSorter
 
         public void Increment()
         {
-            prgProgress.Value++;
-            if (prgProgress.Value == prgProgress.Maximum)
+            if (prgProgress.InvokeRequired)
             {
-                DialogResult = DialogResult.OK;
+                prgProgress.Invoke(new Increment(Increment));
+            }
+            else
+            {
+                prgProgress.Value++;
+                if (prgProgress.Value == prgProgress.Maximum)
+                {
+                    DialogResult = DialogResult.OK;
+                    Close();
+                }
             }
         }
 
-        internal void Abort()
+        internal void Abort(string error)
         {
-            MethodInvoker mi = new MethodInvoker(delegate() { 
-                DialogResult = DialogResult.Abort; 
-                base.Close(); 
-            });
-            this.Invoke(mi);
+            if (InvokeRequired)
+            {
+                Invoke(new ProgressError(Abort), error);
+            }
+            else
+            {
+                DialogResult = DialogResult.Abort;
+                base.Close();
+                MessageBox.Show(error);
+            }
         }
 
         public new void Close()
         {
-            MethodInvoker mi = new MethodInvoker(delegate() {
-                base.Close(); 
-            });
-            lock (this)
+            if (InvokeRequired)
             {
-                if (!this.IsAccessible)
-                {
-                    return;
-                }
-                while (!_created)
-                {
-                    Monitor.Wait(this);
-                }
+                Invoke(new MethodInvoker(Close));
             }
-            this.BeginInvoke(mi);
+            else
+            {
+                lock (this)
+                {
+                    if (!this.IsAccessible)
+                    {
+                        return;
+                    }
+                    while (!_created)
+                    {
+                        Monitor.Pulse(this);
+                    }
+                }
+                base.Close();
+            }
         }
     }
 }

@@ -22,87 +22,134 @@ namespace TVSorter
         }
 
         public void run()
-        {               
-            Database database = new Database();
-            Settings.LoadSettings();
-            Settings.LoadFileRegexp();
-            Log.Init(_log);
-            Log.Add("Program started on " + DateTime.Now.ToLongDateString());
-            Log.Add("Input directory: " + Settings.InputDir);
-            Log.Add("Output directory: " + Settings.OutputDir);
-            Log.Add("Recurse subdirs: " + Settings.RecurseSubDir);
-            Log.Add("Delete empty dir: " + Settings.DeleteEmpty);
-            Log.Add("Output file format: " + Settings.FileNameFormat);
-            foreach (string arg in _args)
+        {
+            try
             {
-                if (arg == "-update_all") //Update the database
+                Database database = new Database();
+                Settings.LoadSettings();
+                Settings.LoadFileRegexp();
+                Log.Init(_log);
+                Log.Add("Program started on " + DateTime.Now.ToLongDateString());
+                Log.Add("Input directory: " + Settings.InputDir);
+                Log.Add("Output directory: " + Settings.OutputDir);
+                Log.Add("Recurse subdirs: " + Settings.RecurseSubDir);
+                Log.Add("Delete empty dir: " + Settings.DeleteEmpty);
+                Log.Add("Output file format: " + Settings.FileNameFormat);
+                foreach (string arg in _args)
                 {
-                    List<TVShow> showList = TVShow.GetAllShows();
-                    try
+                    if (arg == "-update_all") //Update the database
                     {
-                        //Update each show
-                        foreach (TVShow show in showList)
+                        List<TVShow> showList = TVShow.GetAllShows();
+                        try
                         {
-                            TVDB.UpdateShow(show, false);
+                            TaskWaiter waiter = new TaskWaiter(showList.Count);
+                            TVDB.Instance.SetEvents(waiter.Increment, waiter.Abort);
+                            TVDB.Instance.UpdateShows(false, showList.ToArray());
+                            waiter.Wait();
+                            TVDB.Instance.ClearEvents(waiter.Increment, waiter.Abort);
+                            //Wait for the update to finish.
+                        }
+                        catch (WebException e)
+                        {
+                            Log.Add(e.Message);
                         }
                     }
-                    catch (WebException e)
+                    else if (arg.StartsWith("-rename_")) //Rename and move/copy/only
                     {
-                        Log.Add(e.Message);
-                    }
-                }
-                else if (arg.StartsWith("-rename_")) //Rename and move/copy/only
-                {
-                    //Determine the correct sort action
-                    SortAction action;
-                    if (arg == "-rename_only")
-                    {
-                        action = SortAction.Rename;
-                    }
-                    else if (arg == "-rename_move")
-                    {
-                        action = SortAction.Move;
-                    }
-                    else if (arg == "-rename_copy")
-                    {
-                        action = SortAction.Copy;
+                        //Determine the correct sort action
+                        SortAction action;
+                        if (arg == "-rename_only")
+                        {
+                            action = SortAction.Rename;
+                        }
+                        else if (arg == "-rename_move")
+                        {
+                            action = SortAction.Move;
+                        }
+                        else if (arg == "-rename_copy")
+                        {
+                            action = SortAction.Copy;
+                        }
+                        else
+                        {
+                            Log.Add(arg + " not recognised");
+                            continue; //Invalid arg, ignore
+                        }
+                        //Check the directories are valid
+                        if (Settings.InputDir == "" || !Directory.Exists(Settings.InputDir))
+                        {
+                            Log.Add("Input directory not set");
+                            continue;
+                        }
+                        if ((action != SortAction.Rename) &&
+                            (Settings.OutputDir == "" || !Directory.Exists(Settings.OutputDir)))
+                        {
+                            Log.Add("Output directory not set");
+                        }
+                        //Refresh the episodes and the sort them
+                        FileHandler fileHandler = new FileHandler();
+                        fileHandler.RefreshEpisodes(Settings.InputDir);
+                        //Get the files and copy into an array
+                        Dictionary<string, Episode> episodes = fileHandler.Files;
+                        Episode[] episodeArr = new Episode[episodes.Count];
+                        episodes.Values.CopyTo(episodeArr, 0);
+                        //Set up the waiter to wait until the task is complete
+                        TaskWaiter waiter = new TaskWaiter(episodes.Count);
+                        fileHandler.SetEvents(waiter.Increment, waiter.Abort);
+                        //Sort the files.
+                        fileHandler.SortEpisodes(episodeArr, action);
+                        //Wait until complete
+                        waiter.Wait();
+                        fileHandler.ClearEvents(waiter.Increment, waiter.Abort);
                     }
                     else
                     {
-                        Log.Add(arg + " not recognised");
-                        continue; //Invalid arg, ignore
+                        //Probably a log file but might not be valid filename
+                        FileInfo log = new FileInfo(arg);
+                        Log.SetSaveLocation(log);
                     }
-                    //Check the directories are valid
-                    if (Settings.InputDir == "" || !Directory.Exists(Settings.InputDir))
-                    {
-                        Log.Add("Input directory not set");
-                        continue;
-                    }
-                    if ((action != SortAction.Rename) &&
-                        (Settings.OutputDir == "" || !Directory.Exists(Settings.OutputDir)))
-                    {
-                        Log.Add("Output directory not set");
-                    }
-                    //Refresh the episodes and the sort them
-                    FileHandler fileHandler = new FileHandler();
-                    fileHandler.RefreshEpisodes(null, Settings.InputDir);
-                    Dictionary<string, Episode> episodes = fileHandler.Files;
-                    Episode[] episodeArr = new Episode[episodes.Count];
-                    episodes.Values.CopyTo(episodeArr, 0);
-                    fileHandler.SortEpisodes(null, episodeArr, action);
                 }
-                else
+                Log.Add("Program completed. Exiting...");
+                Log.Save();
+                //Sleep briefly to allow reading time
+                Thread.Sleep(3000);
+            }
+            finally
+            {
+                Environment.Exit(0);
+            }
+        }
+
+        private class TaskWaiter
+        {
+            private int _num;
+            private int _count;
+            public TaskWaiter(int num)
+            {
+                _num = num;
+                _count = 0;
+            }
+            public void Wait()
+            {
+                lock (this)
                 {
-                    //Probably a log file but might not be valid filename
-                    FileInfo log = new FileInfo(arg);
-                    Log.SetSaveLocation(log);
+                    Monitor.Wait(this);
                 }
             }
-            Log.Add("Program completed. Exiting...");
-            Log.Save();
-            //Sleep briefly to allow reading time
-            Thread.Sleep(3000);
-            Environment.Exit(0);
+            public void Increment()
+            {
+                lock (this)
+                {
+                    _count++;
+                    if (_num == _count)
+                    {
+                        Monitor.Pulse(this);
+                    }
+                }
+            }
+            public void Abort(string err)
+            {
+            }
         }
     }
 }

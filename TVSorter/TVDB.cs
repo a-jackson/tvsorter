@@ -6,6 +6,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Text;
+using System.Threading;
 
 namespace TVSorter
 {
@@ -14,6 +15,11 @@ namespace TVSorter
     /// </summary>
     public class TVDB
     {
+        private static TVDB instance;
+        public static TVDB Instance
+        {
+            get { return instance ?? (instance = new TVDB()); }
+        }
         //The program's API key and other paths
         const string ApiKey = "D4DCAEBFCA5A6BC1";
         const string SiteAddress = "http://www.thetvdb.com/";
@@ -22,15 +28,36 @@ namespace TVSorter
         const string TimeAddress = SiteAddress + "/api/Updates.php?type=none";
         static Database _database = new Database();
 
-        static string MirrorAddress;
-        public static long ServerTime;
+        //Events
+        public event Increment Increment = delegate { };
+        public event ProgressError Abort = delegate { };
 
-        static bool EnvironmentSet = false;
+        private string MirrorAddress;
+        private long ServerTime;
+
+        private bool EnvironmentSet = false;
+
+        private TVDB()
+        {
+            SetEnvironment();
+        }
+
+        public void SetEvents(Increment inc, ProgressError error)
+        {
+            Increment += inc;
+            Abort += error;
+        }
+
+        public void ClearEvents(Increment inc, ProgressError error)
+        {
+            Increment -= inc;
+            Abort -= error;
+        }
 
         /// <summary>
         /// Sets up the environment for getting data from The TVDB
         /// </summary>
-        private static void SetEnvironment()
+        private void SetEnvironment()
         {
             if (EnvironmentSet)
             {
@@ -56,7 +83,7 @@ namespace TVSorter
         /// <summary>
         /// Updates the ServerTime variable with the current time of The TVDB server
         /// </summary>
-        private static void UpdateServerTime()
+        private void UpdateServerTime()
         {
                 XmlDocument timeDoc = new XmlDocument();
                 timeDoc.Load(TimeAddress);
@@ -68,9 +95,8 @@ namespace TVSorter
         /// </summary>
         /// <param name="name">The name of the show to search for</param>
         /// <returns>The possible results</returns>
-        public static List<TVShow> SearchShow(string name)
+        public List<TVShow> SearchShow(string name)
         {
-            SetEnvironment();
             XmlDocument searchDoc = new XmlDocument();
             searchDoc.Load(MirrorAddress + "/api/GetSeries.php?seriesname=" + name);
             XmlNodeList seriess = searchDoc.GetElementsByTagName("Series");
@@ -92,15 +118,14 @@ namespace TVSorter
         /// </summary>
         /// <param name="showid">The ID to search for</param>
         /// <returns>A TVShow object representing the show</returns>
-        public static TVShow GetShow(int showid)
+        public TVShow GetShow(int showid)
         {
-            SetEnvironment();
             XmlDocument searchDoc = new XmlDocument();
             string seriesAddress = MirrorAddress + ApiLoc + "/series/" + showid + "/en.xml";
             searchDoc.Load(seriesAddress);
             XmlNodeList series = searchDoc.GetElementsByTagName("Series")[0].ChildNodes;
             TVShow show = new TVShow(showid.ToString(), series[15].InnerText,
-                -1, series[19].InnerText, series[15].InnerText);
+                ServerTime, series[19].InnerText, series[15].InnerText);
             return show;
         }
 
@@ -108,15 +133,36 @@ namespace TVSorter
         /// Downloads the banner for the specified show
         /// </summary>
         /// <param name="show">The show to download the banner for</param>
-        private static void DownloadShowBanner(TVShow show)
+        private void DownloadShowBanner(TVShow show)
         {
             if (show.Banner == "" || File.Exists("Data\\"+show.TvdbId))
                 return;
-            SetEnvironment();
             WebClient client = new WebClient();
             string address = MirrorAddress + "/banners/" + show.Banner;
             string save = "Data\\" + show.TvdbId;
             client.DownloadFile(address, save);
+        }
+
+        public void UpdateShows(bool force, params TVShow[] shows)
+        {
+            new Thread(new ThreadStart(delegate()
+            {
+                try
+                {
+                    Log.Add("Update started");
+                    foreach (TVShow show in shows)
+                    {
+                        UpdateShow(show, force);
+                        Increment();
+                    }
+                    Log.Add("Update complete");
+                }
+                catch (Exception ex)
+                {
+                    Abort(ex.Message);
+                    Log.Add("Update failed: " + ex.Message);
+                }
+            })).Start();
         }
 
         /// <summary>
@@ -125,13 +171,13 @@ namespace TVSorter
         /// <param name="show">The show to update</param>
         /// <param name="force">If the update should be forced rather
         /// than checking if there are any updates</param>
-        public static void UpdateShow(TVShow show, bool force)
+        private void UpdateShow(TVShow show, bool force)
         {
             if (show.Locked)
             {
                 return;
             }
-            SetEnvironment();
+            UpdateServerTime();
             //Download banner.
             DownloadShowBanner(show);
             //Not being forced to update and has updated in the last month
@@ -163,8 +209,6 @@ namespace TVSorter
                     return;
                 }
             }
-            //Clear all episode data for this show
-            _database.ExecuteQuery("Delete From Episodes Where show_id = " + show.DatabaseId + ";");
             string showAddress = MirrorAddress + ApiLoc + "/series/" + show.TvdbId +
                 "/all/en.xml";
             XmlDocument showDoc = new XmlDocument();
@@ -174,12 +218,20 @@ namespace TVSorter
             if (banner.InnerText != show.Banner)
             {
                 show.Banner = banner.InnerText;
+                //Delete the old one and get the new one
+                File.Delete("Data\\" + show.TvdbId);
                 DownloadShowBanner(show);
             }
             //Get all the episodes and add to the database
             XmlNodeList episodes = showDoc.GetElementsByTagName("Episode");
+            ProcessXMLFile(show, episodes);
+        }
+
+        private void ProcessXMLFile(TVShow show, XmlNodeList episodes)
+        {
             StringBuilder query = new StringBuilder();
-            int eps = 0;
+            //Clear all episode data for this show            
+            query.Append("Delete From Episodes Where show_id = " + show.DatabaseId + ";");         
             foreach (XmlNode episode in episodes)
             {
                 //Get each piece of data from the XML
@@ -194,7 +246,7 @@ namespace TVSorter
                     int year = int.Parse(dateParts[0]);
                     int month = int.Parse(dateParts[1]);
                     int day = int.Parse(dateParts[2]);
-                    first_air = frmMain.ConvertToUnixTimestamp
+                    first_air = TVShow.ConvertToUnixTimestamp
                         (new DateTime(year, month, day));
                 }
                 else
@@ -230,15 +282,53 @@ namespace TVSorter
                     first_air + ", \"" +
                     episode_name.Replace("\"", "\"\"") + "\");");
             }
-            if (query.Length > 0)
-            {
-                //Execute the query
-                eps = _database.ExecuteQuery("Begin;" + query.ToString() + "Commit;");
-            }
+            //Get the current number of episodes
+            long currEps = (long)_database.ExecuteScalar("Select Count(*) From Episodes Where show_id = " + show.DatabaseId);
+            //Execute the query
+            long eps = _database.ExecuteQuery("Begin;" + query.ToString() + "Commit;");
+            //Eps includes the delete query. Need to remove that many from it.
+            eps -= currEps;
             //Refresh the update time
+            UpdateServerTime();
             show.UpdateTime = ServerTime;
             show.SaveToDatabase();
             Log.Add("Updated " + show.Name + " has " + eps + " episodes");
+        }
+
+
+        /// <summary>
+        /// Searches the output directory for new shows
+        /// <returns>A Dictionary of the results, won't be populated until the thread is completed</returns>
+        /// </summary>
+        public SortedDictionary<string, List<TVShow>> SearchNewShows()
+        {
+            SortedDictionary<string, List<TVShow>> shows = new SortedDictionary<string, List<TVShow>>();
+            Thread addShows = new Thread(new ThreadStart(delegate()
+            {
+                foreach (string dir in Directory.GetDirectories(Settings.OutputDir))
+                {
+                    //Check if the show has already been added.
+                    string name = dir.Substring(dir.LastIndexOf('\\') + 1).Replace("\"", "\"\"");
+                    if ((long)_database.ExecuteScalar("SELECT COUNT(*) FROM shows WHERE folder_name=\""
+                        + name + "\"") == 0)
+                    {
+                        try
+                        {
+                            //Search for the show and add the results
+                            List<TVShow> results = TVDB.Instance.SearchShow(name);
+                            shows.Add(name, results);
+                        }
+                        catch
+                        {
+                            Abort("The TVDB is down, unable to search for shows.");
+                            return;
+                        }
+                    }
+                    Increment();
+                }
+            }));
+            addShows.Start();
+            return shows;
         }
     }
 }

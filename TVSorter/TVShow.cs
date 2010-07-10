@@ -53,51 +53,6 @@ namespace TVSorter
             _locked = locked;
             _useDvdOrder = dvdOrder;
         }
-        /// <summary>
-        /// Create a TVShow and attempt to fill in missing data from the database
-        /// </summary>
-        /// <param name="showName">The show object to create</param>
-        public TVShow(string showName)
-        {
-            Database database = new Database();
-            List<Dictionary<string, object>> results;
-            //See if the show is in the database. Check the name against the show name, folder name 
-            //and all alt names
-            results = database.ExecuteResults("Select * From Shows Where name Like \"" + showName
-                + "\" Or folder_name Like \"" + showName
-                + "\" Or Upper(\"" + showName + "\") In (Select Trim(Upper(alt_name)) From AltNames"
-                + " Where AltNames.show_id = Shows.id);");
-            if (results.Count > 0)
-            {
-                //Get the first show that matches
-                Dictionary<string, object> result = results[0];
-                //Set the values using the results in the database
-                _databaseId = (long)result["id"];
-                _tvdbid = (string)result["tvdb_id"];
-                _name = (string)result["name"];
-                _updateTime = (long)result["update_time"];
-                _useDefaultFormat = ((long)result["use_default_format"] == 1 ? true : false);
-                _customFormat = (string)result["custom_format"];
-                _folderName = (string)result["folder_name"];
-                _banner = (string)result["banner"];
-                _locked = ((long)result["show_locked"] == 1 ? true : false);
-                _useDvdOrder = ((long)result["use_dvd_order"] == 1 ? true : false);
-                //Get the altnames for this show
-                List<Dictionary<string, object>> altName = database.ExecuteResults
-                    ("Select * From AltNames Where show_id = "
-                    + _databaseId + ";");
-                _altNames = "";
-                foreach (Dictionary<string, object> altNameRow in altName)
-                    _altNames += (string)altNameRow["alt_name"] + ",";
-                if (_altNames.EndsWith(","))
-                    _altNames = _altNames.Substring(0, _altNames.Length - 1);
-            }
-            else
-            {
-                _name = showName;
-                _databaseId = -1;
-            }
-        }
 
         /// <summary>
         /// Saves the show to the database, if it exists it updates, else inserts
@@ -244,6 +199,78 @@ namespace TVSorter
                 showList.Add(tvshow);
             }
             return showList;
+        }
+
+        /// <summary>
+        /// Get a TVShow object from the database based on name.
+        /// </summary>
+        /// <param name="showName">The name to search for</param>
+        /// <returns>The TVShow object</returns>
+        public static TVShow GetTVShow(string showName)
+        {
+            Database database = new Database();
+            List<Dictionary<string, object>> results;
+            //See if the show is in the database. Check the name against the show name, folder name 
+            //and all alt names
+            results = database.ExecuteResults("Select * From Shows Where Upper(name) = Upper(\"" + showName
+                + "\") Or Upper(folder_name) = Upper(\"" + showName
+                + "\") Or Upper(\"" + showName + "\") In (Select Trim(Upper(alt_name)) From AltNames"
+                + " Where AltNames.show_id = Shows.id);");
+            if (results.Count > 0)
+            {
+                //Get the first show that matches
+                Dictionary<string, object> result = results[0];
+                //Set the values using the results in the database
+                long databaseId = (long)result["id"];
+                string tvdbid = (string)result["tvdb_id"];
+                string name = (string)result["name"];
+                long updateTime = (long)result["update_time"];
+                bool useDefaultFormat = ((long)result["use_default_format"] == 1 ? true : false);
+                string customFormat = (string)result["custom_format"];
+                string folderName = (string)result["folder_name"];
+                string banner = (string)result["banner"];
+                bool locked = ((long)result["show_locked"] == 1 ? true : false);
+                bool useDvdOrder = ((long)result["use_dvd_order"] == 1 ? true : false);
+                //Get the altnames for this show
+                List<Dictionary<string, object>> altName = database.ExecuteResults
+                    ("Select * From AltNames Where show_id = "
+                    + databaseId + ";");
+                string altNames = "";
+                foreach (Dictionary<string, object> altNameRow in altName)
+                    altNames += (string)altNameRow["alt_name"] + ",";
+                if (altNames.EndsWith(","))
+                    altNames = altNames.Substring(0, altNames.Length - 1);
+                return new TVShow(databaseId, tvdbid, name, updateTime, 
+                    useDefaultFormat, customFormat, folderName, banner, 
+                    altNames, locked, useDvdOrder);
+            }
+            else
+            {
+                return new TVShow(-1, "0", showName, -1, true, "", showName, "", "", false, false);
+            }
+        }
+
+        /// <summary>
+        /// Convert a unix timestamp into a datetime object
+        /// </summary>
+        /// <param name="timestamp">The timestamp to convert</param>
+        /// <returns>The DateTime object</returns>
+        public static DateTime ConvertFromUnixTimestamp(double timestamp)
+        {
+            DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+            return origin.AddSeconds(timestamp);
+        }
+
+        /// <summary>
+        /// Converts a DateTime object into a unix timestamp
+        /// </summary>
+        /// <param name="date">The DateTime object to convert</param>
+        /// <returns>The timestamp</returns>
+        public static long ConvertToUnixTimestamp(DateTime date)
+        {
+            DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+            TimeSpan diff = date - origin;
+            return (long)Math.Floor(diff.TotalSeconds);
         }
     }
 }

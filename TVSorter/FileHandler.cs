@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.IO;
 using System.Windows.Forms;
+using System.Threading;
 
 namespace TVSorter
 {
@@ -25,6 +26,9 @@ namespace TVSorter
 
         private Dictionary<string, int> _months;
 
+        private event Increment Increment = delegate { };
+        private event ProgressError Abort = delegate { };
+
         public FileHandler()
         {
             //A dictionary of filepath and episode objects
@@ -41,6 +45,18 @@ namespace TVSorter
             _months.Add("August", 8); _months.Add("September", 9);
             _months.Add("October", 10); _months.Add("November", 11); 
             _months.Add("December", 12);
+        }
+
+        public void SetEvents(Increment inc, ProgressError error)
+        {
+            Increment += inc;
+            Abort += error;
+        }
+
+        public void ClearEvents(Increment inc, ProgressError error)
+        {
+            Increment -= inc;
+            Abort -= error;
         }
 
         /// <summary>
@@ -180,9 +196,8 @@ namespace TVSorter
         /// <summary>
         /// Refreshes the file list
         /// </summary>
-        /// <param name="inc">Delegate to the increment method, called after each file is processed</param>
         /// <param name="inputFolder">The input directory</param>
-        public void RefreshEpisodes(MethodInvoker inc, string inputFolder)
+        public void RefreshEpisodes(string inputFolder)
         {
             Log.Add("Refresh of directory: " + inputFolder);
             DirectoryInfo dir = new DirectoryInfo(inputFolder);
@@ -190,7 +205,7 @@ namespace TVSorter
             if (!dir.Exists)
                 return;
             //Start the recursive function that processes a directory
-            ProcessFiles(dir, inc);
+            ProcessFiles(dir);
         }
 
         /// <summary>
@@ -198,8 +213,7 @@ namespace TVSorter
         /// get all the episode in it.
         /// </summary>
         /// <param name="dir">The directory to process</param>
-        /// <param name="inc">Delegate for the increment function</param>
-        private void ProcessFiles(DirectoryInfo dir, MethodInvoker inc)
+        private void ProcessFiles(DirectoryInfo dir)
         {
             //Process each file in the directory
             foreach (FileInfo file in dir.GetFiles())
@@ -208,8 +222,7 @@ namespace TVSorter
                 if (!_extensions.IsMatch(file.Extension))
                 {
                     //Increment the progress bar and move on if not.
-                    if (inc != null)
-                        inc();
+                    Increment();
                     continue;
                 }
                 try
@@ -226,18 +239,17 @@ namespace TVSorter
                 }
                 catch (Exception e)
                 {
-                    MessageBox.Show("Error getting an episode from file \n" + file.FullName + "\n" + e.Message);
+                    Log.Add("Error getting an episode from file \n" + file.FullName + "\n" + e.Message);
                 }
                 //Increment the progress bar
-                if (inc != null)
-                    inc();
+                Increment();
             }
             //If the scan should be recursive then process each of the directories in this directory
             if (Settings.RecurseSubDir)
             {
                 foreach (DirectoryInfo subdir in dir.GetDirectories())
                 {
-                    ProcessFiles(subdir, inc);
+                    ProcessFiles(subdir);
                 }
             }
         }
@@ -250,54 +262,63 @@ namespace TVSorter
         /// <summary>
         /// Renames and moves/copies the files
         /// </summary>
-        /// <param name="inc">Delegate for the increment function</param>
         /// <param name="episodes">The array of episodes to move</param>
         /// <param name="action">The type of sorting to do</param>
-        internal void SortEpisodes(MethodInvoker inc, Episode[] episodes, SortAction action)
+        internal void SortEpisodes(Episode[] episodes, SortAction action)
         {
-            //Process each episode
-            foreach (Episode ep in episodes)
+            new Thread(new ThreadStart(delegate()
             {
-                string newName = "";
-                try
+                //Process each episode
+                foreach (Episode ep in episodes)
                 {
-                    //Get the new path
-                    newName = Settings.OutputDir + ep.FormatOutputPath();
-                    if (action == SortAction.Rename)
+                    //Skip anything that isn't complete in cli mode so files don't end
+                    //up in the wrong place.
+                    if (Program.CurrentMode == RunMode.Cli && !ep.IsComplete)
                     {
-                        newName = newName.Substring(newName.LastIndexOf('\\') + 1);
-                        newName = ep.FileInfo.DirectoryName + "\\" + newName;
+                        Log.Add("Skipping file: " + ep.FileInfo.FullName + " not enough data");
+                        Increment();
+                        continue;
                     }
-                    FileInfo newFile = new FileInfo(newName);
-                    //Create the directory if it doesn't exist
-                    if (!newFile.Directory.Exists)
-                        newFile.Directory.Create();
-                    //Move/copy the file and delete the directory it was in if it is now empty
-                    if (action == SortAction.Copy)
+                    string newName = "";
+                    try
                     {
-                        File.Copy(ep.FileInfo.FullName, newName);
+                        //Get the new path
+                        newName = Settings.OutputDir + ep.FormatOutputPath();
+                        if (action == SortAction.Rename)
+                        {
+                            newName = newName.Substring(newName.LastIndexOf('\\') + 1);
+                            newName = ep.FileInfo.DirectoryName + "\\" + newName;
+                        }
+                        FileInfo newFile = new FileInfo(newName);
+                        //Create the directory if it doesn't exist
+                        if (!newFile.Directory.Exists)
+                            newFile.Directory.Create();
+                        //Move/copy the file and delete the directory it was in if it is now empty
+                        if (action == SortAction.Copy)
+                        {
+                            File.Copy(ep.FileInfo.FullName, newName);
+                        }
+                        else
+                        {
+                            File.Move(ep.FileInfo.FullName, newName);
+                        }
+                        if (Settings.DeleteEmpty)
+                        {
+                            RecuriveDelete(ep.FileInfo.Directory);
+                        }
+                        Log.Add(action.ToString() + " file: " + ep.FileInfo.FullName + " -> " + newName);
                     }
-                    else
+                    catch (Exception e)
                     {
-                        File.Move(ep.FileInfo.FullName, newName);
+                        Log.Add("Failed " + action.ToString() + ": " + ep.FileInfo.FullName + " -> " +
+                            newName + " -- " + e.Message);
                     }
-                    if (Settings.DeleteEmpty)
+                    finally
                     {
-                        RecuriveDelete(ep.FileInfo.Directory);
+                        Increment(); //Inc the progress bar
                     }
-                    Log.Add(action.ToString() + " file: " + ep.FileInfo.FullName + " -> " + newName);
                 }
-                catch (Exception e)
-                {
-                    Log.Add("Failed " + action.ToString() + ": " + ep.FileInfo.FullName + " -> " +
-                        newName + " -- " + e.Message);
-                }
-                finally
-                {
-                    if (inc != null)
-                        inc(); //Inc the progress bar
-                }
-            }
+            })).Start();
         }
 
         /// <summary>

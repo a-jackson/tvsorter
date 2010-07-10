@@ -50,7 +50,7 @@ namespace TVSorter
 
         public Episode(string showName, int episode, int season, FileInfo fileInfo)
         {
-            _show = new TVShow(showName);
+            _show = TVShow.GetTVShow(showName); ;
             _episode = episode;
             _season = season;
             _fileInfo = fileInfo;
@@ -61,7 +61,7 @@ namespace TVSorter
 
         public Episode(string showName, DateTime date, FileInfo fileInfo)
         {
-            _show = new TVShow(showName);
+            _show = TVShow.GetTVShow(showName);
             _firstAir = date;
             _fileInfo = fileInfo;
             _episode = -1;
@@ -78,7 +78,7 @@ namespace TVSorter
             Database database = new Database();
             //If the show has no database ID then it couldn't be identified
             //from the available data so can't look up the episode
-            if (_show.DatabaseId == -1)
+            if (_show == null || _show.DatabaseId == -1)
             {
                 _episodeName = "";
                 return;//Show unknown
@@ -94,7 +94,7 @@ namespace TVSorter
                         + _show.DatabaseId + " And season_num = "
                         + SeasonNum + " And episode_num = " + EpisodeNum + ";")[0];
                     _episodeName = (string)results["episode_name"];
-                    _firstAir = frmMain.ConvertFromUnixTimestamp((long)results["first_air"]);
+                    _firstAir = TVShow.ConvertFromUnixTimestamp((long)results["first_air"]);
                 }
                 catch
                 {
@@ -109,7 +109,7 @@ namespace TVSorter
                 try
                 {
                     //Convert to a timestamp as is stored in the database
-                    long firstAir = frmMain.ConvertToUnixTimestamp(_firstAir);
+                    long firstAir = TVShow.ConvertToUnixTimestamp(_firstAir);
                     //Attempt to find an episode with the same airdate
                     Dictionary<string, object> results = database.ExecuteResults(
                         "Select * From Episodes Where show_id = "
@@ -155,6 +155,10 @@ namespace TVSorter
         public FileInfo FileInfo
         {
             get { return _fileInfo; }
+        }
+        public bool IsComplete
+        {
+            get { return (_show != null && _show.DatabaseId != -1 && EpisodeName != ""); }
         }
 
         /// <summary>

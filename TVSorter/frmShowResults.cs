@@ -36,10 +36,10 @@ namespace TVSorter
             try
             {
                 int id = int.Parse(txtTvdbId.Text);
-                TVShow show = TVDB.GetShow(id);
+                TVShow show = TVDB.Instance.GetShow(id);
                 lstResults.Items.Clear();
                 _results.Clear();
-                _results.Add(new TVShow(show.TvdbId, show.Name, TVDB.ServerTime, show.Banner, show.Name));
+                _results.Add(show);
                 lstResults.Items.Add(new ListViewItem(new string[] { show.Name, id.ToString() }));
                 lstResults.View = View.Details;
             }
