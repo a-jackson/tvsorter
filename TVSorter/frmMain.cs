@@ -420,7 +420,6 @@ namespace TVSorter
             new Thread(new ThreadStart(delegate()
             {
                 _fileHandler.RefreshEpisodes(inputDir);
-                progress.Close();
             })).Start();
             progress.ShowDialog();
             _fileHandler.ClearEvents(progress.Increment, progress.Abort);
