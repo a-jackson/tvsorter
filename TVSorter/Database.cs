@@ -15,7 +15,7 @@ namespace TVSorter
     /// </summary>
     public class Database
     {
-        private static string DatabaseFile = "Data\\data.db";
+        private static string DatabaseFile = "Data" + Path.DirectorySeparatorChar + "data.db";
         private static string connectionString = "Data Source=" + DatabaseFile + ";Version=3;";
         /// <summary>
         /// The current version of the database, used to detect older databases so they can

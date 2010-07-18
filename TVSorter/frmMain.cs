@@ -127,11 +127,11 @@ namespace TVSorter
         {
             frmProgress progress =
                 new frmProgress(Directory.GetDirectories(Settings.OutputDir).Length);
-            TVDB.Instance.SetEvents(progress.Increment, progress.Abort);
+            TVDB.Instance.SetEvents(progress.Increment, progress.Abort, progress.Close);
             SortedDictionary<string, List<TVShow>> shows = TVDB.Instance.SearchNewShows();
             if (progress.ShowDialog() == DialogResult.Abort)
                 return;
-            TVDB.Instance.ClearEvents(progress.Increment, progress.Abort);
+            TVDB.Instance.ClearEvents(progress.Increment, progress.Abort, progress.Close);
             //Process the results
             foreach (KeyValuePair<string, List<TVShow>> kvPair in shows)
             {
@@ -234,13 +234,13 @@ namespace TVSorter
             try
             {
                 frmProgress progress = new frmProgress(shows.Length);
-                TVDB.Instance.SetEvents(progress.Increment, progress.Abort);
+                TVDB.Instance.SetEvents(progress.Increment, progress.Abort, progress.Close);
                 TVDB.Instance.UpdateShows(force, shows);
                 if (progress.ShowDialog() == DialogResult.Abort)
                 {
                     MessageBox.Show("An error occured. Unable to update, check the log for details.");
                 }
-                TVDB.Instance.ClearEvents(progress.Increment, progress.Abort);
+                TVDB.Instance.ClearEvents(progress.Increment, progress.Abort, progress.Close);
                 this.lstTVShows_SelectedIndexChanged(this, null);
             }
             catch (Exception e)
@@ -305,10 +305,10 @@ namespace TVSorter
                 episodes[i] = _files[lstInputFolder.CheckedItems[i].Text];
             }
 
-            _fileHandler.SetEvents(progress.Increment, progress.Abort);
+            _fileHandler.SetEvents(progress.Increment, progress.Abort, progress.Close);
             _fileHandler.SortEpisodes(episodes, action);
             progress.ShowDialog();
-            _fileHandler.ClearEvents(progress.Increment, progress.Abort);
+            _fileHandler.ClearEvents(progress.Increment, progress.Abort, progress.Close);
 
             UpdateFolderFilter();
             //Refresh the directory again. - Todo: Only change things that have changed, don't force a full refresh.
@@ -407,7 +407,7 @@ namespace TVSorter
             }
             else
             {
-                inputDir = Settings.InputDir + "\\" + cboFolderFilter.SelectedItem;
+                inputDir = Settings.InputDir + Path.DirectorySeparatorChar + cboFolderFilter.SelectedItem;
             }
             int numFiles = GetMaxFiles(new DirectoryInfo(inputDir));
             if (numFiles == 0)
@@ -416,13 +416,13 @@ namespace TVSorter
                 return;
             }
             frmProgress progress = new frmProgress(numFiles);
-            _fileHandler.SetEvents(progress.Increment, progress.Abort);
+            _fileHandler.SetEvents(progress.Increment, progress.Abort, progress.Close);
             new Thread(new ThreadStart(delegate()
             {
                 _fileHandler.RefreshEpisodes(inputDir);
             })).Start();
             progress.ShowDialog();
-            _fileHandler.ClearEvents(progress.Increment, progress.Abort);
+            _fileHandler.ClearEvents(progress.Increment, progress.Abort, progress.Close);
             _files = _fileHandler.Files;
             //Show in list view
             string inputFolder = Settings.InputDir;
@@ -540,7 +540,7 @@ namespace TVSorter
                 DateTime update = TVShow.ConvertFromUnixTimestamp(selected.UpdateTime);
                 lblLastUpdate.Text = "Last Update: " + update.ToString();
                 lblSelectedShow.Text = selected.Name;
-                string image = "Data\\" + selected.TvdbId;
+                string image = "Data" + Path.DirectorySeparatorChar + selected.TvdbId;
                 if (File.Exists(image))
                 {
                     try
@@ -761,9 +761,9 @@ namespace TVSorter
             if (dlgFolderSelect.ShowDialog() == DialogResult.OK)
             {
                 txtInputFolder.Text = dlgFolderSelect.SelectedPath;
-                if (!txtInputFolder.Text.EndsWith("\\"))
+                if (!txtInputFolder.Text.EndsWith(Path.DirectorySeparatorChar.ToString()))
                 {
-                    txtInputFolder.Text += "\\";
+                    txtInputFolder.Text += Path.DirectorySeparatorChar.ToString();
                 }
             }
         }
@@ -774,9 +774,9 @@ namespace TVSorter
             if (dlgFolderSelect.ShowDialog() == DialogResult.OK)
             {
                 txtOutputFolder.Text = dlgFolderSelect.SelectedPath;
-                if (!txtOutputFolder.Text.EndsWith("\\"))
+                if (!txtOutputFolder.Text.EndsWith(Path.DirectorySeparatorChar.ToString()))
                 {
-                    txtOutputFolder.Text += "\\";
+                    txtOutputFolder.Text += Path.DirectorySeparatorChar.ToString();
                 }
             }
         }

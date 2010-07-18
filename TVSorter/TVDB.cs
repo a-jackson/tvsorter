@@ -31,6 +31,7 @@ namespace TVSorter
         //Events
         public event Increment Increment = delegate { };
         public event ProgressError Abort = delegate { };
+        public event Complete Complete = delegate { };
 
         private string MirrorAddress;
         private long ServerTime;
@@ -42,16 +43,18 @@ namespace TVSorter
             SetEnvironment();
         }
 
-        public void SetEvents(Increment inc, ProgressError error)
+        public void SetEvents(Increment inc, ProgressError error, Complete complete)
         {
             Increment += inc;
             Abort += error;
+            Complete += complete;
         }
 
-        public void ClearEvents(Increment inc, ProgressError error)
+        public void ClearEvents(Increment inc, ProgressError error, Complete complete)
         {
             Increment -= inc;
             Abort -= error;
+            Complete -= complete;
         }
 
         /// <summary>
@@ -135,11 +138,11 @@ namespace TVSorter
         /// <param name="show">The show to download the banner for</param>
         private void DownloadShowBanner(TVShow show)
         {
-            if (show.Banner == "" || File.Exists("Data\\"+show.TvdbId))
+            if (show.Banner == "" || File.Exists("Data" + Path.DirectorySeparatorChar + show.TvdbId))
                 return;
             WebClient client = new WebClient();
             string address = MirrorAddress + "/banners/" + show.Banner;
-            string save = "Data\\" + show.TvdbId;
+            string save = "Data" + Path.DirectorySeparatorChar + show.TvdbId;
             client.DownloadFile(address, save);
         }
 
@@ -162,6 +165,7 @@ namespace TVSorter
                     Abort(ex.Message);
                     Log.Add("Update failed: " + ex.Message);
                 }
+                Complete();
             })).Start();
         }
 
@@ -326,6 +330,7 @@ namespace TVSorter
                     }
                     Increment();
                 }
+                Complete();
             }));
             addShows.Start();
             return shows;

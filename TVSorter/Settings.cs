@@ -9,8 +9,8 @@ namespace TVSorter
     class Settings
     {
         private const string SettingsDir = "Settings";
-        private const string SettingsFile = SettingsDir + "\\settings.cfg";
-        private const string RegexpFile = SettingsDir + "\\regexp.cfg";
+        private static string SettingsFile = SettingsDir + Path.DirectorySeparatorChar + "settings.cfg";
+        private static string RegexpFile = SettingsDir + Path.DirectorySeparatorChar + "regexp.cfg";
 
         public static string OutputDir = "";
         public static string InputDir = "";

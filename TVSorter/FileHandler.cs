@@ -28,6 +28,7 @@ namespace TVSorter
 
         private event Increment Increment = delegate { };
         private event ProgressError Abort = delegate { };
+        private event Complete Complete = delegate { };
 
         public FileHandler()
         {
@@ -47,16 +48,18 @@ namespace TVSorter
             _months.Add("December", 12);
         }
 
-        public void SetEvents(Increment inc, ProgressError error)
+        public void SetEvents(Increment inc, ProgressError error, Complete complete)
         {
             Increment += inc;
             Abort += error;
+            Complete += complete;
         }
 
-        public void ClearEvents(Increment inc, ProgressError error)
+        public void ClearEvents(Increment inc, ProgressError error, Complete complete)
         {
             Increment -= inc;
             Abort -= error;
+            Complete -= complete;
         }
 
         /// <summary>
@@ -206,6 +209,7 @@ namespace TVSorter
                 return;
             //Start the recursive function that processes a directory
             ProcessFiles(dir);
+            Complete();
         }
 
         /// <summary>
@@ -286,8 +290,8 @@ namespace TVSorter
                         newName = Settings.OutputDir + ep.FormatOutputPath();
                         if (action == SortAction.Rename)
                         {
-                            newName = newName.Substring(newName.LastIndexOf('\\') + 1);
-                            newName = ep.FileInfo.DirectoryName + "\\" + newName;
+                            newName = newName.Substring(newName.LastIndexOf(Path.DirectorySeparatorChar) + 1);
+                            newName = ep.FileInfo.DirectoryName + Path.DirectorySeparatorChar + newName;
                         }
                         FileInfo newFile = new FileInfo(newName);
                         //Create the directory if it doesn't exist
@@ -318,6 +322,7 @@ namespace TVSorter
                         Increment(); //Inc the progress bar
                     }
                 }
+                Complete();
             })).Start();
         }
 
@@ -335,11 +340,11 @@ namespace TVSorter
             //Get the paths
             string inputDirPath = inputDir.FullName;
             string dirPath = directory.FullName;
-            if (!inputDirPath.EndsWith("\\"))
-                inputDirPath = inputDirPath + '\\';
+            if (!inputDirPath.EndsWith(Path.DirectorySeparatorChar.ToString()))
+                inputDirPath = inputDirPath + Path.DirectorySeparatorChar;
             inputDirPath.ToLower();
-            if (!dirPath.EndsWith("\\"))
-                dirPath = dirPath + '\\';
+            if (!dirPath.EndsWith(Path.DirectorySeparatorChar.ToString()))
+                dirPath = dirPath + Path.DirectorySeparatorChar;
             dirPath.ToLower();
             if (inputDirPath == dirPath)
             {

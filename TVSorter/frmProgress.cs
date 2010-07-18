@@ -12,6 +12,7 @@ namespace TVSorter
 {
     public delegate void Increment();
     public delegate void ProgressError(string error);
+    public delegate void Complete();
 
     public partial class frmProgress : Form
     {
@@ -46,7 +47,6 @@ namespace TVSorter
                 if (prgProgress.Value == prgProgress.Maximum)
                 {
                     DialogResult = DialogResult.OK;
-                    Close();
                 }
             }
         }

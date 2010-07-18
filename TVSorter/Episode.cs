@@ -24,7 +24,7 @@ namespace TVSorter
         public static Episode ExampleEpiosde = new Episode(
             new TVShow("","The IT Crowd",0,"", "The IT Crowd"),
             1, 1, "Yesterday's Jam",
-            new DateTime(2006, 2, 3), new FileInfo("C:\\file.avi"));
+            new DateTime(2006, 2, 3), new FileInfo("file.avi"));
 
         private static DateTime NullDate = new DateTime(1,1,1);
 
@@ -276,7 +276,7 @@ namespace TVSorter
             //Remove any characters that can't be in a filename
             foreach (char ch in Path.GetInvalidFileNameChars())
             {
-                if (ch.Equals('\\'))
+                if (ch.Equals(Path.DirectorySeparatorChar))
                     continue;
                 format = format.Replace(ch.ToString(), "");
             }

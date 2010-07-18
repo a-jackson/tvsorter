@@ -43,10 +43,10 @@ namespace TVSorter
                         try
                         {
                             TaskWaiter waiter = new TaskWaiter(showList.Count);
-                            TVDB.Instance.SetEvents(waiter.Increment, waiter.Abort);
+                            TVDB.Instance.SetEvents(waiter.Increment, waiter.Abort, waiter.Complete);
                             TVDB.Instance.UpdateShows(false, showList.ToArray());
                             waiter.Wait();
-                            TVDB.Instance.ClearEvents(waiter.Increment, waiter.Abort);
+                            TVDB.Instance.ClearEvents(waiter.Increment, waiter.Abort, waiter.Complete);
                             //Wait for the update to finish.
                         }
                         catch (WebException e)
@@ -95,12 +95,12 @@ namespace TVSorter
                         episodes.Values.CopyTo(episodeArr, 0);
                         //Set up the waiter to wait until the task is complete
                         TaskWaiter waiter = new TaskWaiter(episodes.Count);
-                        fileHandler.SetEvents(waiter.Increment, waiter.Abort);
+                        fileHandler.SetEvents(waiter.Increment, waiter.Abort, waiter.Complete);
                         //Sort the files.
                         fileHandler.SortEpisodes(episodeArr, action);
                         //Wait until complete
                         waiter.Wait();
-                        fileHandler.ClearEvents(waiter.Increment, waiter.Abort);
+                        fileHandler.ClearEvents(waiter.Increment, waiter.Abort, waiter.Complete);
                     }
                     else
                     {
@@ -138,17 +138,17 @@ namespace TVSorter
             }
             public void Increment()
             {
-                lock (this)
-                {
-                    _count++;
-                    if (_num == _count)
-                    {
-                        Monitor.Pulse(this);
-                    }
-                }
+                _count++;
             }
             public void Abort(string err)
             {
+            }
+            public void Complete()
+            {
+                lock (this)
+                {
+                    Monitor.Pulse(this);
+                }
             }
         }
     }
