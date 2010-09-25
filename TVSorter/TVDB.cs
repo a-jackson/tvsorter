@@ -266,7 +266,7 @@ namespace TVSorter
                     if (dvdE == "" || dvdS == "")
                     {
                         dvdE = episode.ChildNodes[10].InnerText;
-                        dvdS = episode.ChildNodes[18].InnerText;
+                        dvdS = episode.ChildNodes[19].InnerText;
                     }
                     episode_num = (int)float.Parse(dvdE);
                     season_num = (int)float.Parse(dvdS);
@@ -274,7 +274,7 @@ namespace TVSorter
                 else
                 {
                     episode_num = int.Parse(episode.ChildNodes[10].InnerText);
-                    season_num = int.Parse(episode.ChildNodes[18].InnerText);
+                    season_num = int.Parse(episode.ChildNodes[19].InnerText);
                 }
                 //Build the query
                 query.Append("Insert Into Episodes (show_id, tvdb_id, episode_num, season_num," +
