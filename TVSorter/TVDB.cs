@@ -239,9 +239,9 @@ namespace TVSorter
             foreach (XmlNode episode in episodes)
             {
                 //Get each piece of data from the XML
-                string tvdb_id = episode.ChildNodes[0].InnerText;
-                string episode_name = episode.ChildNodes[9].InnerText;
-                string date = episode.ChildNodes[11].InnerText;
+                string tvdb_id = episode["id"].InnerText;
+                string episode_name = episode["EpisodeName"].InnerText;
+                string date = episode["FirstAired"].InnerText;
                 long first_air;
                 if (date.Length > 0)
                 {
@@ -261,20 +261,20 @@ namespace TVSorter
                 int season_num;
                 if (show.UseDvdOrder)
                 {
-                    string dvdE = episode.ChildNodes[5].InnerText;
-                    string dvdS = episode.ChildNodes[6].InnerText;
+                    string dvdE = episode["DVD_episodenumber"].InnerText;
+                    string dvdS = episode["DVD_season"].InnerText;
                     if (dvdE == "" || dvdS == "")
                     {
-                        dvdE = episode.ChildNodes[10].InnerText;
-                        dvdS = episode.ChildNodes[19].InnerText;
+                        dvdE = episode["EpisodeNumber"].InnerText;
+                        dvdS = episode["SeasonNumber"].InnerText;
                     }
                     episode_num = (int)float.Parse(dvdE);
                     season_num = (int)float.Parse(dvdS);
                 }
                 else
                 {
-                    episode_num = int.Parse(episode.ChildNodes[10].InnerText);
-                    season_num = int.Parse(episode.ChildNodes[19].InnerText);
+                    episode_num = int.Parse(episode["EpisodeNumber"].InnerText);
+                    season_num = int.Parse(episode["SeasonNumber"].InnerText);
                 }
                 //Build the query
                 query.Append("Insert Into Episodes (show_id, tvdb_id, episode_num, season_num," +
