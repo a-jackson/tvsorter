@@ -90,6 +90,12 @@
             this.toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
             this.btnLockAll = new System.Windows.Forms.ToolStripButton();
             this.btnUnlockAll = new System.Windows.Forms.ToolStripButton();
+            this.tpgMissingEps = new System.Windows.Forms.TabPage();
+            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.tvMissingEps = new System.Windows.Forms.TreeView();
+            this.chkSkipSeason0 = new System.Windows.Forms.CheckBox();
+            this.btnSearchMissingEpisodes = new System.Windows.Forms.Button();
+            this.label13 = new System.Windows.Forms.Label();
             this.tpgSettings = new System.Windows.Forms.TabPage();
             this.settingsSubTabs = new System.Windows.Forms.TabControl();
             this.generalSettings = new System.Windows.Forms.TabPage();
@@ -143,6 +149,10 @@
             this.grpShowCustomFormat.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picShowPic)).BeginInit();
             this.toolStrip2.SuspendLayout();
+            this.tpgMissingEps.SuspendLayout();
+            this.splitContainer1.Panel1.SuspendLayout();
+            this.splitContainer1.Panel2.SuspendLayout();
+            this.splitContainer1.SuspendLayout();
             this.tpgSettings.SuspendLayout();
             this.settingsSubTabs.SuspendLayout();
             this.generalSettings.SuspendLayout();
@@ -161,6 +171,7 @@
             // 
             this.tabControl1.Controls.Add(this.tpgInputFolder);
             this.tabControl1.Controls.Add(this.tpgTVShows);
+            this.tabControl1.Controls.Add(this.tpgMissingEps);
             this.tabControl1.Controls.Add(this.tpgSettings);
             this.tabControl1.Controls.Add(this.tpgLog);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -737,6 +748,74 @@
             this.btnUnlockAll.Text = "Unlock All";
             this.btnUnlockAll.Click += new System.EventHandler(this.btnUnlockAll_Click);
             // 
+            // tpgMissingEps
+            // 
+            this.tpgMissingEps.Controls.Add(this.splitContainer1);
+            this.tpgMissingEps.Location = new System.Drawing.Point(4, 22);
+            this.tpgMissingEps.Name = "tpgMissingEps";
+            this.tpgMissingEps.Size = new System.Drawing.Size(936, 504);
+            this.tpgMissingEps.TabIndex = 4;
+            this.tpgMissingEps.Text = "Missing Episodes";
+            this.tpgMissingEps.UseVisualStyleBackColor = true;
+            // 
+            // splitContainer1
+            // 
+            this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer1.Location = new System.Drawing.Point(0, 0);
+            this.splitContainer1.Name = "splitContainer1";
+            // 
+            // splitContainer1.Panel1
+            // 
+            this.splitContainer1.Panel1.Controls.Add(this.tvMissingEps);
+            // 
+            // splitContainer1.Panel2
+            // 
+            this.splitContainer1.Panel2.Controls.Add(this.chkSkipSeason0);
+            this.splitContainer1.Panel2.Controls.Add(this.btnSearchMissingEpisodes);
+            this.splitContainer1.Panel2.Controls.Add(this.label13);
+            this.splitContainer1.Size = new System.Drawing.Size(936, 504);
+            this.splitContainer1.SplitterDistance = 250;
+            this.splitContainer1.TabIndex = 0;
+            // 
+            // tvMissingEps
+            // 
+            this.tvMissingEps.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tvMissingEps.Location = new System.Drawing.Point(0, 0);
+            this.tvMissingEps.Name = "tvMissingEps";
+            this.tvMissingEps.Size = new System.Drawing.Size(250, 504);
+            this.tvMissingEps.TabIndex = 0;
+            // 
+            // chkSkipSeason0
+            // 
+            this.chkSkipSeason0.AutoSize = true;
+            this.chkSkipSeason0.Location = new System.Drawing.Point(5, 53);
+            this.chkSkipSeason0.Name = "chkSkipSeason0";
+            this.chkSkipSeason0.Size = new System.Drawing.Size(144, 17);
+            this.chkSkipSeason0.TabIndex = 2;
+            this.chkSkipSeason0.Text = "Skip Season 0 (Specials)";
+            this.chkSkipSeason0.UseVisualStyleBackColor = true;
+            // 
+            // btnSearchMissingEpisodes
+            // 
+            this.btnSearchMissingEpisodes.Location = new System.Drawing.Point(5, 76);
+            this.btnSearchMissingEpisodes.Name = "btnSearchMissingEpisodes";
+            this.btnSearchMissingEpisodes.Size = new System.Drawing.Size(75, 23);
+            this.btnSearchMissingEpisodes.TabIndex = 1;
+            this.btnSearchMissingEpisodes.Text = "Search";
+            this.btnSearchMissingEpisodes.UseVisualStyleBackColor = true;
+            this.btnSearchMissingEpisodes.Click += new System.EventHandler(this.btnSearchMissingEpisodes_Click);
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(2, 11);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(388, 39);
+            this.label13.TabIndex = 0;
+            this.label13.Text = "This searches the output directory for episodes and compares it to the database. " +
+                "\r\nAny database entries that aren\'t found in the output directory are shown on th" +
+                "e \r\nleft as missing episodes.";
+            // 
             // tpgSettings
             // 
             this.tpgSettings.AutoScroll = true;
@@ -1192,6 +1271,11 @@
             ((System.ComponentModel.ISupportInitialize)(this.picShowPic)).EndInit();
             this.toolStrip2.ResumeLayout(false);
             this.toolStrip2.PerformLayout();
+            this.tpgMissingEps.ResumeLayout(false);
+            this.splitContainer1.Panel1.ResumeLayout(false);
+            this.splitContainer1.Panel2.ResumeLayout(false);
+            this.splitContainer1.Panel2.PerformLayout();
+            this.splitContainer1.ResumeLayout(false);
             this.tpgSettings.ResumeLayout(false);
             this.settingsSubTabs.ResumeLayout(false);
             this.generalSettings.ResumeLayout(false);
@@ -1321,6 +1405,12 @@
         private System.Windows.Forms.ToolStripButton btnMoveDownRegexp;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator10;
         private System.Windows.Forms.ToolStripButton btnRemoveRegexp;
+        private System.Windows.Forms.TabPage tpgMissingEps;
+        private System.Windows.Forms.SplitContainer splitContainer1;
+        private System.Windows.Forms.TreeView tvMissingEps;
+        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.Button btnSearchMissingEpisodes;
+        private System.Windows.Forms.CheckBox chkSkipSeason0;
     }
 }
 

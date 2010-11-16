@@ -870,6 +870,96 @@ namespace TVSorter
         }
 
         #endregion
+
+        private void btnSearchMissingEpisodes_Click(object sender, EventArgs e)
+        {
+            if (Settings.OutputDir == "" || !Directory.Exists(Settings.InputDir))
+            {
+                MessageBox.Show("Check your output directory and try again");
+                return;
+            }
+            string outputDir;
+            if (cboFolderFilter.SelectedIndex == 0)
+            {
+                outputDir = Settings.OutputDir;
+            }
+            else
+            {
+                outputDir = Settings.OutputDir + Path.DirectorySeparatorChar + cboFolderFilter.SelectedItem;
+            }
+            tvMissingEps.Nodes.Clear();
+            bool recurse = Settings.RecurseSubDir;
+            Settings.RecurseSubDir = true;
+
+            int numFiles = GetMaxFiles(new DirectoryInfo(outputDir));
+            if (numFiles == 0)
+                return;
+   
+            frmProgress progress = new frmProgress(numFiles);
+            _fileHandler.SetEvents(progress.Increment, progress.Abort, progress.Close);
+            new Thread(new ThreadStart(delegate()
+            {
+                _fileHandler.RefreshEpisodes(outputDir);
+            })).Start();
+            progress.ShowDialog();
+            _fileHandler.ClearEvents(progress.Increment, progress.Abort, progress.Close);
+            _files = _fileHandler.Files;
+
+            frmProgress progress2 = new frmProgress(3);
+            new Thread(new ThreadStart(delegate()
+            {
+                _database.ExecuteQuery("CREATE TABLE FILES(FILE_ID INTEGER PRIMARY KEY AUTOINCREMENT, EPISODE_ID INTEGER)");
+                progress2.Increment();
+                //Show in list view
+                StringBuilder query = new StringBuilder();
+                foreach (KeyValuePair<string, Episode> episode in _files)
+                {
+                    query.Append("INSERT INTO FILES (EPISODE_ID) VALUES (" + episode.Value.ID + ");");
+                }
+                progress2.Increment();
+                _database.ExecuteQuery("Begin;" + query.ToString() + "Commit;");
+                progress2.Increment();
+            })).Start();
+            progress2.ShowDialog();
+            
+            long time = TVShow.ConvertToUnixTimestamp(DateTime.Now);
+            List<Dictionary<string, object>> missing = _database.ExecuteResults
+                ("SELECT Shows.name, Episodes.season_num, Episodes.episode_num, Episodes.episode_name " +
+                    "FROM Shows INNER JOIN Episodes On (Shows.id = Episodes.show_id) WHERE Episodes.id NOT " +
+                    "IN (SELECT EPISODE_ID FROM FILES) AND Episodes.first_air < " + time +
+                    " AND Episodes.first_air != 0" +
+                    (chkSkipSeason0.Checked ? " AND Episodes.season_num != 0" : "") +
+                    " ORDER BY Shows.name, Episodes.season_num, Episodes.episode_num;");
+            TreeNode root = new TreeNode();
+            string lastShow= "";
+            long lastSeason = -1;
+            foreach (Dictionary<string, object> episode in missing)
+            {
+                string showName = (string)episode["name"];
+                long seasonNum = (long)episode["season_num"];
+                long episodeNum = (long)episode["episode_num"];
+                string episodeName = (string)episode["episode_name"];
+
+                if (showName != lastShow)
+                {
+                    root.Nodes.Add(showName, showName);
+                    lastShow = showName;
+                    lastSeason = -1;
+                }
+                if (lastSeason != seasonNum)
+                {
+                    root.Nodes[showName].Nodes.Add(seasonNum.ToString(), "Season " + seasonNum);
+                    lastSeason = seasonNum;
+                }
+                root.Nodes[showName].Nodes[seasonNum.ToString()].Nodes.Add(episodeNum.ToString(), episodeNum + " - " + episodeName);
+            }
+            foreach (TreeNode node in root.Nodes)
+            {
+                tvMissingEps.Nodes.Add(node);
+            }
+            _database.ExecuteQuery("DROP TABLE FILES");
+            Settings.RecurseSubDir = recurse;
+        }
         #endregion
         #endregion
     }

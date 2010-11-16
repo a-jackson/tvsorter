@@ -29,6 +29,7 @@ namespace TVSorter
         private static DateTime NullDate = new DateTime(1,1,1);
 
         private TVShow _show;
+        private long _id;
         private long _episode;
         private long _season;
         private string _episodeName;
@@ -76,6 +77,7 @@ namespace TVSorter
         public void GetEpisodeInfo()
         {
             Database database = new Database();
+            _id = -1;
             //If the show has no database ID then it couldn't be identified
             //from the available data so can't look up the episode
             if (_show == null || _show.DatabaseId == -1)
@@ -95,6 +97,7 @@ namespace TVSorter
                         + SeasonNum + " And episode_num = " + EpisodeNum + ";")[0];
                     _episodeName = (string)results["episode_name"];
                     _firstAir = TVShow.ConvertFromUnixTimestamp((long)results["first_air"]);
+                    _id = (long)results["id"];
                 }
                 catch
                 {
@@ -119,6 +122,7 @@ namespace TVSorter
                     _episodeName = (string)results["episode_name"];
                     _season = (long)results["season_num"];
                     _episode = (long)results["episode_num"];
+                    _id = (long)results["id"];
                 }
                 catch
                 {
@@ -140,6 +144,10 @@ namespace TVSorter
             set { _show = value; GetEpisodeInfo(); }
         }
 
+        public long ID
+        {
+            get { return _id; }
+        }
         public string EpisodeName
         {
             get { return (_episodeName ?? "").Trim(); }
