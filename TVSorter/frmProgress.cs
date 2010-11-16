@@ -67,6 +67,8 @@ namespace TVSorter
 
         public new void Close()
         {
+            if (!IsAccessible)
+                return;
             if (InvokeRequired)
             {
                 Invoke(new MethodInvoker(Close));
