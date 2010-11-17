@@ -139,6 +139,11 @@
             this.tpgLog = new System.Windows.Forms.TabPage();
             this.lstLog = new System.Windows.Forms.ListBox();
             this.dlgFolderSelect = new System.Windows.Forms.FolderBrowserDialog();
+            this.btnRefreshFileList = new System.Windows.Forms.Button();
+            this.chkSkipMissingSeasons = new System.Windows.Forms.CheckBox();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.rdoSearchMissingEps = new System.Windows.Forms.RadioButton();
+            this.rdoDuplicateEps = new System.Windows.Forms.RadioButton();
             this.tabControl1.SuspendLayout();
             this.tpgInputFolder.SuspendLayout();
             this.toolStrip1.SuspendLayout();
@@ -165,6 +170,7 @@
             this.toolStrip3.SuspendLayout();
             this.grpRegexpInfo.SuspendLayout();
             this.tpgLog.SuspendLayout();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -755,7 +761,7 @@
             this.tpgMissingEps.Name = "tpgMissingEps";
             this.tpgMissingEps.Size = new System.Drawing.Size(936, 504);
             this.tpgMissingEps.TabIndex = 4;
-            this.tpgMissingEps.Text = "Missing Episodes";
+            this.tpgMissingEps.Text = "Missing/Duplicate Episodes";
             this.tpgMissingEps.UseVisualStyleBackColor = true;
             // 
             // splitContainer1
@@ -770,11 +776,12 @@
             // 
             // splitContainer1.Panel2
             // 
-            this.splitContainer1.Panel2.Controls.Add(this.chkSkipSeason0);
+            this.splitContainer1.Panel2.Controls.Add(this.groupBox1);
+            this.splitContainer1.Panel2.Controls.Add(this.btnRefreshFileList);
             this.splitContainer1.Panel2.Controls.Add(this.btnSearchMissingEpisodes);
             this.splitContainer1.Panel2.Controls.Add(this.label13);
             this.splitContainer1.Size = new System.Drawing.Size(936, 504);
-            this.splitContainer1.SplitterDistance = 250;
+            this.splitContainer1.SplitterDistance = 249;
             this.splitContainer1.TabIndex = 0;
             // 
             // tvMissingEps
@@ -782,13 +789,13 @@
             this.tvMissingEps.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tvMissingEps.Location = new System.Drawing.Point(0, 0);
             this.tvMissingEps.Name = "tvMissingEps";
-            this.tvMissingEps.Size = new System.Drawing.Size(250, 504);
+            this.tvMissingEps.Size = new System.Drawing.Size(249, 504);
             this.tvMissingEps.TabIndex = 0;
             // 
             // chkSkipSeason0
             // 
             this.chkSkipSeason0.AutoSize = true;
-            this.chkSkipSeason0.Location = new System.Drawing.Point(5, 53);
+            this.chkSkipSeason0.Location = new System.Drawing.Point(6, 42);
             this.chkSkipSeason0.Name = "chkSkipSeason0";
             this.chkSkipSeason0.Size = new System.Drawing.Size(144, 17);
             this.chkSkipSeason0.TabIndex = 2;
@@ -797,7 +804,7 @@
             // 
             // btnSearchMissingEpisodes
             // 
-            this.btnSearchMissingEpisodes.Location = new System.Drawing.Point(5, 76);
+            this.btnSearchMissingEpisodes.Location = new System.Drawing.Point(6, 162);
             this.btnSearchMissingEpisodes.Name = "btnSearchMissingEpisodes";
             this.btnSearchMissingEpisodes.Size = new System.Drawing.Size(75, 23);
             this.btnSearchMissingEpisodes.TabIndex = 1;
@@ -1244,6 +1251,61 @@
             this.lstLog.Size = new System.Drawing.Size(930, 498);
             this.lstLog.TabIndex = 0;
             // 
+            // btnRefreshFileList
+            // 
+            this.btnRefreshFileList.Location = new System.Drawing.Point(6, 53);
+            this.btnRefreshFileList.Name = "btnRefreshFileList";
+            this.btnRefreshFileList.Size = new System.Drawing.Size(106, 23);
+            this.btnRefreshFileList.TabIndex = 5;
+            this.btnRefreshFileList.Text = "Refresh File List";
+            this.btnRefreshFileList.UseVisualStyleBackColor = true;
+            this.btnRefreshFileList.Click += new System.EventHandler(this.btnRefreshFileList_Click);
+            // 
+            // chkSkipMissingSeasons
+            // 
+            this.chkSkipMissingSeasons.AutoSize = true;
+            this.chkSkipMissingSeasons.Location = new System.Drawing.Point(156, 42);
+            this.chkSkipMissingSeasons.Name = "chkSkipMissingSeasons";
+            this.chkSkipMissingSeasons.Size = new System.Drawing.Size(159, 17);
+            this.chkSkipMissingSeasons.TabIndex = 6;
+            this.chkSkipMissingSeasons.Text = "Skip Entire Missing Seasons";
+            this.chkSkipMissingSeasons.UseVisualStyleBackColor = true;
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.rdoDuplicateEps);
+            this.groupBox1.Controls.Add(this.chkSkipMissingSeasons);
+            this.groupBox1.Controls.Add(this.rdoSearchMissingEps);
+            this.groupBox1.Controls.Add(this.chkSkipSeason0);
+            this.groupBox1.Location = new System.Drawing.Point(6, 82);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(320, 74);
+            this.groupBox1.TabIndex = 7;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Search Options";
+            // 
+            // rdoSearchMissingEps
+            // 
+            this.rdoSearchMissingEps.AutoSize = true;
+            this.rdoSearchMissingEps.Checked = true;
+            this.rdoSearchMissingEps.Location = new System.Drawing.Point(6, 19);
+            this.rdoSearchMissingEps.Name = "rdoSearchMissingEps";
+            this.rdoSearchMissingEps.Size = new System.Drawing.Size(106, 17);
+            this.rdoSearchMissingEps.TabIndex = 0;
+            this.rdoSearchMissingEps.TabStop = true;
+            this.rdoSearchMissingEps.Text = "Missing Episodes";
+            this.rdoSearchMissingEps.UseVisualStyleBackColor = true;
+            // 
+            // rdoDuplicateEps
+            // 
+            this.rdoDuplicateEps.AutoSize = true;
+            this.rdoDuplicateEps.Location = new System.Drawing.Point(118, 19);
+            this.rdoDuplicateEps.Name = "rdoDuplicateEps";
+            this.rdoDuplicateEps.Size = new System.Drawing.Size(116, 17);
+            this.rdoDuplicateEps.TabIndex = 1;
+            this.rdoDuplicateEps.Text = "Duplicate Episodes";
+            this.rdoDuplicateEps.UseVisualStyleBackColor = true;
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1295,6 +1357,8 @@
             this.grpRegexpInfo.ResumeLayout(false);
             this.grpRegexpInfo.PerformLayout();
             this.tpgLog.ResumeLayout(false);
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -1411,6 +1475,11 @@
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.Button btnSearchMissingEpisodes;
         private System.Windows.Forms.CheckBox chkSkipSeason0;
+        private System.Windows.Forms.Button btnRefreshFileList;
+        private System.Windows.Forms.CheckBox chkSkipMissingSeasons;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.RadioButton rdoDuplicateEps;
+        private System.Windows.Forms.RadioButton rdoSearchMissingEps;
     }
 }
 

@@ -22,7 +22,7 @@ namespace TVSorter
         private Dictionary<string, Episode> _files;
 
         //File extensions to look at. Anything else will be ignored
-        public static Regex _extensions = new Regex("[.](avi|mkv|mpg|wmv|tbn|nfo)", RegexOptions.IgnoreCase);
+        public static Regex _extensions = new Regex("[.](avi|mkv|mpg|wmv)", RegexOptions.IgnoreCase);
 
         private Dictionary<string, int> _months;
 
