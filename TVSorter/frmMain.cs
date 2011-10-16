@@ -258,16 +258,20 @@ namespace TVSorter
         private int GetMaxFiles(DirectoryInfo dir)
         {
             int max = 0;
-            FileInfo[] files = dir.GetFiles();
-            max += files.Length;
-            //Only check subdirectories if the option is enabled
-            if (Settings.RecurseSubDir)
+            try
             {
-                foreach (DirectoryInfo subdir in dir.GetDirectories())
+                FileInfo[] files = dir.GetFiles();
+                max += files.Length;
+                //Only check subdirectories if the option is enabled
+                if (Settings.RecurseSubDir)
                 {
-                    max += GetMaxFiles(subdir);
+                    foreach (DirectoryInfo subdir in dir.GetDirectories())
+                    {
+                        max += GetMaxFiles(subdir);
+                    }
                 }
             }
+            catch { }
             return max;
         }
 
@@ -877,7 +881,7 @@ namespace TVSorter
         {
             tvMissingEps.Nodes.Clear();
             List<Dictionary<string, object>> results = null;
-            long time = TVShow.ConvertToUnixTimestamp(DateTime.Now);
+            long time = TVShow.ConvertToUnixTimestamp(DateTime.Now)-86400;
             if (rdoSearchMissingEps.Checked)
             {
                 if (chkSkipMissingSeasons.Checked)
@@ -892,6 +896,7 @@ namespace TVSorter
                         "AND first_air < " + time + " " +
                         "AND first_air != 0 " +
                         (chkSkipSeason0.Checked ? " AND Episodes.season_num != 0 " : "") +
+                        (chkSkipPart2.Checked ? " AND Episodes.episode_name NOT LIKE '%(2)' " : "") +
                         "GROUP BY show_id, season_num " +
                         "ORDER BY show_id, season_num " +
                         ") As MissingSeasonCount, " +
@@ -901,6 +906,7 @@ namespace TVSorter
                         "WHERE first_air < " + time + " " +
                         "AND first_air != 0 " +
                         (chkSkipSeason0.Checked ? " AND Episodes.season_num != 0 " : "") +
+                        (chkSkipPart2.Checked ? " AND Episodes.episode_name NOT LIKE '%(2)' " : "") +
                         "group by show_id, season_num " +
                         ") As SeasonCount " +
                         "WHERE MissingSeasonCount.show_id = SeasonCount.show_id " +
@@ -913,7 +919,9 @@ namespace TVSorter
                         "IN (SELECT EPISODE_ID FROM FILES) " +
                         " AND Episodes.first_air < " + time + " " +
                         " AND Episodes.first_air != 0 " +
+                        (chkSkipLocked.Checked ? " AND Shows.show_locked != 1 " : "") +
                         (chkSkipSeason0.Checked ? " AND Episodes.season_num != 0 " : "") +
+                        (chkSkipPart2.Checked ? " AND Episodes.episode_name NOT LIKE '%(2)' " : "") +
                         (chkSkipMissingSeasons.Checked ? " AND NOT EXISTS (SELECT * FROM Missing " +
                         " Where show_id = Episodes.show_id AND season_num = Episodes.season_num)" : "") +
                         " ORDER BY Shows.name, Episodes.season_num, Episodes.episode_num;");
@@ -921,7 +929,7 @@ namespace TVSorter
             else if (rdoDuplicateEps.Checked)
             {
                 results = _database.ExecuteResults(
-                "select name, season_num, episode_num from " +
+                "select name, season_num, episode_num, episode_name from " +
                 "(select * from (select episode_id, count(episode_id) as cnt " +
                 "from files group by episode_id) where cnt > 1) as file inner join " +
                 "episodes on episodes.id = file.episode_id inner join shows on " +
@@ -954,6 +962,7 @@ namespace TVSorter
                 }
                 root.Nodes[showName].Nodes[seasonNum.ToString()].Nodes.Add(episodeNum.ToString(), episodeNum + " - " + episodeName);
             }
+            lblSearchResults.Text = "Search Results: " + results.Count;
             foreach (TreeNode node in root.Nodes)
             {
                 tvMissingEps.Nodes.Add(node);
@@ -972,19 +981,10 @@ namespace TVSorter
                 MessageBox.Show("Check your output directory and try again");
                 return;
             }
-            string outputDir;
-            if (cboFolderFilter.SelectedIndex == 0)
-            {
-                outputDir = Settings.OutputDir;
-            }
-            else
-            {
-                outputDir = Settings.OutputDir + Path.DirectorySeparatorChar + cboFolderFilter.SelectedItem;
-            }
+            string outputDir = Settings.OutputDir;
 
             bool recurse = Settings.RecurseSubDir;
             Settings.RecurseSubDir = true;
-
             int numFiles = GetMaxFiles(new DirectoryInfo(outputDir));
             if (numFiles == 0)
                 return;

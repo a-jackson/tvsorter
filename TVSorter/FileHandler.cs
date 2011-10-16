@@ -26,12 +26,15 @@ namespace TVSorter
 
         private Dictionary<string, int> _months;
 
+        private Database _database;
+
         private event Increment Increment = delegate { };
         private event ProgressError Abort = delegate { };
         private event Complete Complete = delegate { };
 
         public FileHandler()
         {
+            _database = new Database();
             //A dictionary of filepath and episode objects
             _files = new Dictionary<string, Episode>();
             //The months and their number equivalent
@@ -219,43 +222,51 @@ namespace TVSorter
         /// <param name="dir">The directory to process</param>
         private void ProcessFiles(DirectoryInfo dir)
         {
-            //Process each file in the directory
-            foreach (FileInfo file in dir.GetFiles())
+            try
             {
-                //Check if it matches one of the valid extensions
-                if (!_extensions.IsMatch(file.Extension))
+                //Process each file in the directory
+                foreach (FileInfo file in dir.GetFiles())
                 {
-                    //Increment the progress bar and move on if not.
-                    Increment();
-                    continue;
-                }
-                try
-                {
-                    //Attempt to get an episode object
-                    Episode episode = GetEpisode(file);
-                    if (episode != null)
+                    //Check if it matches one of the valid extensions
+                    if (!_extensions.IsMatch(file.Extension))
                     {
-                        //Add the file if one is found
-                        _files.Add(
-                            file.FullName.Replace(Settings.InputDir, ""),
-                            episode);
+                        //Increment the progress bar and move on if not.
+                        Increment();
+                        continue;
+                    }
+                    try
+                    {
+                        //Attempt to get an episode object
+                        Episode episode = GetEpisode(file);
+                        if (episode != null)
+                        {
+                            //Add the file if one is found
+                            _files.Add(
+                                file.FullName.Replace(Settings.InputDir, ""),
+                                episode);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Add("Error getting an episode from file \n" + file.FullName + "\n" + e.Message);
+                    }
+                    //Increment the progress bar
+                    Increment();
+                }
+            }
+            catch { }
+            try
+            {
+                //If the scan should be recursive then process each of the directories in this directory
+                if (Settings.RecurseSubDir)
+                {
+                    foreach (DirectoryInfo subdir in dir.GetDirectories())
+                    {
+                        ProcessFiles(subdir);
                     }
                 }
-                catch (Exception e)
-                {
-                    Log.Add("Error getting an episode from file \n" + file.FullName + "\n" + e.Message);
-                }
-                //Increment the progress bar
-                Increment();
             }
-            //If the scan should be recursive then process each of the directories in this directory
-            if (Settings.RecurseSubDir)
-            {
-                foreach (DirectoryInfo subdir in dir.GetDirectories())
-                {
-                    ProcessFiles(subdir);
-                }
-            }
+            catch { }
         }
 
         public Dictionary<string, Episode> Files
@@ -306,6 +317,7 @@ namespace TVSorter
                         {
                             File.Move(ep.FileInfo.FullName, newName);
                         }
+                        _database.ExecuteQuery("Insert Into Files (Episode_ID) Values (" + ep.ID + ");");
                         if (Settings.DeleteEmpty)
                         {
                             RecuriveDelete(ep.FileInfo.Directory);
