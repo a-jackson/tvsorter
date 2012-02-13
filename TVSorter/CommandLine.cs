@@ -35,16 +35,26 @@ namespace TVSorter
                 Log.Add("Recurse subdirs: " + Settings.RecurseSubDir);
                 Log.Add("Delete empty dir: " + Settings.DeleteEmpty);
                 Log.Add("Output file format: " + Settings.FileNameFormat);
+
+                bool force = false; // default off
                 foreach (string arg in _args)
                 {
-                    if (arg == "-update_all") //Update the database
+                    if (arg.StartsWith("-update"))
                     {
+                        if (arg == "-update_all") //Update the database
+                        {
+                            force = false;
+                        }
+                        else if (arg == "-update_force_all") //Force update of the database
+                        {
+                            force = true;
+                        }
                         List<TVShow> showList = TVShow.GetAllShows();
                         try
                         {
                             TaskWaiter waiter = new TaskWaiter(showList.Count);
                             TVDB.Instance.SetEvents(waiter.Increment, waiter.Abort, waiter.Complete);
-                            TVDB.Instance.UpdateShows(false, showList.ToArray());
+                            TVDB.Instance.UpdateShows(force, showList.ToArray());
                             waiter.Wait();
                             TVDB.Instance.ClearEvents(waiter.Increment, waiter.Abort, waiter.Complete);
                             //Wait for the update to finish.
