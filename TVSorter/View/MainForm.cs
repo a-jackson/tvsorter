@@ -1,40 +1,34 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright company="TVSorter" file="Program.cs">
+// <copyright company="TVSorter" file="MainForm.cs">
 //   2012 - Andrew Jackson
 // </copyright>
 // <summary>
-//   TVSorter's Program.
+//   The main form of the program.
 // </summary>
 // 
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace TVSorter
+namespace TVSorter.View
 {
     #region Using Directives
 
-    using System;
     using System.Windows.Forms;
-
-    using TVSorter.View;
 
     #endregion
 
     /// <summary>
-    /// TVSorter's Program.
+    /// The main form of the program.
     /// </summary>
-    internal static class Program
+    public partial class MainForm : Form
     {
-        #region Methods
+        #region Constructors and Destructors
 
         /// <summary>
-        /// The main entry point for the application.
+        ///   Initializes a new instance of the <see cref="MainForm" /> class.
         /// </summary>
-        [STAThread]
-        private static void Main()
+        public MainForm()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainForm());
+            this.InitializeComponent();
         }
 
         #endregion
