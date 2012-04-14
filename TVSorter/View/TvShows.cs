@@ -170,7 +170,21 @@ namespace TVSorter.View
                             this.selectedShowName.Text = this.controller.SelectedShow.Name;
                             string imagePath = "Images" + Path.DirectorySeparatorChar
                                                + this.controller.SelectedShow.TvdbId + ".jpg";
-                            this.selectedShowBanner.Image = File.Exists(imagePath) ? Image.FromFile(imagePath) : null;
+                            try
+                            {
+                                this.selectedShowBanner.Image = File.Exists(imagePath) ? Image.FromFile(imagePath) : null;
+                            }
+                            catch (Exception Ex)
+                            {
+                                try
+                                {
+                                    File.Delete(imagePath);
+                                }
+                                catch
+                                {
+                                    // Unable to delete
+                                }
+                            }
                             this.selectedShowTvdb.Text = "TVDB ID: " + this.controller.SelectedShow.TvdbId;
                             this.selectedShowLastUpdated.Text = "Last Updated: "
                                                                 + this.controller.SelectedShow.LastUpdated;
