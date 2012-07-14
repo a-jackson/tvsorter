@@ -5,7 +5,6 @@
 // <summary>
 //   Controller for the missing / duplicate episodes tab.
 // </summary>
-// 
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace TVSorter.Controller
@@ -16,7 +15,8 @@ namespace TVSorter.Controller
     using System.Collections.Generic;
     using System.Linq;
 
-    using TVSorter.DAL;
+    using TVSorter.Scanning;
+    using TVSorter.Storage;
     using TVSorter.Types;
     using TVSorter.View;
 
@@ -27,7 +27,7 @@ namespace TVSorter.Controller
     /// </summary>
     public class MissingDuplicateController : ControllerBase
     {
-        #region Constants and Fields
+        #region Fields
 
         /// <summary>
         ///   The episode displayed on the tree.
@@ -130,9 +130,10 @@ namespace TVSorter.Controller
         /// <param name="hideWholeSeasons">
         /// A value indicating whether to hide entire missing seasons. 
         /// </param>
-        public void SearchMissingEpisodes(bool hideUnaired, bool hideSeason0, bool hidePart2, bool hideLocked, bool hideWholeSeasons)
+        public void SearchMissingEpisodes(
+            bool hideUnaired, bool hideSeason0, bool hidePart2, bool hideLocked, bool hideWholeSeasons)
         {
-            var missingEpisodes = this.storage.GetMissingEpisodes().ToList();
+            List<Episode> missingEpisodes = this.storage.GetMissingEpisodes().ToList();
 
             if (hideUnaired)
             {
@@ -158,13 +159,13 @@ namespace TVSorter.Controller
 
             if (hideWholeSeasons)
             {
-                var seasonCounts = this.storage.SeasonEpisodeCount();
+                Dictionary<TvShow, Dictionary<int, int>> seasonCounts = this.storage.SeasonEpisodeCount();
                 var removeEpsiodes = new List<Episode>();
-                var showGroups = missingEpisodes.GroupBy(x => x.Show);
-                foreach (var seasonGroup in from showGroup in showGroups 
-                                            let seasonGroups = showGroup.GroupBy(x => x.SeasonNumber) 
-                                            from seasonGroup in seasonGroups 
-                                            where seasonGroup.Count() == seasonCounts[showGroup.Key][seasonGroup.Key] 
+                IEnumerable<IGrouping<TvShow, Episode>> showGroups = missingEpisodes.GroupBy(x => x.Show);
+                foreach (var seasonGroup in from showGroup in showGroups
+                                            let seasonGroups = showGroup.GroupBy(x => x.SeasonNumber)
+                                            from seasonGroup in seasonGroups
+                                            where seasonGroup.Count() == seasonCounts[showGroup.Key][seasonGroup.Key]
                                             select seasonGroup)
                 {
                     removeEpsiodes.AddRange(seasonGroup);
@@ -172,7 +173,7 @@ namespace TVSorter.Controller
 
                 missingEpisodes = missingEpisodes.Where(x => !removeEpsiodes.Contains(x)).ToList();
             }
-            
+
             this.Episodes = missingEpisodes.OrderBy(x => x.Show.Name).ToList();
         }
 

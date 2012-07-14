@@ -5,16 +5,16 @@
 // <summary>
 //   The public interface of a data provider.
 // </summary>
-// 
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace TVSorter.DAL
+namespace TVSorter.Data
 {
     #region Using Directives
 
     using System;
     using System.Collections.Generic;
 
+    using TVSorter.Storage;
     using TVSorter.Types;
 
     #endregion
@@ -60,7 +60,7 @@ namespace TVSorter.DAL
         /// Updates the specified collection of shows.
         /// </summary>
         /// <param name="shows">
-        ///   The shows to update. 
+        /// The shows to update. 
         /// </param>
         void UpdateShows(IList<TvShow> shows);
 
@@ -68,10 +68,10 @@ namespace TVSorter.DAL
         /// Updates the specified collection of shows asynchronously.
         /// </summary>
         /// <param name="shows">
-        ///   The shows to update. 
+        /// The shows to update. 
         /// </param>
         /// <param name="userState">
-        ///   A state object that will be returned in all events. 
+        /// A state object that will be returned in all events. 
         /// </param>
         void UpdateShowsAsync(IList<TvShow> shows, object userState);
 

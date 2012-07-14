@@ -5,10 +5,9 @@
 // <summary>
 //   Downloads the XML files from the TVDB.
 // </summary>
-// 
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace TVSorter.DAL
+namespace TVSorter.Data.Tvdb
 {
     #region Using Directives
 
@@ -28,7 +27,7 @@ namespace TVSorter.DAL
     /// </summary>
     internal class TvdbDownload
     {
-        #region Constants and Fields
+        #region Constants
 
         /// <summary>
         ///   The TVDB API key.
@@ -59,6 +58,10 @@ namespace TVSorter.DAL
         ///   The address to download the server time from.
         /// </summary>
         private const string TimeAddress = SiteAddress + "/api/Updates.php?type=none";
+
+        #endregion
+
+        #region Fields
 
         /// <summary>
         ///   The task that determines the mirror.
@@ -184,7 +187,7 @@ namespace TVSorter.DAL
         public StringReader DownloadUpdates(DateTime time)
         {
             var timestamp = (int)(time - new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds;
-            var updatesUrl = SiteAddress + "/api/Updates.php?type=all&time=" + timestamp;
+            string updatesUrl = SiteAddress + "/api/Updates.php?type=all&time=" + timestamp;
             return this.DownloadXml(updatesUrl);
         }
 
@@ -196,9 +199,9 @@ namespace TVSorter.DAL
         /// </returns>
         public DateTime GetServerTime()
         {
-            var timeXml = this.DownloadXml(TimeAddress);
-            var time = XDocument.Load(timeXml);
-            var timestamp = time.Descendants("Time").First().Value;
+            StringReader timeXml = this.DownloadXml(TimeAddress);
+            XDocument time = XDocument.Load(timeXml);
+            string timestamp = time.Descendants("Time").First().Value;
 
             return new DateTime(1970, 1, 1, 0, 0, 0).AddSeconds(long.Parse(timestamp));
         }
@@ -233,7 +236,7 @@ namespace TVSorter.DAL
         private StringReader DownloadXml(string url)
         {
             var client = new WebClient();
-            var xml = client.DownloadString(url);
+            string xml = client.DownloadString(url);
             return new StringReader(xml);
         }
 
@@ -246,8 +249,8 @@ namespace TVSorter.DAL
         private string InitialiseMirror()
         {
             // Download the mirrors 
-            var mirrorString = this.DownloadXml(MirrorsAddress);
-            var mirrors = XDocument.Load(mirrorString);
+            StringReader mirrorString = this.DownloadXml(MirrorsAddress);
+            XDocument mirrors = XDocument.Load(mirrorString);
 
             // Randomly select one that has a typemask of 7 
             // meaning all data is available at that mirror.

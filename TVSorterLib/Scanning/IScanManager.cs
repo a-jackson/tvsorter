@@ -5,10 +5,9 @@
 // <summary>
 //   The public interface of a file scan manager.
 // </summary>
-// 
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace TVSorter.DAL
+namespace TVSorter.Scanning
 {
     #region Using Directives
 

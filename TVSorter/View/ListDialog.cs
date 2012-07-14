@@ -5,7 +5,6 @@
 // <summary>
 //   A dialog that shows a list of strings and allows adding and removing.
 // </summary>
-// 
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace TVSorter.View
@@ -25,7 +24,7 @@ namespace TVSorter.View
     /// </summary>
     public partial class ListDialog : Form, IView
     {
-        #region Constants and Fields
+        #region Fields
 
         /// <summary>
         ///   The controller.

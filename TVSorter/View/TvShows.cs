@@ -5,7 +5,6 @@
 // <summary>
 //   The TV Shows tab.
 // </summary>
-// 
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace TVSorter.View
@@ -30,7 +29,7 @@ namespace TVSorter.View
     /// </summary>
     public partial class TvShows : UserControl, IView
     {
-        #region Constants and Fields
+        #region Fields
 
         /// <summary>
         ///   The controller.
@@ -235,6 +234,20 @@ namespace TVSorter.View
         }
 
         /// <summary>
+        /// Handles the reset last updated button being clicked.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender of the event. 
+        /// </param>
+        /// <param name="e">
+        /// The arguments of the event. 
+        /// </param>
+        private void ResetLastUpdatedButtonClick(object sender, EventArgs e)
+        {
+            this.controller.ResetLastUpdated();
+        }
+
+        /// <summary>
         /// Handles the Revert button being clicked.
         /// </summary>
         /// <param name="sender">
@@ -263,13 +276,13 @@ namespace TVSorter.View
             {
                 return;
             }
-                this.controller.SelectedShow.CustomFormat = this.selectedShowCustomFormatText.Text;
-                this.controller.SelectedShow.FolderName = this.selectedShowFolderNameText.Text;
-                this.controller.SelectedShow.UseCustomFormat = this.selectedShowUseCustomFormat.Checked;
-                this.controller.SelectedShow.UseDvdOrder = this.selectedShowUseDvdOrder.Checked;
-                this.controller.SelectedShow.Locked = this.selectedShowLocked;
-                this.controller.SaveSelectedShow();
 
+            this.controller.SelectedShow.CustomFormat = this.selectedShowCustomFormatText.Text;
+            this.controller.SelectedShow.FolderName = this.selectedShowFolderNameText.Text;
+            this.controller.SelectedShow.UseCustomFormat = this.selectedShowUseCustomFormat.Checked;
+            this.controller.SelectedShow.UseDvdOrder = this.selectedShowUseDvdOrder.Checked;
+            this.controller.SelectedShow.Locked = this.selectedShowLocked;
+            this.controller.SaveSelectedShow();
 
             this.tvShowsList.Refresh();
         }
@@ -458,19 +471,5 @@ namespace TVSorter.View
         }
 
         #endregion
-
-        /// <summary>
-        /// Handles the reset last updated button being clicked.
-        /// </summary>
-        /// <param name="sender">
-        /// The sender of the event. 
-        /// </param>
-        /// <param name="e">
-        /// The arguments of the event. 
-        /// </param>
-        private void ResetLastUpdatedButtonClick(object sender, EventArgs e)
-        {
-            this.controller.ResetLastUpdated();
-        }
     }
 }

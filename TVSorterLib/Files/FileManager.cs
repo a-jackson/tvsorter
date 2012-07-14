@@ -5,10 +5,9 @@
 // <summary>
 //   The file manager.
 // </summary>
-// 
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace TVSorter.DAL
+namespace TVSorter.Files
 {
     #region Using Directives
 
@@ -18,6 +17,7 @@ namespace TVSorter.DAL
     using System.Linq;
     using System.Threading.Tasks;
 
+    using TVSorter.Storage;
     using TVSorter.Types;
 
     #endregion
@@ -27,7 +27,7 @@ namespace TVSorter.DAL
     /// </summary>
     internal class FileManager : DalBase, IFileManager
     {
-        #region Constants and Fields
+        #region Fields
 
         /// <summary>
         ///   The storage.
@@ -273,9 +273,9 @@ namespace TVSorter.DAL
         {
             int value = 0;
             int max = files.Count;
-            foreach (var file in files)
+            foreach (FileResult file in files)
             {
-                var file1 = file;
+                FileResult file1 = file;
                 if (file1.Incomplete)
                 {
                     this.OnLogMessage("Skipped {0}. - Not enough information.", file1.InputFile.Name);
@@ -292,14 +292,17 @@ namespace TVSorter.DAL
                 }
 
                 // Get the path for all the destination directories.
-                var destinationFiles = from dest in this.settings.DestinationDirectories
-                                       select
-                                           string.Format(
-                                               "{0}{1}{2}", dest, Path.DirectorySeparatorChar, file1.OutputPath);
+                IEnumerable<string> destinationFiles = from dest in this.settings.DestinationDirectories
+                                                       select
+                                                           string.Format(
+                                                               "{0}{1}{2}", 
+                                                               dest, 
+                                                               Path.DirectorySeparatorChar, 
+                                                               file1.OutputPath);
                 bool continueFile = true;
 
                 // Check if the destination exists in any of the destinations
-                foreach (var any in
+                foreach (bool any in
                     destinationFiles.Where(File.Exists).Select(
                         dest =>
                         this.settings.OverwriteKeywords.Any(
@@ -351,6 +354,7 @@ namespace TVSorter.DAL
                         {
                             this.OnLogMessage("Failed to copy {0}", file1.InputFile.Name);
                         }
+
                         this.OnLogMessage("Copied {0} to {1}", file1.InputFile.Name, destinationInfo.Name);
                         break;
                 }

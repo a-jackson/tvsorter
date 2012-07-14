@@ -5,7 +5,6 @@
 // <summary>
 //   The controller for displaying search results.
 // </summary>
-// 
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace TVSorter.Controller
@@ -25,7 +24,7 @@ namespace TVSorter.Controller
     /// </summary>
     public class SearchResultsController : ShowSearchController
     {
-        #region Constants and Fields
+        #region Fields
 
         /// <summary>
         ///   The folder name that was searched for.

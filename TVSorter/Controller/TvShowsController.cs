@@ -5,7 +5,6 @@
 // <summary>
 //   The controller for the TV Shows tab.
 // </summary>
-// 
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace TVSorter.Controller
@@ -20,7 +19,8 @@ namespace TVSorter.Controller
     using System.Threading.Tasks;
     using System.Windows.Forms;
 
-    using TVSorter.DAL;
+    using TVSorter.Data;
+    using TVSorter.Storage;
     using TVSorter.Types;
     using TVSorter.View;
 
@@ -33,17 +33,12 @@ namespace TVSorter.Controller
     /// </summary>
     internal class TvShowsController : ControllerBase
     {
-        #region Constants and Fields
+        #region Fields
 
         /// <summary>
         ///   The data provider.
         /// </summary>
         private IDataProvider data;
-
-        /// <summary>
-        ///   The storage.
-        /// </summary>
-        private IStorageProvider storage;
 
         /// <summary>
         ///   The selected show.
@@ -54,6 +49,11 @@ namespace TVSorter.Controller
         ///   The shows.
         /// </summary>
         private BindingList<TvShow> shows;
+
+        /// <summary>
+        ///   The storage.
+        /// </summary>
+        private IStorageProvider storage;
 
         /// <summary>
         ///   The tv view.
@@ -126,7 +126,7 @@ namespace TVSorter.Controller
             Task.Factory.StartNew(
                 delegate
                     {
-                        foreach (var show in this.Shows)
+                        foreach (TvShow show in this.Shows)
                         {
                             TvShow show1 = show;
                             string url = string.Format("http://thetvdb.com/?tab=series&id={0}&lid=7", show1.TvdbId);
@@ -141,7 +141,7 @@ namespace TVSorter.Controller
                                         destination, 
                                         show1.FolderName, 
                                         Path.DirectorySeparatorChar);
-                            foreach (var file in files.Where(x => !File.Exists(x)))
+                            foreach (string file in files.Where(x => !File.Exists(x)))
                             {
                                 File.WriteAllText(file, url);
                             }
@@ -175,9 +175,9 @@ namespace TVSorter.Controller
             {
                 this.Shows = new BindingList<TvShow>(this.storage.LoadTvShows());
                 this.TvShowSelected(0);
-            } 
+            }
             catch (Exception)
-            {  
+            {
             }
         }
 
@@ -186,12 +186,27 @@ namespace TVSorter.Controller
         /// </summary>
         public void RemoveSelectedShow()
         {
-           if (this.SelectedShow == null)
-           {
-               return;
-           }
-                this.storage.RemoveShow(this.SelectedShow);
-          
+            if (this.SelectedShow == null)
+            {
+                return;
+            }
+
+            this.storage.RemoveShow(this.SelectedShow);
+        }
+
+        /// <summary>
+        /// Resets the last updated date of the selected show.
+        /// </summary>
+        public void ResetLastUpdated()
+        {
+            if (this.SelectedShow == null)
+            {
+                return;
+            }
+
+            this.SelectedShow.LastUpdated = new DateTime(1970, 1, 1);
+            this.storage.SaveShow(this.SelectedShow);
+            this.OnPropertyChanged("SelectedShow");
         }
 
         /// <summary>
@@ -199,11 +214,12 @@ namespace TVSorter.Controller
         /// </summary>
         public void SaveSelectedShow()
         {
-           if (this.SelectedShow == null)
-           {
-               return;
-           }
-                this.storage.SaveShow(this.SelectedShow);
+            if (this.SelectedShow == null)
+            {
+                return;
+            }
+
+            this.storage.SaveShow(this.SelectedShow);
         }
 
         /// <summary>
@@ -213,7 +229,7 @@ namespace TVSorter.Controller
         {
             Settings settings = this.storage.LoadSettings();
             var showDirs = new List<string>();
-            foreach (var dirInfo in
+            foreach (DirectoryInfo dirInfo in
                 from dir in settings.DestinationDirectories where Directory.Exists(dir) select new DirectoryInfo(dir))
             {
                 showDirs.AddRange(
@@ -228,7 +244,7 @@ namespace TVSorter.Controller
             Task.Factory.StartNew(
                 delegate
                     {
-                        foreach (var showName in showDirs)
+                        foreach (string showName in showDirs)
                         {
                             List<TvShow> results = this.data.SearchShow(showName);
                             if (results.Count == 1)
@@ -290,6 +306,7 @@ namespace TVSorter.Controller
             {
                 return;
             }
+
             this.MaxValue = 1;
             this.Value = 0;
             this.data.UpdateShowsAsync(new List<TvShow> { this.SelectedShow }, this);
@@ -390,7 +407,7 @@ namespace TVSorter.Controller
         private void UpdateShowsCompleted(object sender, UpdateShowsCompletedEventArgs e)
         {
             if (e.UserState != this)
-        {
+            {
                 return;
             }
 
@@ -400,20 +417,6 @@ namespace TVSorter.Controller
             this.OnPropertyChanged("SelectedShow");
         }
 
-        /// <summary>
-        /// Resets the last updated date of the selected show.
-        /// </summary>
-        public void ResetLastUpdated()
-        {
-           if (this.SelectedShow == null)
-           {
-               return;
-           }
-
-            this.SelectedShow.LastUpdated = new DateTime(1970, 1, 1);
-            this.storage.SaveShow(this.SelectedShow);
-            this.OnPropertyChanged("SelectedShow");
-        }
         #endregion
     }
 }

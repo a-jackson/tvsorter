@@ -5,10 +5,9 @@
 // <summary>
 //   The event args for the banner download required event.
 // </summary>
-// 
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace TVSorter.DAL
+namespace TVSorter.Data
 {
     #region Using Directives
 

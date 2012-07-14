@@ -5,7 +5,6 @@
 // <summary>
 //   The file result.
 // </summary>
-// 
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace TVSorter.Types
@@ -29,6 +28,11 @@ namespace TVSorter.Types
         public Episode Episode { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the result is incomplete.
+        /// </summary>
+        public bool Incomplete { get; set; }
+
+        /// <summary>
         ///   Gets or sets InputFile.
         /// </summary>
         public FileInfo InputFile { get; set; }
@@ -42,11 +46,6 @@ namespace TVSorter.Types
         ///   Gets or sets Show.
         /// </summary>
         public TvShow Show { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether the result is incomplete.
-        /// </summary>
-        public bool Incomplete { get; set; }
 
         #endregion
     }

@@ -5,10 +5,9 @@
 // <summary>
 //   The event args for the RefreshFileCountsComplete event.
 // </summary>
-// 
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace TVSorter.DAL
+namespace TVSorter.Scanning
 {
     #region Using Directives
 

@@ -5,7 +5,6 @@
 // <summary>
 //   The controller for the sort episodes tab.
 // </summary>
-// 
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace TVSorter.Controller
@@ -19,11 +18,13 @@ namespace TVSorter.Controller
     using System.Linq;
     using System.Windows.Forms;
 
-    using TVSorter.DAL;
+    using TVSorter.Files;
+    using TVSorter.Scanning;
+    using TVSorter.Storage;
     using TVSorter.Types;
     using TVSorter.View;
 
-    using ProgressChangedEventArgs = TVSorter.DAL.ProgressChangedEventArgs;
+    using ProgressChangedEventArgs = TVSorter.ProgressChangedEventArgs;
     using Settings = TVSorter.Types.Settings;
 
     #endregion
@@ -33,7 +34,7 @@ namespace TVSorter.Controller
     /// </summary>
     public class SortEpisodesController : ControllerBase
     {
-        #region Constants and Fields
+        #region Fields
 
         /// <summary>
         ///   The file manager.
@@ -230,7 +231,7 @@ namespace TVSorter.Controller
         public void SetEpisodeNum(IEnumerable<int> indices, int episodeNum)
         {
             IEnumerable<FileResult> checkedResults = indices.Select(index => this.Results[index]);
-            foreach (var result in checkedResults)
+            foreach (FileResult result in checkedResults)
             {
                 if (result.Episode == null)
                 {
@@ -253,7 +254,7 @@ namespace TVSorter.Controller
         public void SetSeasonNum(IEnumerable<int> indices, int seasonNum)
         {
             IEnumerable<FileResult> checkedResults = indices.Select(index => this.Results[index]);
-            foreach (var result in checkedResults)
+            foreach (FileResult result in checkedResults)
             {
                 if (result.Episode == null)
                 {
@@ -276,7 +277,7 @@ namespace TVSorter.Controller
         public void SetShow(IEnumerable<int> indices, TvShow show)
         {
             IEnumerable<FileResult> checkedResults = indices.Select(index => this.Results[index]);
-            foreach (var result in checkedResults)
+            foreach (FileResult result in checkedResults)
             {
                 result.Show = show;
                 this.scanner.ResetEpisode(result);
@@ -312,7 +313,7 @@ namespace TVSorter.Controller
                 if (source.Exists)
                 {
                     dirs.Add(Path.DirectorySeparatorChar.ToString(CultureInfo.InvariantCulture));
-                    foreach (var subDir in source.GetDirectories())
+                    foreach (DirectoryInfo subDir in source.GetDirectories())
                     {
                         dirs.Add(string.Concat(Path.DirectorySeparatorChar, subDir.Name));
                     }

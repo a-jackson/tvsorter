@@ -5,10 +5,9 @@
 // <summary>
 //   The event args for the Show update event.
 // </summary>
-// 
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace TVSorter.DAL
+namespace TVSorter.Storage
 {
     #region Using Directives
 

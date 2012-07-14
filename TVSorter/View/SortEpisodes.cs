@@ -5,7 +5,6 @@
 // <summary>
 //   The sort episodes tab.
 // </summary>
-// 
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace TVSorter.View
@@ -21,6 +20,7 @@ namespace TVSorter.View
     using System.Windows.Forms;
 
     using TVSorter.Controller;
+    using TVSorter.Types;
 
     #endregion
 
@@ -29,7 +29,7 @@ namespace TVSorter.View
     /// </summary>
     public partial class SortEpisodes : UserControl, IView
     {
-        #region Constants and Fields
+        #region Fields
 
         /// <summary>
         ///   The controller.
@@ -154,7 +154,7 @@ namespace TVSorter.View
         private void ProcessResults()
         {
             this.resultsList.Items.Clear();
-            foreach (var result in this.controller.Results)
+            foreach (FileResult result in this.controller.Results)
             {
                 var listItem =
                     new ListViewItem(
@@ -190,7 +190,7 @@ namespace TVSorter.View
         /// </param>
         private void ResetListItems(IEnumerable<int> checkedResults)
         {
-            foreach (var result in checkedResults)
+            foreach (int result in checkedResults)
             {
                 ListViewItem item = this.resultsList.Items[result];
                 item.SubItems[0].Text = this.controller.Results[result].InputFile.FullName;

@@ -5,7 +5,6 @@
 // <summary>
 //   The dialog showing the progress bar.
 // </summary>
-// 
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace TVSorter.View
@@ -24,7 +23,7 @@ namespace TVSorter.View
     /// </summary>
     public partial class ProgressDialog : Form
     {
-        #region Constants and Fields
+        #region Fields
 
         /// <summary>
         ///   That task that the dialog is showing the progress for.

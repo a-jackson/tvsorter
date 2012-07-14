@@ -5,7 +5,6 @@
 // <summary>
 //   The public interface of the progress task.
 // </summary>
-// 
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace TVSorter.Controller

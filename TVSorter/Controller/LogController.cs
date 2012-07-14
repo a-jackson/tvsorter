@@ -5,7 +5,6 @@
 // <summary>
 //   Controller for the Log.
 // </summary>
-// 
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace TVSorter.Controller
@@ -15,7 +14,6 @@ namespace TVSorter.Controller
     using System;
     using System.Collections.Generic;
 
-    using TVSorter.DAL;
     using TVSorter.View;
 
     #endregion
@@ -25,13 +23,13 @@ namespace TVSorter.Controller
     /// </summary>
     public class LogController : ControllerBase
     {
-        #region Constants and Fields
+        #region Fields
 
         /// <summary>
         ///   A value indicating whether the controller has been initialised.
         /// </summary>
         private bool initialised;
-        
+
         #endregion
 
         #region Constructors and Destructors

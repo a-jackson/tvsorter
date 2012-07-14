@@ -5,7 +5,6 @@
 // <summary>
 //   Controller for adding new shows.
 // </summary>
-// 
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace TVSorter.Controller

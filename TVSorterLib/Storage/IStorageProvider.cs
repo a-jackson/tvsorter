@@ -5,10 +5,9 @@
 // <summary>
 //   The public interface to the storage provider.
 // </summary>
-// 
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace TVSorter.DAL
+namespace TVSorter.Storage
 {
     #region Using Directives
 

@@ -5,10 +5,9 @@
 // <summary>
 //   The public interface of the file manager.
 // </summary>
-// 
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace TVSorter.DAL
+namespace TVSorter.Files
 {
     #region Using Directives
 

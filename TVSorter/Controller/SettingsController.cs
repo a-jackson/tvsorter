@@ -5,14 +5,13 @@
 // <summary>
 //   The controller for the settings tab.
 // </summary>
-// 
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace TVSorter.Controller
 {
     #region Using Directives
 
-    using TVSorter.DAL;
+    using TVSorter.Storage;
     using TVSorter.View;
 
     using Settings = TVSorter.Types.Settings;
@@ -24,7 +23,7 @@ namespace TVSorter.Controller
     /// </summary>
     public class SettingsController : ControllerBase
     {
-        #region Constants and Fields
+        #region Fields
 
         /// <summary>
         ///   The storage provider.

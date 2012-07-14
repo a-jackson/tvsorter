@@ -5,7 +5,6 @@
 // <summary>
 //   Controller for lists.
 // </summary>
-// 
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace TVSorter.Controller
@@ -24,7 +23,7 @@ namespace TVSorter.Controller
     /// </summary>
     public class ListController : ControllerBase
     {
-        #region Constants and Fields
+        #region Fields
 
         /// <summary>
         ///   The list of items.

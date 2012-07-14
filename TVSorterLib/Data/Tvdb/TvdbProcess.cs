@@ -5,10 +5,9 @@
 // <summary>
 //   The tvdb process.
 // </summary>
-// 
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace TVSorter.DAL
+namespace TVSorter.Data.Tvdb
 {
     #region Using Directives
 
@@ -79,7 +78,7 @@ namespace TVSorter.DAL
         /// <param name="serverTime">
         /// The time of the server. 
         /// </param>
-        public void ProcessShow(TvShow show, string filePath, LogMessageEventRaiser onLogMessage, DateTime serverTime)
+        public void ProcessShow(TvShow show, string filePath, LogMessageEventHandler onLogMessage, DateTime serverTime)
         {
             if (show == null)
             {
@@ -118,8 +117,8 @@ namespace TVSorter.DAL
                 this.OnBannerDownloadRequired(show, banner.Value);
             }
 
-            var episodeElement = "EpisodeNumber";
-            var seasonElement = "SeasonNumber";
+            string episodeElement = "EpisodeNumber";
+            string seasonElement = "SeasonNumber";
 
             if (show.UseDvdOrder)
             {
@@ -127,20 +126,21 @@ namespace TVSorter.DAL
                 seasonElement = "DVD_season";
             }
 
-            var episodes = from episode in data.Descendants("Episode")
-                           let episodeNum = this.GetElementValue(episode, episodeElement, "-1")
-                           let seasonNum = this.GetElementValue(episode, seasonElement, "-1")
-                           select
-                               new Episode
-                                   {
-                                       TvdbId = this.GetElementValue(episode, "id", string.Empty), 
-                                       EpisodeNumber = this.ParseInt(episodeNum), 
-                                       SeasonNumber = this.ParseInt(seasonNum), 
-                                       FirstAir =
-                                           DateTime.Parse(this.GetElementValue(episode, "FirstAired", "1970-01-01")), 
-                                       Name = this.GetElementValue(episode, "EpisodeName", string.Empty), 
-                                       Show = show, 
-                                   };
+            IEnumerable<Episode> episodes = from episode in data.Descendants("Episode")
+                                            let episodeNum = this.GetElementValue(episode, episodeElement, "-1")
+                                            let seasonNum = this.GetElementValue(episode, seasonElement, "-1")
+                                            select
+                                                new Episode
+                                                    {
+                                                        TvdbId = this.GetElementValue(episode, "id", string.Empty), 
+                                                        EpisodeNumber = this.ParseInt(episodeNum), 
+                                                        SeasonNumber = this.ParseInt(seasonNum), 
+                                                        FirstAir =
+                                                            DateTime.Parse(
+                                                                this.GetElementValue(episode, "FirstAired", "1970-01-01")), 
+                                                        Name = this.GetElementValue(episode, "EpisodeName", string.Empty), 
+                                                        Show = show, 
+                                                    };
 
             show.LastUpdated = serverTime;
             Factory.StorageProvider.SaveShow(show);
@@ -159,7 +159,7 @@ namespace TVSorter.DAL
         /// </returns>
         public IEnumerable<string> ProcessUpdates(StringReader xml)
         {
-            var doc = XDocument.Load(xml);
+            XDocument doc = XDocument.Load(xml);
 
             return doc.Descendants("Series").Select(x => x.Value);
         }

@@ -5,10 +5,9 @@
 // <summary>
 //   The log message event args.
 // </summary>
-// 
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace TVSorter.DAL
+namespace TVSorter
 {
     #region Using Directives
 

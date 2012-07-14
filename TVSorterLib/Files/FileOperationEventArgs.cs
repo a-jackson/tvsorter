@@ -5,10 +5,9 @@
 // <summary>
 //   The event args for a file operation.
 // </summary>
-// 
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace TVSorter.DAL
+namespace TVSorter.Files
 {
     #region Using Directives
 

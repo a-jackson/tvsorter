@@ -5,10 +5,9 @@
 // <summary>
 //   Manages accessing show data from the TVDB.
 // </summary>
-// 
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace TVSorter.DAL
+namespace TVSorter.Data.Tvdb
 {
     #region Using Directives
 
@@ -19,6 +18,7 @@ namespace TVSorter.DAL
     using System.Threading;
     using System.Threading.Tasks;
 
+    using TVSorter.Storage;
     using TVSorter.Types;
 
     #endregion
@@ -28,7 +28,7 @@ namespace TVSorter.DAL
     /// </summary>
     internal class Tvdb : DalBase, IDataProvider
     {
-        #region Constants and Fields
+        #region Static Fields
 
         /// <summary>
         ///   The directory to cache data in.
@@ -39,6 +39,10 @@ namespace TVSorter.DAL
         ///   The directory to download images to.
         /// </summary>
         public static readonly string ImageDirectory = "Images" + Path.DirectorySeparatorChar;
+
+        #endregion
+
+        #region Fields
 
         /// <summary>
         ///   The tvdb download.
@@ -141,7 +145,7 @@ namespace TVSorter.DAL
                     {
                         // Determine which shows require an update.
                         // Get the earliest update time.
-                        var updateTime = shows.Select(x => x.LastUpdated).OrderBy(x => x).First();
+                        DateTime updateTime = shows.Select(x => x.LastUpdated).OrderBy(x => x).First();
 
                         List<string> updateIds;
 
@@ -152,7 +156,7 @@ namespace TVSorter.DAL
                         }
                         else
                         {
-                            var updates = this.tvdbDownload.DownloadUpdates(updateTime);
+                            StringReader updates = this.tvdbDownload.DownloadUpdates(updateTime);
                             updateIds = this.tvdbProcess.ProcessUpdates(updates).ToList();
 
                             // The updates list only shows 1000 updates so data may be missing if 
@@ -163,11 +167,11 @@ namespace TVSorter.DAL
                             }
                         }
 
-                        var serverTime = this.tvdbDownload.GetServerTime();
+                        DateTime serverTime = this.tvdbDownload.GetServerTime();
 
                         var taskList = new List<Task>();
 
-                        foreach (var show in shows)
+                        foreach (TvShow show in shows)
                         {
                             TvShow show1 = show;
 

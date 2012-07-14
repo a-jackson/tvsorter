@@ -5,7 +5,6 @@
 // <summary>
 //   The log tab.
 // </summary>
-// 
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace TVSorter.View
@@ -17,7 +16,6 @@ namespace TVSorter.View
     using System.Windows.Forms;
 
     using TVSorter.Controller;
-    using TVSorter.DAL;
 
     #endregion
 
@@ -26,7 +24,7 @@ namespace TVSorter.View
     /// </summary>
     public partial class Log : UserControl
     {
-        #region Constants and Fields
+        #region Fields
 
         /// <summary>
         ///   The log controller.

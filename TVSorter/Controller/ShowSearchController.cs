@@ -5,7 +5,6 @@
 // <summary>
 //   Controller for handle show searches.
 // </summary>
-// 
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace TVSorter.Controller
@@ -14,7 +13,8 @@ namespace TVSorter.Controller
 
     using System.ComponentModel;
 
-    using TVSorter.DAL;
+    using TVSorter.Data;
+    using TVSorter.Storage;
     using TVSorter.Types;
     using TVSorter.View;
 
@@ -25,7 +25,7 @@ namespace TVSorter.Controller
     /// </summary>
     public abstract class ShowSearchController : ControllerBase
     {
-        #region Constants and Fields
+        #region Fields
 
         /// <summary>
         ///   The text for the close button.

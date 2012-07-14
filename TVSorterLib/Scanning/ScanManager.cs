@@ -5,10 +5,9 @@
 // <summary>
 //   Handles the scanning of files.
 // </summary>
-// 
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace TVSorter.DAL
+namespace TVSorter.Scanning
 {
     #region Using Directives
 
@@ -20,6 +19,7 @@ namespace TVSorter.DAL
     using System.Text.RegularExpressions;
     using System.Threading.Tasks;
 
+    using TVSorter.Storage;
     using TVSorter.Types;
 
     #endregion
@@ -29,12 +29,16 @@ namespace TVSorter.DAL
     /// </summary>
     internal class ScanManager : DalBase, IScanManager
     {
-        #region Constants and Fields
+        #region Static Fields
 
         /// <summary>
         ///   An array of characters that can be used as spaces.
         /// </summary>
         private static readonly char[] SpacerChars = new[] { '.', '_', '-' };
+
+        #endregion
+
+        #region Fields
 
         /// <summary>
         ///   The list of shows from storage.
@@ -109,28 +113,6 @@ namespace TVSorter.DAL
         public List<FileResult> Refresh(string subDirectory)
         {
             return this.Refresh(subDirectory, null);
-        } 
-
-        /// <summary>
-        /// Refresh the specified sub directory.
-        /// </summary>
-        /// <param name="subDirectory">
-        /// The sub directory to refresh. 
-        /// </param>
-        /// <param name="userState">
-        /// The user State.
-        /// </param>
-        /// <returns>
-        /// The list of files indentified during the refresh operation. 
-        /// </returns>
-        private List<FileResult> Refresh(string subDirectory, object userState)
-        {
-            var root = new DirectoryInfo(string.Concat(this.settings.SourceDirectory, subDirectory));
-            int max = 0;
-            int value = 0;
-            var results = this.ProcessDirectory(root, ref max, ref value, userState);
-            this.OnLogMessage("Refresh complete. Found {0} files", results.Count);
-            return results;
         }
 
         /// <summary>
@@ -147,7 +129,7 @@ namespace TVSorter.DAL
             Task.Factory.StartNew(
                 () =>
                     {
-                        var results = this.Refresh(subDirectory, userState);
+                        List<FileResult> results = this.Refresh(subDirectory, userState);
                         this.OnRefreshComplete(results, userState);
                     });
         }
@@ -196,8 +178,10 @@ namespace TVSorter.DAL
         public void ResetEpsiode(FileResult result, int seasonNum, int episodeNum)
         {
             List<Episode> episodes = this.storage.LoadEpisodes(result.Show);
-            var eps = from ep in episodes where ep.EpisodeNumber == episodeNum && ep.SeasonNumber == seasonNum select ep;
-            var episode = eps.FirstOrDefault();
+            IEnumerable<Episode> eps = from ep in episodes
+                                       where ep.EpisodeNumber == episodeNum && ep.SeasonNumber == seasonNum
+                                       select ep;
+            Episode episode = eps.FirstOrDefault();
             FileResult newResult = this.ProcessFile(result.InputFile, result.Show, episode);
             result.Episode = episode;
             result.OutputPath = newResult.OutputPath;
@@ -251,7 +235,7 @@ namespace TVSorter.DAL
             }
 
             // If the string ends with a separator character then remove it
-            foreach (var sep in separatorChars)
+            foreach (string sep in separatorChars)
             {
                 if (newName[0].EndsWith(sep))
                 {
@@ -400,14 +384,16 @@ namespace TVSorter.DAL
 
             // Remove any duplicate spaces
             showName =
-                showName.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).Aggregate(
+                showName.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).Aggregate(
                     (x, y) => string.Concat(x, " ", y));
 
             // Match the show's name against the name, folder name and any alternate names.
             // fileSafeNmae removes any invalid file name chars from the show's name to match against as well.
             return (from show in this.shows
-                    let fileSafeName = new string(show.Name.Where(x => !Path.GetInvalidFileNameChars().Contains(x)).ToArray())
-                    where show.Name.Equals(showName, StringComparison.InvariantCultureIgnoreCase)
+                    let fileSafeName =
+                        new string(show.Name.Where(x => !Path.GetInvalidFileNameChars().Contains(x)).ToArray())
+                    where
+                        show.Name.Equals(showName, StringComparison.InvariantCultureIgnoreCase)
                         || show.FolderName.Equals(showName, StringComparison.InvariantCultureIgnoreCase)
                         || fileSafeName.Equals(showName, StringComparison.InvariantCultureIgnoreCase)
                         ||
@@ -494,11 +480,11 @@ namespace TVSorter.DAL
             var results = new List<FileResult>();
 
             // Get the files where the extension is in the list of extensions.
-            var files =
+            List<FileInfo> files =
                 directory.GetFiles().Where(file => this.settings.FileExtensions.Contains(file.Extension)).ToList();
             max += files.Count;
 
-            foreach (var result in files.Select(this.ProcessFile))
+            foreach (FileResult result in files.Select(this.ProcessFile))
             {
                 if (result != null)
                 {
@@ -512,7 +498,7 @@ namespace TVSorter.DAL
             if (this.settings.RecurseSubdirectories || overrideRecurse)
             {
                 DirectoryInfo[] dirs = directory.GetDirectories();
-                foreach (var dir in dirs)
+                foreach (DirectoryInfo dir in dirs)
                 {
                     results.AddRange(this.ProcessDirectory(dir, ref max, ref value, userState, overrideRecurse));
                 }
@@ -547,7 +533,7 @@ namespace TVSorter.DAL
                 return null;
             }
 
-            var episodes = this.storage.LoadEpisodes(show);
+            List<Episode> episodes = this.storage.LoadEpisodes(show);
 
             Episode ep;
 
@@ -622,18 +608,36 @@ namespace TVSorter.DAL
                 episode = this.ProcessEpisode(firstMatch, show);
             }
 
-            var output = this.FormatOutputPath(show, episode, file);
+            string output = this.FormatOutputPath(show, episode, file);
 
-            var incomplete = string.IsNullOrWhiteSpace(output) || string.IsNullOrWhiteSpace(episode.Name);
+            bool incomplete = string.IsNullOrWhiteSpace(output) || string.IsNullOrWhiteSpace(episode.Name);
 
             return new FileResult
                 {
-                    Episode = episode, 
-                    InputFile = file, 
-                    Show = show, 
-                    OutputPath = output,
-                    Incomplete = incomplete
+                   Episode = episode, InputFile = file, Show = show, OutputPath = output, Incomplete = incomplete 
                 };
+        }
+
+        /// <summary>
+        /// Refresh the specified sub directory.
+        /// </summary>
+        /// <param name="subDirectory">
+        /// The sub directory to refresh. 
+        /// </param>
+        /// <param name="userState">
+        /// The user State.
+        /// </param>
+        /// <returns>
+        /// The list of files indentified during the refresh operation. 
+        /// </returns>
+        private List<FileResult> Refresh(string subDirectory, object userState)
+        {
+            var root = new DirectoryInfo(string.Concat(this.settings.SourceDirectory, subDirectory));
+            int max = 0;
+            int value = 0;
+            List<FileResult> results = this.ProcessDirectory(root, ref max, ref value, userState);
+            this.OnLogMessage("Refresh complete. Found {0} files", results.Count);
+            return results;
         }
 
         /// <summary>
@@ -644,27 +648,28 @@ namespace TVSorter.DAL
         /// </param>
         private void RefreshFileCounts(object userState)
         {
-            var directories = this.settings.DestinationDirectories;
+            List<string> directories = this.settings.DestinationDirectories;
             int max = 1;
             int value = 0;
             var results = new List<FileResult>();
 
             // Search all the destination directories.
-            foreach (var directory in directories)
+            foreach (string directory in directories)
             {
-                var files = this.ProcessDirectory(new DirectoryInfo(directory), ref max, ref value, userState, true);
+                List<FileResult> files = this.ProcessDirectory(
+                    new DirectoryInfo(directory), ref max, ref value, userState, true);
                 results.AddRange(files);
             }
 
             // Group the results by episode.
-            var episodeGroups = results.GroupBy(x => x.Episode);
+            IEnumerable<IGrouping<Episode, FileResult>> episodeGroups = results.GroupBy(x => x.Episode);
             foreach (var group in episodeGroups)
             {
                 if (group.Key != null)
                 {
                     // Set the file count to the size of the group.
-                    var count = group.Count();
-                    foreach (var ep in group)
+                    int count = group.Count();
+                    foreach (FileResult ep in group)
                     {
                         ep.Episode.FileCount = count;
                     }
@@ -672,7 +677,7 @@ namespace TVSorter.DAL
             }
 
             // Group the result by show for saving them.
-            var showGroups = results.GroupBy(x => x.Show);
+            IEnumerable<IGrouping<TvShow, FileResult>> showGroups = results.GroupBy(x => x.Show);
             foreach (var group in showGroups)
             {
                 if (group.Key != null)

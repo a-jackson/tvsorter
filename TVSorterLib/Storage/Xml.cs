@@ -5,10 +5,9 @@
 // <summary>
 //   Class that manages access to the XML file.
 // </summary>
-// 
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace TVSorter.DAL
+namespace TVSorter.Storage
 {
     #region Using Directives
 
@@ -27,7 +26,7 @@ namespace TVSorter.DAL
     /// </summary>
     internal class Xml : DalBase, IStorageProvider
     {
-        #region Constants and Fields
+        #region Constants
 
         /// <summary>
         ///   The path the XML file.
@@ -262,7 +261,7 @@ namespace TVSorter.DAL
             }
 
             // Loop through each episode
-            foreach (var episode in episodes.Where(x => x != null))
+            foreach (Episode episode in episodes.Where(x => x != null))
             {
                 // Create the XML element
                 XElement episodeElement = CreateElement(episode);
@@ -372,7 +371,7 @@ namespace TVSorter.DAL
                 throw new Exception("XML file is invalid");
             }
 
-            foreach (var show in shows)
+            foreach (TvShow show in shows)
             {
                 this.UpdateShow(show, showsElement);
             }
@@ -388,15 +387,16 @@ namespace TVSorter.DAL
         /// </returns>
         public Dictionary<TvShow, Dictionary<int, int>> SeasonEpisodeCount()
         {
-            var doc = XDocument.Load(XmlFile);
+            XDocument doc = XDocument.Load(XmlFile);
 
             var results = new Dictionary<TvShow, Dictionary<int, int>>();
 
-            var shows = doc.Descendants("Show");
+            IEnumerable<XElement> shows = doc.Descendants("Show");
 
-            foreach (var show in shows)
+            foreach (XElement show in shows)
             {
-                var seasons = show.Descendants("Episode").GroupBy(x => int.Parse(GetAttribute(x, "seasonnum", "-1")));
+                IEnumerable<IGrouping<int, XElement>> seasons =
+                    show.Descendants("Episode").GroupBy(x => int.Parse(GetAttribute(x, "seasonnum", "-1")));
 
                 results.Add(CreateTvShow(show), seasons.ToDictionary(x => x.Key, x => x.Count()));
             }
@@ -453,7 +453,7 @@ namespace TVSorter.DAL
                 "deleteemptysubdirectories", settings.DeleteEmptySubdirectories);
             var renameIfExists = new XAttribute("renameifexists", settings.RenameIfExists);
 
-            var directories =
+            IEnumerable<XElement> directories =
                 settings.DestinationDirectories.Select(
                     dir =>
                     new XElement("Destination", new XAttribute("selected", dir == settings.DestinationDirectory), dir));
@@ -599,10 +599,10 @@ namespace TVSorter.DAL
 
             if (destinationDirectories != null)
             {
-                foreach (var dir in destinationDirectories.Descendants("Destination"))
+                foreach (XElement dir in destinationDirectories.Descendants("Destination"))
                 {
                     settings.DestinationDirectories.Add(dir.Value);
-                    var attribute = dir.Attribute("selected");
+                    XAttribute attribute = dir.Attribute("selected");
                     if (attribute != null && bool.Parse(attribute.Value))
                     {
                         settings.DestinationDirectory = dir.Value;
@@ -688,7 +688,7 @@ namespace TVSorter.DAL
         /// </returns>
         private IEnumerable<Episode> GetEpisodes(Func<int, bool> fileCountSelector)
         {
-            var doc = XDocument.Load(XmlFile);
+            XDocument doc = XDocument.Load(XmlFile);
 
             return from element in doc.Descendants("Episode")
                    where fileCountSelector(int.Parse(GetAttribute(element, "filecount", "0")))

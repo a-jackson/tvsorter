@@ -5,7 +5,6 @@
 // <summary>
 //   Dialog for selecting a show.
 // </summary>
-// 
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace TVSorter.View
@@ -25,7 +24,7 @@ namespace TVSorter.View
     /// </summary>
     public partial class ShowSelectDialog : Form
     {
-        #region Constants and Fields
+        #region Fields
 
         /// <summary>
         ///   The list of shows.

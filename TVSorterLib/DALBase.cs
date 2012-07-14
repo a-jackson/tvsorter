@@ -5,10 +5,9 @@
 // <summary>
 //   Defines the DALBase type.
 // </summary>
-// 
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace TVSorter.DAL
+namespace TVSorter
 {
     #region Using Directives
 

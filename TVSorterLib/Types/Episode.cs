@@ -5,7 +5,6 @@
 // <summary>
 //   The episode.
 // </summary>
-// 
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace TVSorter.Types
@@ -49,14 +48,14 @@ namespace TVSorter.Types
         public int SeasonNumber { get; set; }
 
         /// <summary>
-        ///   Gets or sets TvdbId.
-        /// </summary>
-        public string TvdbId { get; set; }
-
-        /// <summary>
         /// Gets or sets the episodes show.
         /// </summary>
         public TvShow Show { get; set; }
+
+        /// <summary>
+        ///   Gets or sets TvdbId.
+        /// </summary>
+        public string TvdbId { get; set; }
 
         #endregion
 

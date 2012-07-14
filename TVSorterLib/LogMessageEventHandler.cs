@@ -1,14 +1,13 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright company="TVSorter" file="LogMessageEventRaiser.cs">
+// <copyright company="TVSorter" file="LogMessageEventHandler.cs">
 //   2012 - Andrew Jackson
 // </copyright>
 // <summary>
 //   Defines the signature of the log message event.
 // </summary>
-// 
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace TVSorter.DAL
+namespace TVSorter
 {
     /// <summary>
     /// Defines the signature of the log message event.
@@ -19,5 +18,5 @@ namespace TVSorter.DAL
     /// <param name="args">
     /// The args. 
     /// </param>
-    public delegate void LogMessageEventRaiser(string message, params object[] args);
+    public delegate void LogMessageEventHandler(string message, params object[] args);
 }

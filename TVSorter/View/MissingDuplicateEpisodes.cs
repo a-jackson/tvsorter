@@ -5,7 +5,6 @@
 // <summary>
 //   The missing and duplicated episodes tab.
 // </summary>
-// 
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace TVSorter.View
@@ -13,6 +12,7 @@ namespace TVSorter.View
     #region Using Directives
 
     using System;
+    using System.Collections.Generic;
     using System.ComponentModel;
     using System.Linq;
     using System.Windows.Forms;
@@ -26,7 +26,7 @@ namespace TVSorter.View
     /// </summary>
     public partial class MissingDuplicateEpisodes : UserControl, IView
     {
-        #region Constants and Fields
+        #region Fields
 
         /// <summary>
         ///   The controller.
@@ -96,11 +96,11 @@ namespace TVSorter.View
         private void MissingButtonClick(object sender, EventArgs e)
         {
             this.controller.SearchMissingEpisodes(
-                hideUnaired.Checked,
-                hideSeason0.Checked,
-                hidePart2.Checked,
-                hideLocked.Checked,
-                hideWholeSeasons.Checked);
+                this.hideUnaired.Checked, 
+                this.hideSeason0.Checked, 
+                this.hidePart2.Checked, 
+                this.hideLocked.Checked, 
+                this.hideWholeSeasons.Checked);
         }
 
         /// <summary>
@@ -161,9 +161,10 @@ namespace TVSorter.View
             {
                 var showNode = new TreeNode(show.Key.Name);
                 this.episodesTree.Nodes.Add(showNode);
-                var seasons = show.GroupBy(
-                    x => string.Format("Season {0}", x.SeasonNumber), 
-                    x => string.Format("{0} - {1}", x.EpisodeNumber, x.Name));
+                IEnumerable<IGrouping<string, string>> seasons =
+                    show.GroupBy(
+                        x => string.Format("Season {0}", x.SeasonNumber), 
+                        x => string.Format("{0} - {1}", x.EpisodeNumber, x.Name));
                 foreach (var season in seasons)
                 {
                     var seasonNode = new TreeNode(season.Key);

@@ -5,17 +5,22 @@
 // <summary>
 //   Factory for retrieving instances of DAL types.
 // </summary>
-// 
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace TVSorter.DAL
+namespace TVSorter
 {
+    using TVSorter.Data;
+    using TVSorter.Data.Tvdb;
+    using TVSorter.Files;
+    using TVSorter.Scanning;
+    using TVSorter.Storage;
+
     /// <summary>
     /// Factory for retrieving instances of DAL types.
     /// </summary>
     public static class Factory
     {
-        #region Constants and Fields
+        #region Static Fields
 
         /// <summary>
         ///   The data provider.

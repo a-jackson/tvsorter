@@ -5,7 +5,6 @@
 // <summary>
 //   The settings tab.
 // </summary>
-// 
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace TVSorter.View
@@ -27,7 +26,7 @@ namespace TVSorter.View
     /// </summary>
     public partial class Settings : UserControl, IView
     {
-        #region Constants and Fields
+        #region Fields
 
         /// <summary>
         ///   The controller.

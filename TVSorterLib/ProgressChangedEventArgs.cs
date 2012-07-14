@@ -5,10 +5,9 @@
 // <summary>
 //   The event args for the process changed event.
 // </summary>
-// 
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace TVSorter.DAL
+namespace TVSorter
 {
     #region Using Directives
 

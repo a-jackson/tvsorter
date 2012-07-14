@@ -5,7 +5,6 @@
 // <summary>
 //   Dialog for searching for a show.
 // </summary>
-// 
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace TVSorter.View
@@ -17,6 +16,7 @@ namespace TVSorter.View
     using System.Windows.Forms;
 
     using TVSorter.Controller;
+    using TVSorter.Types;
 
     #endregion
 
@@ -25,7 +25,7 @@ namespace TVSorter.View
     /// </summary>
     public partial class ShowSearchDialog : Form, IView
     {
-        #region Constants and Fields
+        #region Fields
 
         /// <summary>
         ///   The controller.
@@ -129,7 +129,7 @@ namespace TVSorter.View
                     this.listResults.Items.Clear();
                     if (this.controller.SearchResults != null)
                     {
-                        foreach (var show in this.controller.SearchResults)
+                        foreach (TvShow show in this.controller.SearchResults)
                         {
                             this.listResults.Items.Add(new ListViewItem(new[] { show.Name, show.TvdbId }));
                         }

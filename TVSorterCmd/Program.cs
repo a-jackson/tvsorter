@@ -5,7 +5,6 @@
 // <summary>
 //   TVSorterCmd's program.
 // </summary>
-// 
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace TVSorter
@@ -13,11 +12,16 @@ namespace TVSorter
     #region Using Directives
 
     using System;
+    using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
     using System.Linq;
 
-    using TVSorter.DAL;
+    using TVSorter.Data;
+    using TVSorter.Files;
+    using TVSorter.Scanning;
+    using TVSorter.Storage;
+    using TVSorter.Types;
 
     #endregion
 
@@ -36,18 +40,18 @@ namespace TVSorter
         /// </param>
         public static void Main(string[] args)
         {
-            var storage = Factory.StorageProvider;
-            var scanner = Factory.Scanner;
-            var fileManager = Factory.FileManager;
-            var data = Factory.DataProvider;
+            IStorageProvider storage = Factory.StorageProvider;
+            IScanManager scanner = Factory.Scanner;
+            IFileManager fileManager = Factory.FileManager;
+            IDataProvider data = Factory.DataProvider;
 
             data.LogMessage += LogMessageReceived;
             scanner.LogMessage += LogMessageReceived;
             fileManager.LogMessage += LogMessageReceived;
 
-            var shows = storage.LoadTvShows();
+            List<TvShow> shows = storage.LoadTvShows();
 
-            foreach (var arg in args)
+            foreach (string arg in args)
             {
                 switch (arg.ToLower())
                 {
@@ -56,8 +60,8 @@ namespace TVSorter
                         break;
                     case "-copy":
                     case "-move":
-                        var results = scanner.Refresh(
-                            Path.DirectorySeparatorChar.ToString(CultureInfo.InvariantCulture));
+                        List<FileResult> results =
+                            scanner.Refresh(Path.DirectorySeparatorChar.ToString(CultureInfo.InvariantCulture));
                         if (arg.Equals("-copy"))
                         {
                             fileManager.CopyFile(results);
