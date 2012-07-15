@@ -64,7 +64,6 @@
     <Compile Include="Storage\Xml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Storage\ValidateXml.cs" />
     <Compile Include="Storage\XElementExtensions.cs" />
     <Compile Include="Episode.cs" />
     <Compile Include="FileResult.cs" />

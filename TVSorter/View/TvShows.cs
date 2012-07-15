@@ -173,7 +173,7 @@ namespace TVSorter.View
                                                                     ? Image.FromFile(imagePath)
                                                                     : null;
                             }
-                            catch (Exception Ex)
+                            catch (Exception)
                             {
                                 try
                                 {

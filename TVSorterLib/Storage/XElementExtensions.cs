@@ -61,7 +61,7 @@ namespace TVSorter.Storage
         /// <returns>
         /// The child element's inner text.
         /// </returns>
-        public static string GetElementText(this XElement element, string name, string defaultValue = null)
+        public static string GetElementText(this XElement element, XName name, string defaultValue = null)
         {
             if (element == null)
             {
@@ -84,7 +84,7 @@ namespace TVSorter.Storage
         /// <returns>
         /// The child element's inner text.
         /// </returns>
-        public static IEnumerable<string> GetElementsText(this XElement element, string name)
+        public static IEnumerable<string> GetElementsText(this XElement element, XName name)
         {
             if (element == null)
             {

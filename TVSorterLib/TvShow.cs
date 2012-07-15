@@ -2,9 +2,6 @@
 // <copyright company="TVSorter" file="TvShow.cs">
 //   2012 - Andrew Jackson
 // </copyright>
-// <summary>
-//   The tv show.
-// </summary>
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter
 {
@@ -14,6 +11,7 @@ namespace TVSorter
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Xml.Linq;
 
     using TVSorter.Data.Tvdb;
     using TVSorter.Storage;
@@ -76,6 +74,17 @@ namespace TVSorter
         /// </summary>
         internal TvShow()
         {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TvShow"/> class from XML.
+        /// </summary>
+        /// <param name="element">
+        /// The Show element.
+        /// </param>
+        internal TvShow(XElement element)
+        {
+            FromXml(element, this);
         }
 
         #endregion
@@ -353,6 +362,30 @@ namespace TVSorter
         #region Methods
 
         /// <summary>
+        /// Loads the specified XElement into the show.
+        /// </summary>
+        /// <param name="showNode">
+        /// The element to read from.
+        /// </param>
+        /// <param name="show">
+        /// The show to read.
+        /// </param>
+        internal static void FromXml(XElement showNode, TvShow show)
+        {
+            show.Name = showNode.GetAttribute("name", string.Empty);
+            show.FolderName = showNode.GetAttribute("foldername", string.Empty);
+            show.TvdbId = showNode.GetAttribute("tvdbid", string.Empty);
+            show.Banner = showNode.GetAttribute("banner", string.Empty);
+            show.CustomFormat = showNode.GetAttribute("customformat", string.Empty);
+            show.UseCustomFormat = bool.Parse(showNode.GetAttribute("usecustomformat", "false"));
+            show.UseDvdOrder = bool.Parse(showNode.GetAttribute("usedvdorder", "false"));
+            show.Locked = bool.Parse(showNode.GetAttribute("locked", "false"));
+            show.LastUpdated = DateTime.Parse(showNode.GetAttribute("lastupdated", "1970-01-01 00:00:00"));
+            show.AlternateNames = showNode.Descendants("AlternateName").Select(altName => altName.Value).ToList();
+            show.Episodes = showNode.Descendants(Xml.GetName("Episode")).Select(x => new Episode(x));
+        }
+
+        /// <summary>
         /// Gets all the possible names of this show.
         /// </summary>
         /// <returns>The possible names of the show.</returns>
@@ -378,6 +411,44 @@ namespace TVSorter
                     yield return GetFileSafeName(alternateName);
                 }
             }
+        }
+
+        /// <summary>
+        /// Converts the TVShow to XML.
+        /// </summary>
+        /// <returns>The XML element for the show.</returns>
+        internal XElement ToXml()
+        {
+            var alternateNames = new XElement(Xml.GetName("AlternateNames"));
+            if (this.AlternateNames != null)
+            {
+                alternateNames.Add(
+                    this.AlternateNames.Select(
+                        alternateName => new XElement(Xml.GetName("AlternateName"), alternateName)));
+            }
+
+            var episodes = new XElement(Xml.GetName("Episodes"));
+
+            if (this.Episodes != null)
+            {
+                episodes.Add(this.Episodes.Select(x => x.ToXml()));
+            }
+
+            var element = new XElement(
+                Xml.GetName("Show"), 
+                new XAttribute("name", this.Name ?? string.Empty), 
+                new XAttribute("foldername", this.FolderName ?? string.Empty), 
+                new XAttribute("tvdbid", this.TvdbId ?? string.Empty), 
+                new XAttribute("banner", this.Banner ?? string.Empty), 
+                new XAttribute("customformat", this.CustomFormat ?? string.Empty), 
+                new XAttribute("usecustomformat", this.UseCustomFormat), 
+                new XAttribute("usedvdorder", this.UseDvdOrder), 
+                new XAttribute("locked", this.Locked), 
+                new XAttribute("lastupdated", this.LastUpdated), 
+                alternateNames, 
+                episodes);
+
+            return element;
         }
 
         /// <summary>

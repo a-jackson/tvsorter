@@ -119,20 +119,35 @@ namespace TVSorter.Data.Tvdb
                 seasonElement = "DVD_season";
             }
 
-            show.Episodes = from episode in data.Descendants("Episode")
-                            let episodeNum = this.GetElementValue(episode, episodeElement, "-1")
-                            let seasonNum = this.GetElementValue(episode, seasonElement, "-1")
-                            select
-                                new Episode
-                                    {
-                                        TvdbId = this.GetElementValue(episode, "id", string.Empty), 
-                                        EpisodeNumber = this.ParseInt(episodeNum), 
-                                        SeasonNumber = this.ParseInt(seasonNum), 
-                                        FirstAir =
-                                            DateTime.Parse(this.GetElementValue(episode, "FirstAired", "1970-01-01")), 
-                                        Name = this.GetElementValue(episode, "EpisodeName", string.Empty), 
-                                        Show = show, 
-                                    };
+            var newEpisodes = (from episode in data.Descendants("Episode")
+                               let episodeNum = this.GetElementValue(episode, episodeElement, "-1")
+                               let seasonNum = this.GetElementValue(episode, seasonElement, "-1")
+                               select
+                                   new Episode
+                                       {
+                                           TvdbId = this.GetElementValue(episode, "id", string.Empty),
+                                           EpisodeNumber = this.ParseInt(episodeNum),
+                                           SeasonNumber = this.ParseInt(seasonNum),
+                                           FirstAir =
+                                               DateTime.Parse(this.GetElementValue(episode, "FirstAired", "1970-01-01")),
+                                           Name = this.GetElementValue(episode, "EpisodeName", string.Empty),
+                                           Show = show,
+                                       }).ToList();
+
+            // Copy the episodes filecount across
+            if (show.Episodes != null)
+            {
+                foreach (var episode in newEpisodes)
+                {
+                    var currentEpisode = show.Episodes.FirstOrDefault(x => x.Equals(episode));
+                    if (currentEpisode != null)
+                    {
+                        episode.FileCount = currentEpisode.FileCount;
+                    }
+                }
+            }
+
+            show.Episodes = newEpisodes;
 
             show.LastUpdated = serverTime;
         }

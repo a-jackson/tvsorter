@@ -6,7 +6,6 @@
 //   The controller for the sort episodes tab.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace TVSorter.Controller
 {
     #region Using Directives
@@ -17,6 +16,7 @@ namespace TVSorter.Controller
     using System.Globalization;
     using System.IO;
     using System.Linq;
+
     using TVSorter.View;
 
     using Settings = TVSorter.Settings;
@@ -31,19 +31,19 @@ namespace TVSorter.Controller
         #region Fields
 
         /// <summary>
+        /// The file searcher.
+        /// </summary>
+        private FileSearch fileSearch;
+
+        /// <summary>
         ///   The last subdirectory scanned.
         /// </summary>
         private string lastSubdirectoryScanned;
-        
+
         /// <summary>
         ///   The sort view.
         /// </summary>
         private IView sortView;
-
-        /// <summary>
-        /// The file searcher.
-        /// </summary>
-        private FileSearch fileSearch;
 
         /// <summary>
         ///   The sub directories.
@@ -130,7 +130,7 @@ namespace TVSorter.Controller
             this.fileSearch = new FileSearch();
 
             this.sortView = view;
-            
+
             this.LoadSettings();
         }
 
@@ -227,6 +227,7 @@ namespace TVSorter.Controller
             foreach (FileResult result in checkedResults)
             {
                 result.Show = show;
+
                 // this.scanner.ResetEpisode(result);
             }
         }
@@ -271,7 +272,7 @@ namespace TVSorter.Controller
 
             return dirs;
         }
-        
+
         #endregion
     }
 }

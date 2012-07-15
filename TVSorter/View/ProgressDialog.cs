@@ -2,6 +2,9 @@
 // <copyright company="TVSorter" file="ProgressDialog.cs">
 //   2012 - Andrew Jackson
 // </copyright>
+// <summary>
+//   The dialog showing the progress bar.
+// </summary>
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter.View
 {

@@ -6,7 +6,6 @@
 //   The controller for the TV Shows tab.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace TVSorter.Controller
 {
     #region Using Directives
@@ -15,8 +14,9 @@ namespace TVSorter.Controller
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Linq;
+
     using TVSorter.View;
-    
+
     #endregion
 
     /// <summary>
@@ -35,7 +35,7 @@ namespace TVSorter.Controller
         ///   The shows.
         /// </summary>
         private BindingList<TvShow> shows;
-        
+
         /// <summary>
         ///   The tv view.
         /// </summary>
@@ -206,7 +206,7 @@ namespace TVSorter.Controller
                     {
                         // Only update the unlocked shows.
                         List<TvShow> unlockedShows = this.Shows.Where(x => !x.Locked).ToList();
-                        foreach (var show in unlockedShows)
+                        foreach (TvShow show in unlockedShows)
                         {
                             show.Update();
                         }

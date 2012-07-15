@@ -11,6 +11,7 @@ namespace TVSorter
     #region Using Directives
 
     using System;
+    using System.Xml.Linq;
 
     using TVSorter.Storage;
 
@@ -21,6 +22,24 @@ namespace TVSorter
     /// </summary>
     public class Episode : IEquatable<Episode>
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Episode"/> class.
+        /// </summary>
+        internal Episode()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Episode"/> class from XML.
+        /// </summary>
+        /// <param name="element">
+        /// The episode element.
+        /// </param>
+        internal Episode(XElement element)
+        {
+            FromXml(element, this);
+        }
+
         #region Public Properties
 
         /// <summary>
@@ -135,6 +154,38 @@ namespace TVSorter
         {
             var xml = new Xml();
             xml.SaveEpisode(this);
+        }
+
+        /// <summary>
+        /// Loads the episode from XML.
+        /// </summary>
+        /// <param name="episodeNode">The Episode element to load.</param>
+        /// <param name="episode">The episode to load into.</param>
+        internal static void FromXml(XElement episodeNode, Episode episode)
+        {
+            episode.Name = episodeNode.GetAttribute("name", string.Empty);
+            episode.TvdbId = episodeNode.GetAttribute("tvdbid", string.Empty);
+            episode.SeasonNumber = int.Parse(episodeNode.GetAttribute("seasonnum", "-1"));
+            episode.EpisodeNumber = int.Parse(episodeNode.GetAttribute("episodenum", "-1"));
+            episode.FirstAir = DateTime.Parse(episodeNode.GetAttribute("firstair", "1970-01-01 00:00:00"));
+            episode.FileCount = int.Parse(episodeNode.GetAttribute("filecount", "0"));
+        }
+
+        /// <summary>
+        /// Converts the episode to XML.
+        /// </summary>
+        /// <returns>The XElement.</returns>
+        internal XElement ToXml()
+        {
+            var episodeElement = new XElement(
+                Xml.GetName("Episode"),
+                new XAttribute("name", this.Name),
+                new XAttribute("tvdbid", this.TvdbId),
+                new XAttribute("seasonnum", this.SeasonNumber),
+                new XAttribute("episodenum", this.EpisodeNumber),
+                new XAttribute("firstair", this.FirstAir),
+                new XAttribute("filecount", this.FileCount));
+            return episodeElement;
         }
 
         #endregion
