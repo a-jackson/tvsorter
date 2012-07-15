@@ -125,7 +125,7 @@ namespace TVSorter.Data.Tvdb
                 File.Delete(saveAddress);
             }
 
-            webClient.DownloadFileAsync(new Uri(bannerAddress), saveAddress);
+            webClient.DownloadFile(new Uri(bannerAddress), saveAddress);
         }
 
         /// <summary>

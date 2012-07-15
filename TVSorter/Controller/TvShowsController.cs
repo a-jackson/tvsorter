@@ -172,6 +172,7 @@ namespace TVSorter.Controller
                     {
                         this.SearchResults = TvShow.SearchNewShows();
                         this.OnSearchShowsComplete();
+                        this.RefreshShows();
                     });
             task.Start();
 
@@ -210,6 +211,7 @@ namespace TVSorter.Controller
                         {
                             show.Update();
                         }
+                        this.OnPropertyChanged("SelectedShow");
                     });
             task.Start();
 
@@ -230,6 +232,7 @@ namespace TVSorter.Controller
                         }
 
                         this.SelectedShow.Update();
+                        this.OnPropertyChanged("SelectedShow");
                     });
             task.Start();
             this.tvView.StartTaskProgress(task, "Updating " + this.SelectedShow.Name);
@@ -251,5 +254,13 @@ namespace TVSorter.Controller
         }
 
         #endregion
+
+        /// <summary>
+        /// Refreshes the list of TVShows.
+        /// </summary>
+        public void RefreshShows()
+        {
+            this.Shows = new BindingList<TvShow>(TvShow.GetTvShows().ToList());
+        }
     }
 }

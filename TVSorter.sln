@@ -7,11 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TVSorterLib", "TVSorterLib\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TVSorterCmd", "TVSorterCmd\TVSorterCmd.csproj", "{AB5BF33E-EA7D-4475-9B4B-5CE9CBFD32E4}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1E4B9A77-B50C-480D-9F42-7EFF532AD47B}"
-	ProjectSection(SolutionItems) = preProject
-		TVSorter-1.0.xsd = TVSorter-1.0.xsd
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

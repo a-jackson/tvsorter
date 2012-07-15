@@ -62,7 +62,7 @@ namespace TVSorter.View
         /// </param>
         private void OnLogMessage(object sender, LogMessageEventArgs e)
         {
-            this.Invoke(new Action(() => this.log.Items.Add(e.ToString())));
+            this.Invoke(new Action(() => this.log.TopIndex = this.log.Items.Add(e.ToString())));
         }
 
         /// <summary>

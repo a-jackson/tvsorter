@@ -365,9 +365,7 @@ namespace TVSorter.Storage
                     // Create the file and populate with default settings.
                     var doc = new XDocument(
                         new XDeclaration(XmlVersion + ".0", "utf-8", "yes"),
-                        new XElement(GetName("TVSorter")),
-                        new Settings(true).ToXml(),
-                        new XElement(GetName("Shows")));
+                        new XElement(GetName("TVSorter"), new Settings(true).ToXml(), new XElement(GetName("Shows"))));
 
                     doc.Save(XmlFile);
                 }

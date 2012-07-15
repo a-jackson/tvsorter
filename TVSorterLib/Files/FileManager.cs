@@ -100,7 +100,7 @@ namespace TVSorter.Files
         /// <param name="type">
         /// The operation to perform on the files. 
         /// </param>
-        private void ProcessFiles(List<FileResult> files, SortType type)
+        private void ProcessFiles(IEnumerable<FileResult> files, SortType type)
         {
             foreach (FileResult file in files)
             {
@@ -154,6 +154,7 @@ namespace TVSorter.Files
                 {
                     case SortType.Move:
                         File.Move(file1.InputFile.FullName, destination);
+                        Logger.OnLogMessage(this, "Moved {0}", file1.InputFile.Name);
                         if (this.settings.DeleteEmptySubdirectories)
                         {
                             // If no files exist in the directory
@@ -165,6 +166,7 @@ namespace TVSorter.Files
                                         this.settings.SourceDirectory.TrimEnd(Path.DirectorySeparatorChar)))
                                 {
                                     file1.InputFile.Directory.Delete(true);
+                                    Logger.OnLogMessage(this, "Delete directory: {0}", file1.InputFile.DirectoryName);
                                 }
                             }
                         }
@@ -172,6 +174,7 @@ namespace TVSorter.Files
                         break;
                     case SortType.Copy:
                         File.Copy(file1.InputFile.FullName, destination);
+                        Logger.OnLogMessage(this, "Copied {0}", file1.InputFile.Name);
                         break;
                 }
 

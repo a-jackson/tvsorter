@@ -177,6 +177,8 @@ namespace TVSorter.Files
                 }
             }
 
+            Logger.OnLogMessage(this, "Scanned directory: {0}", directory.FullName);
+
             if (!this.settings.RecurseSubdirectories && !overrideRecurse)
             {
                 yield break;

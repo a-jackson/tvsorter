@@ -174,6 +174,7 @@ namespace TVSorter.View
             this.revertButton = new System.Windows.Forms.Button();
             this.updateShowButton = new System.Windows.Forms.Button();
             this.removeShowButton = new System.Windows.Forms.Button();
+            this.resetLastUpdatedButton = new System.Windows.Forms.Button();
             this.namesGroup = new System.Windows.Forms.GroupBox();
             this.nameTable = new System.Windows.Forms.TableLayoutPanel();
             this.selectedShowFolderNameText = new System.Windows.Forms.TextBox();
@@ -187,7 +188,6 @@ namespace TVSorter.View
             this.createNfoFilesButton = new System.Windows.Forms.Button();
             this.tvShowsList = new System.Windows.Forms.ListBox();
             this.topButtonsFlow = new System.Windows.Forms.FlowLayoutPanel();
-            this.resetLastUpdatedButton = new System.Windows.Forms.Button();
             selectedShowTable = new System.Windows.Forms.TableLayoutPanel();
             customFormatGroup = new System.Windows.Forms.GroupBox();
             selectedShowButtons = new System.Windows.Forms.FlowLayoutPanel();
@@ -401,6 +401,16 @@ namespace TVSorter.View
             this.removeShowButton.UseVisualStyleBackColor = true;
             this.removeShowButton.Click += new System.EventHandler(this.RemoveShowButtonClick);
             // 
+            // resetLastUpdatedButton
+            // 
+            this.resetLastUpdatedButton.Location = new System.Drawing.Point(345, 3);
+            this.resetLastUpdatedButton.Name = "resetLastUpdatedButton";
+            this.resetLastUpdatedButton.Size = new System.Drawing.Size(115, 23);
+            this.resetLastUpdatedButton.TabIndex = 4;
+            this.resetLastUpdatedButton.Text = "Reset Last Updated";
+            this.resetLastUpdatedButton.UseVisualStyleBackColor = true;
+            this.resetLastUpdatedButton.Click += new System.EventHandler(this.ResetLastUpdatedButtonClick);
+            // 
             // namesGroup
             // 
             this.namesGroup.Controls.Add(this.nameTable);
@@ -566,16 +576,6 @@ namespace TVSorter.View
             this.topButtonsFlow.Name = "topButtonsFlow";
             this.topButtonsFlow.Size = new System.Drawing.Size(749, 35);
             this.topButtonsFlow.TabIndex = 0;
-            // 
-            // resetLastUpdatedButton
-            // 
-            this.resetLastUpdatedButton.Location = new System.Drawing.Point(345, 3);
-            this.resetLastUpdatedButton.Name = "resetLastUpdatedButton";
-            this.resetLastUpdatedButton.Size = new System.Drawing.Size(115, 23);
-            this.resetLastUpdatedButton.TabIndex = 4;
-            this.resetLastUpdatedButton.Text = "Reset Last Updated";
-            this.resetLastUpdatedButton.UseVisualStyleBackColor = true;
-            this.resetLastUpdatedButton.Click += new System.EventHandler(this.ResetLastUpdatedButtonClick);
             // 
             // TvShows
             // 

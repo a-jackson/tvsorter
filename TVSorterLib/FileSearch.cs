@@ -76,6 +76,7 @@ namespace TVSorter
 
             var scanManager = new ScanManager();
             this.Results = scanManager.Refresh(subDirectory);
+            Logger.OnLogMessage(this, "Scan complete. Found {0} files.", this.Results.Count);
         }
 
         /// <summary>

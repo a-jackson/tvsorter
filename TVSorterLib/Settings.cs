@@ -194,7 +194,7 @@ namespace TVSorter
                     dir =>
                     new XElement(
                         Xml.GetName("Destination"),
-                        new XAttribute(Xml.GetName("selected"), dir == this.DestinationDirectory),
+                        new XAttribute("selected", dir == this.DestinationDirectory),
                         dir)));
 
             var fileExtensions = new XElement(
@@ -202,7 +202,7 @@ namespace TVSorter
                 this.FileExtensions.Select(ext => new XElement(Xml.GetName("Extension"), ext)));
 
             var regularExpressions = new XElement(
-                Xml.GetName("RegularExpressions"),
+                Xml.GetName("RegularExpression"),
                 this.RegularExpressions.Select(exp => new XElement(Xml.GetName("RegEx"), exp)));
 
             var overwriteKeywords = new XElement(

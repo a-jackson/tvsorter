@@ -64,7 +64,7 @@ namespace TVSorter
         public TvShow(TvShow searchResult)
         {
             this.Name = searchResult.Name;
-            this.FolderName = GetFileSafeName(searchResult.Name);
+            this.FolderName = searchResult.FolderName;
             this.TvdbId = searchResult.TvdbId;
             this.InitialiseDefaultData();
         }
@@ -174,6 +174,7 @@ namespace TVSorter
                 foreach (string file in files.Where(x => !File.Exists(x)))
                 {
                     File.WriteAllText(file, url);
+                    Logger.OnLogMessage(show1, "Created nfo file {0}", file);
                 }
             }
         }
@@ -226,6 +227,9 @@ namespace TVSorter
                     select dir.Name);
             }
 
+            // Sort the directories so the show's are added alphabetically.
+            showDirs.Sort();
+
             var searchResults = new Dictionary<string, List<TvShow>>();
             foreach (string showName in showDirs)
             {
@@ -237,11 +241,13 @@ namespace TVSorter
                 {
                     var show = new TvShow(results[0]);
                     show.Save();
+                    Logger.OnLogMessage(show, "Found show {0}", show.Name);
                 }
                 else
                 {
                     // Any 0 or more than 1 result should be added to the dictionary for user selection.
                     searchResults.Add(showName, results);
+                    Logger.OnLogMessage(results, "Found {0} results for {1}", results.Count, showName);
                 }
             }
 
