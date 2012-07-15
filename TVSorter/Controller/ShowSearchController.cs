@@ -6,16 +6,12 @@
 //   Controller for handle show searches.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace TVSorter.Controller
 {
     #region Using Directives
 
     using System.ComponentModel;
 
-    using TVSorter.Data;
-    using TVSorter.Storage;
-    using TVSorter.Types;
     using TVSorter.View;
 
     #endregion
@@ -33,19 +29,9 @@ namespace TVSorter.Controller
         private string closeButtonText;
 
         /// <summary>
-        ///   The data provider.
-        /// </summary>
-        private IDataProvider dataProvider;
-
-        /// <summary>
         ///   The list of results.
         /// </summary>
         private BindingList<TvShow> searchResults;
-
-        /// <summary>
-        ///   The storage provider.
-        /// </summary>
-        private IStorageProvider storageProvider;
 
         /// <summary>
         ///   The title of the form.
@@ -119,8 +105,6 @@ namespace TVSorter.Controller
         /// </param>
         public override void Initialise(IView view)
         {
-            this.dataProvider = Factory.DataProvider;
-            this.storageProvider = Factory.StorageProvider;
         }
 
         /// <summary>
@@ -131,7 +115,7 @@ namespace TVSorter.Controller
         /// </param>
         public void Search(string name)
         {
-            this.SearchResults = new BindingList<TvShow>(this.dataProvider.SearchShow(name));
+            this.SearchResults = new BindingList<TvShow>(TvShow.SearchShow(name));
         }
 
         /// <summary>
@@ -142,7 +126,8 @@ namespace TVSorter.Controller
         /// </param>
         public virtual void Select(int index)
         {
-            this.storageProvider.SaveShow(this.SearchResults[index]);
+            var show = new TvShow(this.SearchResults[index]);
+            show.Save();
         }
 
         #endregion

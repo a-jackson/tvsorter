@@ -6,7 +6,6 @@
 //   The log message event args.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace TVSorter
 {
     #region Using Directives

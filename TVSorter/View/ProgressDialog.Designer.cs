@@ -30,11 +30,6 @@ namespace TVSorter.View
         /// </summary>
         private readonly IContainer components;
 
-        /// <summary>
-        ///   The task progress.
-        /// </summary>
-        private ProgressBar taskProgress;
-
         #endregion
 
         #region Methods
@@ -61,24 +56,25 @@ namespace TVSorter.View
         /// </summary>
         private void InitializeComponent()
         {
-            this.taskProgress = new System.Windows.Forms.ProgressBar();
+            this.log = new System.Windows.Forms.ListBox();
             this.SuspendLayout();
             // 
-            // taskProgress
+            // log
             // 
-            this.taskProgress.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.taskProgress.Location = new System.Drawing.Point(0, 0);
-            this.taskProgress.Name = "taskProgress";
-            this.taskProgress.Size = new System.Drawing.Size(160, 27);
-            this.taskProgress.TabIndex = 0;
+            this.log.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.log.FormattingEnabled = true;
+            this.log.Location = new System.Drawing.Point(0, 0);
+            this.log.Name = "log";
+            this.log.Size = new System.Drawing.Size(440, 92);
+            this.log.TabIndex = 0;
             // 
             // ProgressDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(160, 27);
+            this.ClientSize = new System.Drawing.Size(440, 92);
             this.ControlBox = false;
-            this.Controls.Add(this.taskProgress);
+            this.Controls.Add(this.log);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
@@ -87,11 +83,12 @@ namespace TVSorter.View
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Task";
-            this.Load += new System.EventHandler(this.ProgressDialogLoad);
             this.ResumeLayout(false);
 
         }
 
         #endregion
+
+        private ListBox log;
     }
 }

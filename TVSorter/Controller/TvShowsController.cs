@@ -14,18 +14,9 @@ namespace TVSorter.Controller
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
-    using System.IO;
     using System.Linq;
-    using System.Threading.Tasks;
-    using System.Windows.Forms;
-
-    using TVSorter.Data;
-    using TVSorter.Storage;
-    using TVSorter.Types;
     using TVSorter.View;
-
-    using Settings = TVSorter.Types.Settings;
-
+    
     #endregion
 
     /// <summary>
@@ -36,11 +27,6 @@ namespace TVSorter.Controller
         #region Fields
 
         /// <summary>
-        ///   The data provider.
-        /// </summary>
-        private IDataProvider data;
-
-        /// <summary>
         ///   The selected show.
         /// </summary>
         private TvShow selectedShow;
@@ -49,12 +35,7 @@ namespace TVSorter.Controller
         ///   The shows.
         /// </summary>
         private BindingList<TvShow> shows;
-
-        /// <summary>
-        ///   The storage.
-        /// </summary>
-        private IStorageProvider storage;
-
+        
         /// <summary>
         ///   The tv view.
         /// </summary>
@@ -121,38 +102,9 @@ namespace TVSorter.Controller
         /// </summary>
         public void CreateNfoFiles()
         {
-            this.MaxValue = this.Shows.Count;
-            this.Value = 0;
-            Task.Factory.StartNew(
-                delegate
-                    {
-                        foreach (TvShow show in this.Shows)
-                        {
-                            TvShow show1 = show;
-                            string url = string.Format("http://thetvdb.com/?tab=series&id={0}&lid=7", show1.TvdbId);
-                            IEnumerable<string> files =
-                                from destination in this.storage.LoadSettings().DestinationDirectories
-                                where
-                                    Directory.Exists(
-                                        string.Concat(destination, Path.DirectorySeparatorChar, show1.FolderName))
-                                select
-                                    string.Format(
-                                        "{0}{2}{1}{2}tvshow.nfo", 
-                                        destination, 
-                                        show1.FolderName, 
-                                        Path.DirectorySeparatorChar);
-                            foreach (string file in files.Where(x => !File.Exists(x)))
-                            {
-                                File.WriteAllText(file, url);
-                            }
-
-                            this.Value++;
-                            this.OnProgressChanged();
-                        }
-
-                        this.OnTaskComplete();
-                    });
-            this.tvView.StartTaskProgress(this, "Creating .nfo files.");
+            var task = new BackgroundTask(TvShow.CreateNfoFiles);
+            task.Start();
+            this.tvView.StartTaskProgress(task, "Creating .nfo files.");
         }
 
         /// <summary>
@@ -164,21 +116,8 @@ namespace TVSorter.Controller
         public override void Initialise(IView view)
         {
             this.tvView = view;
-            this.storage = Factory.StorageProvider;
-            this.data = Factory.DataProvider;
-            this.data.ShowUpdated += this.ShowUpdated;
-            this.data.UpdateShowsCompleted += this.UpdateShowsCompleted;
-            this.storage.ShowAdded += this.ShowAdded;
-            this.storage.ShowRemoved += this.ShowRemoved;
-
-            try
-            {
-                this.Shows = new BindingList<TvShow>(this.storage.LoadTvShows());
-                this.TvShowSelected(0);
-            }
-            catch (Exception)
-            {
-            }
+            this.Shows = new BindingList<TvShow>(TvShow.GetTvShows().ToList());
+            this.TvShowSelected(0);
         }
 
         /// <summary>
@@ -191,7 +130,8 @@ namespace TVSorter.Controller
                 return;
             }
 
-            this.storage.RemoveShow(this.SelectedShow);
+            this.SelectedShow.Delete();
+            this.Shows.Remove(this.SelectedShow);
         }
 
         /// <summary>
@@ -205,7 +145,7 @@ namespace TVSorter.Controller
             }
 
             this.SelectedShow.LastUpdated = new DateTime(1970, 1, 1);
-            this.storage.SaveShow(this.SelectedShow);
+            this.SelectedShow.Save();
             this.OnPropertyChanged("SelectedShow");
         }
 
@@ -219,7 +159,7 @@ namespace TVSorter.Controller
                 return;
             }
 
-            this.storage.SaveShow(this.SelectedShow);
+            this.SelectedShow.Save();
         }
 
         /// <summary>
@@ -227,43 +167,15 @@ namespace TVSorter.Controller
         /// </summary>
         public void SearchShows()
         {
-            Settings settings = this.storage.LoadSettings();
-            var showDirs = new List<string>();
-            foreach (DirectoryInfo dirInfo in
-                from dir in settings.DestinationDirectories where Directory.Exists(dir) select new DirectoryInfo(dir))
-            {
-                showDirs.AddRange(
-                    from dir in dirInfo.GetDirectories()
-                    where !showDirs.Contains(dir.Name) && !this.Shows.Select(x => x.FolderName).Contains(dir.Name)
-                    select dir.Name);
-            }
-
-            this.SearchResults = new Dictionary<string, List<TvShow>>();
-            this.MaxValue = showDirs.Count;
-            this.Value = 0;
-            Task.Factory.StartNew(
-                delegate
+            var task = new BackgroundTask(
+                () =>
                     {
-                        foreach (string showName in showDirs)
-                        {
-                            List<TvShow> results = this.data.SearchShow(showName);
-                            if (results.Count == 1)
-                            {
-                                this.storage.SaveShow(results[0]);
-                            }
-                            else
-                            {
-                                this.SearchResults.Add(showName, results);
-                            }
-
-                            this.Value++;
-                            this.OnProgressChanged();
-                        }
-
+                        this.SearchResults = TvShow.SearchNewShows();
                         this.OnSearchShowsComplete();
-                        this.OnTaskComplete();
                     });
-            this.tvView.StartTaskProgress(this, "Searching shows");
+            task.Start();
+
+            this.tvView.StartTaskProgress(task, "Searching shows");
         }
 
         /// <summary>
@@ -289,12 +201,19 @@ namespace TVSorter.Controller
         /// </summary>
         public void UpdateAllShows()
         {
-            // Only update the unlocked shows.
-            List<TvShow> unlockedShows = this.Shows.Where(x => !x.Locked).ToList();
-            this.MaxValue = unlockedShows.Count;
-            this.Value = 0;
-            this.data.UpdateShowsAsync(unlockedShows, this);
-            this.tvView.StartTaskProgress(this, "Updating All Shows");
+            var task = new BackgroundTask(
+                () =>
+                    {
+                        // Only update the unlocked shows.
+                        List<TvShow> unlockedShows = this.Shows.Where(x => !x.Locked).ToList();
+                        foreach (var show in unlockedShows)
+                        {
+                            show.Update();
+                        }
+                    });
+            task.Start();
+
+            this.tvView.StartTaskProgress(task, "Updating All Shows");
         }
 
         /// <summary>
@@ -302,15 +221,18 @@ namespace TVSorter.Controller
         /// </summary>
         public void UpdateSelectedShow()
         {
-            if (this.SelectedShow == null)
-            {
-                return;
-            }
+            var task = new BackgroundTask(
+                () =>
+                    {
+                        if (this.SelectedShow == null)
+                        {
+                            return;
+                        }
 
-            this.MaxValue = 1;
-            this.Value = 0;
-            this.data.UpdateShowsAsync(new List<TvShow> { this.SelectedShow }, this);
-            this.tvView.StartTaskProgress(this, "Updating " + this.SelectedShow.Name);
+                        this.SelectedShow.Update();
+                    });
+            task.Start();
+            this.tvView.StartTaskProgress(task, "Updating " + this.SelectedShow.Name);
         }
 
         #endregion
@@ -326,95 +248,6 @@ namespace TVSorter.Controller
             {
                 this.SearchShowsComplete(this, EventArgs.Empty);
             }
-        }
-
-        /// <summary>
-        /// Handles a new show being added.
-        /// </summary>
-        /// <param name="sender">
-        /// The sender. 
-        /// </param>
-        /// <param name="e">
-        /// The arguments of the event. 
-        /// </param>
-        private void ShowAdded(object sender, ShowEventArgs e)
-        {
-            if (this.tvView.InvokeRequired)
-            {
-                this.tvView.Invoke(new Action<object, ShowEventArgs>(this.ShowAdded), new[] { sender, e });
-            }
-            else
-            {
-                this.Shows.Add(e.Show);
-            }
-        }
-
-        /// <summary>
-        /// Handles a show being removed.
-        /// </summary>
-        /// <param name="sender">
-        /// The sender. 
-        /// </param>
-        /// <param name="e">
-        /// The arguments of the event. 
-        /// </param>
-        private void ShowRemoved(object sender, ShowEventArgs e)
-        {
-            if (this.tvView.InvokeRequired)
-            {
-                this.tvView.Invoke(new Action<object, ShowEventArgs>(this.ShowRemoved), new[] { sender, e });
-            }
-            else
-            {
-                this.Shows.Remove(e.Show);
-            }
-        }
-
-        /// <summary>
-        /// Handles a show being updated.
-        /// </summary>
-        /// <param name="sender">
-        /// The sender. 
-        /// </param>
-        /// <param name="e">
-        /// The arguments of the event. 
-        /// </param>
-        private void ShowUpdated(object sender, ShowUpdatedEventArgs e)
-        {
-            if (e.UserState != this)
-            {
-                return;
-            }
-
-            this.Value++;
-            this.OnProgressChanged();
-
-            if (!e.Success)
-            {
-                MessageBox.Show(e.Error.Message);
-            }
-        }
-
-        /// <summary>
-        /// The update shows completed.
-        /// </summary>
-        /// <param name="sender">
-        /// The sender. 
-        /// </param>
-        /// <param name="e">
-        /// The arguments of the event. 
-        /// </param>
-        private void UpdateShowsCompleted(object sender, UpdateShowsCompletedEventArgs e)
-        {
-            if (e.UserState != this)
-            {
-                return;
-            }
-
-            this.OnTaskComplete();
-
-            // Refresh the selected show.
-            this.OnPropertyChanged("SelectedShow");
         }
 
         #endregion

@@ -6,7 +6,6 @@
 //   The missing and duplicated episodes tab.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace TVSorter.View
 {
     #region Using Directives

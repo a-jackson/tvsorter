@@ -6,7 +6,6 @@
 //   The TV Shows tab.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace TVSorter.View
 {
     #region Using Directives
@@ -20,7 +19,6 @@ namespace TVSorter.View
 
     using TVSorter.Controller;
     using TVSorter.Properties;
-    using TVSorter.Types;
 
     #endregion
 
@@ -171,7 +169,9 @@ namespace TVSorter.View
                                                + this.controller.SelectedShow.TvdbId + ".jpg";
                             try
                             {
-                                this.selectedShowBanner.Image = File.Exists(imagePath) ? Image.FromFile(imagePath) : null;
+                                this.selectedShowBanner.Image = File.Exists(imagePath)
+                                                                    ? Image.FromFile(imagePath)
+                                                                    : null;
                             }
                             catch (Exception Ex)
                             {
@@ -184,6 +184,7 @@ namespace TVSorter.View
                                     // Unable to delete
                                 }
                             }
+
                             this.selectedShowTvdb.Text = "TVDB ID: " + this.controller.SelectedShow.TvdbId;
                             this.selectedShowLastUpdated.Text = "Last Updated: "
                                                                 + this.controller.SelectedShow.LastUpdated;

@@ -6,7 +6,6 @@
 //   Controller for lists.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace TVSorter.Controller
 {
     #region Using Directives

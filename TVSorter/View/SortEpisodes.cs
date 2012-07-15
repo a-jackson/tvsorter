@@ -6,7 +6,6 @@
 //   The sort episodes tab.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace TVSorter.View
 {
     #region Using Directives
@@ -20,7 +19,6 @@ namespace TVSorter.View
     using System.Windows.Forms;
 
     using TVSorter.Controller;
-    using TVSorter.Types;
 
     #endregion
 
@@ -114,7 +112,7 @@ namespace TVSorter.View
         /// </param>
         private void CopyButtonClick(object sender, EventArgs e)
         {
-            this.controller.CopyEpisodes(this.resultsList.CheckedIndices.Cast<int>());
+            this.controller.CopyEpisodes();
         }
 
         /// <summary>
@@ -145,7 +143,7 @@ namespace TVSorter.View
         /// </param>
         private void MoveButtonClick(object sender, EventArgs e)
         {
-            this.controller.MoveEpisodes(this.resultsList.CheckedIndices.Cast<int>());
+            this.controller.MoveEpisodes();
         }
 
         /// <summary>

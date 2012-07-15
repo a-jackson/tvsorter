@@ -6,7 +6,6 @@
 //   Class that manages access to the XML file.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace TVSorter.Storage
 {
     #region Using Directives
@@ -15,16 +14,16 @@ namespace TVSorter.Storage
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Xml;
     using System.Xml.Linq;
-
-    using TVSorter.Types;
+    using System.Xml.Schema;
 
     #endregion
 
     /// <summary>
     /// Class that manages access to the XML file.
     /// </summary>
-    internal class Xml : DalBase, IStorageProvider
+    internal class Xml
     {
         #region Constants
 
@@ -38,7 +37,7 @@ namespace TVSorter.Storage
         #region Constructors and Destructors
 
         /// <summary>
-        ///   Initializes a new instance of the <see cref="Xml" /> class. Initialises a new instance of the Xml class.
+        ///   Initializes a new instance of the <see cref="Xml" /> class. Initialises a new instance of the TvShowXml class.
         /// </summary>
         public Xml()
         {
@@ -47,31 +46,40 @@ namespace TVSorter.Storage
 
         #endregion
 
-        #region Public Events
-
-        /// <summary>
-        ///   Occurs when the settings are chanaged.
-        /// </summary>
-        public event EventHandler SettingsChanged;
-
-        /// <summary>
-        ///   Occurs when a new show is added.
-        /// </summary>
-        public event EventHandler<ShowEventArgs> ShowAdded;
-
-        /// <summary>
-        ///   Occurs when a show is removed.
-        /// </summary>
-        public event EventHandler<ShowEventArgs> ShowRemoved;
-
-        /// <summary>
-        ///   Occurs when a show is updated.
-        /// </summary>
-        public event EventHandler<ShowEventArgs> ShowUpdated;
-
-        #endregion
-
         #region Public Methods and Operators
+
+        /// <summary>
+        /// Finds a TV Show in the file and loads it.
+        /// </summary>
+        /// <param name="show">
+        /// The TV Show to load data into.
+        /// </param>
+        /// <param name="name">
+        /// The name of the show to search.
+        /// </param>
+        /// <param name="results">
+        /// The number of matches found.
+        /// </param>
+        public void FindTvShow(TvShow show, string name, out int results)
+        {
+            // Remove any duplicate spaces
+            name =
+                name.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).Aggregate(
+                    (x, y) => string.Concat(x, " ", y));
+
+            XDocument doc = XDocument.Load(XmlFile);
+
+            List<XElement> showElements = (from element in doc.Descendants("Show")
+                                           let showNames = this.GetShowsNames(element)
+                                           where showNames.Contains(name, StringComparer.InvariantCultureIgnoreCase)
+                                           select element).ToList();
+            results = showElements.Count;
+
+            if (showElements.Count != 0 && showElements.Count <= 1)
+            {
+                LoadTvShow(showElements[0], show);
+            }
+        }
 
         /// <summary>
         /// Gets the episodes that have more than 1 file grouped by show.
@@ -96,63 +104,62 @@ namespace TVSorter.Storage
         }
 
         /// <summary>
-        /// Loads the episodes for the specified show.
-        /// </summary>
-        /// <param name="show">
-        /// The show to get episodes for. 
-        /// </param>
-        /// <returns>
-        /// The list of episodes for the show. 
-        /// </returns>
-        public List<Episode> LoadEpisodes(TvShow show)
-        {
-            XDocument doc = XDocument.Load(XmlFile);
-            if (doc.Root == null)
-            {
-                throw new Exception("XML file is invalid.");
-            }
-
-            XElement showsElement = doc.Root.Element("Shows");
-            if (showsElement == null)
-            {
-                throw new Exception("XML file is invalid");
-            }
-
-            XElement showElement =
-                showsElement.Elements("Show").FirstOrDefault(x => GetAttribute(x, "tvdbid", "-1").Equals(show.TvdbId));
-            if (showElement == null)
-            {
-                throw new Exception("Show cannot be found");
-            }
-
-            return showElement.Descendants("Episode").Select(CreateEpisode).ToList();
-        }
-
-        /// <summary>
         /// Reads the settings from the XML file.
         /// </summary>
-        /// <returns>
-        /// The settings object that represents the settings in the file. 
-        /// </returns>
-        public Settings LoadSettings()
+        /// <param name="settings">
+        /// The settings to set from the XML.
+        /// </param>
+        public void LoadSettings(Settings settings)
         {
+            if (!File.Exists(XmlFile))
+            {
+                throw new IOException("Settings file does not exist.");
+            }
+
+            ValidateXml.Validate(XmlFile);
+
             try
             {
                 XDocument doc = XDocument.Load(XmlFile);
-                XElement settingsNode = doc.Descendants("Settings").FirstOrDefault();
+                XElement settingsNode = doc.Root.Element("Settings");
 
                 if (settingsNode == null)
                 {
-                    throw new Exception("XML is not valid");
+                    throw new XmlSchemaException("The XML file is invalid.");
                 }
 
-                Settings settings = CreateSettings(settingsNode);
+                settings.SourceDirectory = settingsNode.GetAttribute("sourcedirectory", string.Empty);
+                settings.DefaultOutputFormat = settingsNode.GetAttribute("defaultformat", string.Empty);
+                settings.RecurseSubdirectories = bool.Parse(settingsNode.GetAttribute("recursesubdirectories", "false"));
+                settings.DeleteEmptySubdirectories =
+                    bool.Parse(settingsNode.GetAttribute("deleteemptysubdirectories", "false"));
+                settings.RenameIfExists = bool.Parse(settingsNode.GetAttribute("renameifexists", "false"));
+                settings.DestinationDirectories = new List<string>();
+                settings.DestinationDirectory = string.Empty;
 
-                return settings;
+                XElement destinationDirectories = settingsNode.Element("DestinationDirectories");
+
+                if (destinationDirectories != null)
+                {
+                    settings.DestinationDirectories = destinationDirectories.GetElementsText("Destination").ToList();
+                    foreach (XElement dir in from dir in destinationDirectories.Descendants("Destination")
+                                             let selected = dir.GetAttribute("selected", "false")
+                                             where bool.Parse(selected)
+                                             select dir)
+                    {
+                        settings.DestinationDirectory = dir.Value;
+                    }
+                }
+
+                settings.FileExtensions = settingsNode.Element("FileExtensions").GetElementsText("Extension").ToList();
+                settings.RegularExpressions =
+                    settingsNode.Element("RegularExpression").GetElementsText("RegEx").ToList();
+                settings.OverwriteKeywords =
+                    settingsNode.Element("OverwriteKeywords").GetElementsText("Keyword").ToList();
             }
-            catch
+            catch (Exception e)
             {
-                return Settings.Default;
+                throw new XmlException("Unable to load the Settings.", e);
             }
         }
 
@@ -162,13 +169,19 @@ namespace TVSorter.Storage
         /// <returns>
         /// The list of TV shows. 
         /// </returns>
-        public List<TvShow> LoadTvShows()
+        public IEnumerable<TvShow> LoadTvShows()
         {
             try
             {
                 XDocument doc = XDocument.Load(XmlFile);
 
-                return doc.Descendants("Show").Select(CreateTvShow).OrderBy(x => x.Name).ToList();
+                return doc.Descendants("Show").Select(
+                    x =>
+                        {
+                            var show = new TvShow();
+                            LoadTvShow(x, show);
+                            return show;
+                        }).OrderBy(x => x.Name);
             }
             catch
             {
@@ -196,105 +209,28 @@ namespace TVSorter.Storage
             if (showElement != null)
             {
                 showElement.Remove();
-                this.OnShowRemoved(show);
             }
 
             doc.Save(XmlFile);
         }
 
         /// <summary>
-        /// Saves the specified collection of episodes for the specified show. Updates them if they already exist or adds if they do not.
+        /// Saves the specified episode.
         /// </summary>
-        /// <param name="show">
-        /// The show the episodes are for. 
+        /// <param name="episode">
+        /// The episode to save.
         /// </param>
-        /// <param name="episodes">
-        /// The collection of episodes to save. 
-        /// </param>
-        /// <param name="retainFileCount">
-        /// A value indicating whether the file count in the XML should be retained. 
-        /// </param>
-        public void SaveEpisodes(TvShow show, IEnumerable<Episode> episodes, bool retainFileCount)
+        public void SaveEpisode(Episode episode)
         {
-            if (show == null)
+            if (episode == null)
             {
-                throw new ArgumentNullException("show");
-            }
-
-            if (episodes == null)
-            {
-                throw new ArgumentNullException("episodes");
+                throw new ArgumentNullException("episode", "Episode cannot be null.");
             }
 
             XDocument doc = XDocument.Load(XmlFile);
 
-            if (doc.Root == null)
-            {
-                throw new Exception("XML file is invalid");
-            }
-
-            // Ensure that Shows exists in the file
-            XElement showsElement = doc.Root.Element("Shows");
-            if (showsElement == null)
-            {
-                throw new Exception("XML file is invalid");
-            }
-
-            // Find the specified show
-            XElement showElement = showsElement.Descendants("Show").Where(
-                x =>
-                    {
-                        XAttribute tvdbid = x.Attribute("tvdbid");
-                        return tvdbid != null && tvdbid.Value.Equals(show.TvdbId);
-                    }).FirstOrDefault();
-            if (showElement == null)
-            {
-                throw new Exception("Show cannot be found.");
-            }
-
-            // Ensure that the Episodes element exists and add it if it doesn't
-            XElement episodesElement = showElement.Element("Episodes");
-            if (episodesElement == null)
-            {
-                episodesElement = new XElement("Episodes");
-                showElement.Add(episodesElement);
-            }
-
-            // Loop through each episode
-            foreach (Episode episode in episodes.Where(x => x != null))
-            {
-                // Create the XML element
-                XElement episodeElement = CreateElement(episode);
-
-                // Check to see if this episode already exists.
-                XElement existingElement = episodesElement.Descendants("Episode").Where(
-                    x =>
-                        {
-                            XAttribute tvdbid = x.Attribute("tvdbid");
-                            return tvdbid != null && tvdbid.Value.Equals(episode.TvdbId);
-                        }).FirstOrDefault();
-
-                // Replace the elment if it exists and add it if it does.
-                if (existingElement != null)
-                {
-                    if (retainFileCount)
-                    {
-                        XAttribute newCount = episodeElement.Attribute("filecount");
-                        XAttribute existingCount = existingElement.Attribute("filecount");
-                        if (newCount != null && existingCount != null)
-                        {
-                            newCount.Value = existingCount.Value;
-                        }
-                    }
-
-                    existingElement.ReplaceWith(episodeElement);
-                }
-                else
-                {
-                    episodesElement.Add(episodeElement);
-                }
-            }
-
+            XElement episodes = GetEpisodesElement(episode.Show, doc);
+            SaveEpisode(false, episode, episodes);
             doc.Save(XmlFile);
         }
 
@@ -308,23 +244,28 @@ namespace TVSorter.Storage
         {
             XDocument doc = XDocument.Load(XmlFile);
 
-            XElement newSettingsElement = CreateElement(settings);
-
-            if (doc.Root != null)
-            {
-                XElement settingsElement = doc.Root.Element("Settings");
-                if (settingsElement != null)
-                {
-                    settingsElement.ReplaceWith(newSettingsElement);
-                }
-                else
-                {
-                    doc.Root.AddFirst(newSettingsElement);
-                }
-            }
+            doc.Root.Element("Settings").ReplaceWith(
+                new XElement(
+                    "Settings", 
+                    new XElement(
+                        "DestinationDirectories", 
+                        settings.DestinationDirectories.Select(
+                            dir =>
+                            new XElement(
+                                "Destination", new XAttribute("selected", dir == settings.DestinationDirectory), dir))), 
+                    new XElement(
+                        "FileExtensions", settings.FileExtensions.Select(ext => new XElement("Extension", ext))), 
+                    new XElement(
+                        "RegularExpressions", settings.RegularExpressions.Select(exp => new XElement("RegEx", exp))), 
+                    new XElement(
+                        "OverwriteKeywords", settings.OverwriteKeywords.Select(key => new XElement("Keyword", key))), 
+                    new XElement("SourceDirectory", settings.SourceDirectory), 
+                    new XElement("DefaultFormat", settings.DefaultOutputFormat), 
+                    new XElement("RecurseSubdirectories", settings.RecurseSubdirectories), 
+                    new XElement("DeleteEmptySubdirectories", settings.DeleteEmptySubdirectories), 
+                    new XElement("RenameIfExists", settings.RenameIfExists)));
 
             doc.Save(XmlFile);
-            this.OnSettingsChanged();
         }
 
         /// <summary>
@@ -336,9 +277,10 @@ namespace TVSorter.Storage
         public void SaveShow(TvShow show)
         {
             XDocument doc = XDocument.Load(XmlFile);
+
             if (doc.Root == null)
             {
-                throw new Exception("XML file is invalid.");
+                throw new Exception("XML file in invalid");
             }
 
             XElement shows = doc.Root.Element("Shows");
@@ -360,12 +302,8 @@ namespace TVSorter.Storage
         public void SaveShow(IEnumerable<TvShow> shows)
         {
             XDocument doc = XDocument.Load(XmlFile);
-            if (doc.Root == null)
-            {
-                throw new Exception("XML file is invalid.");
-            }
 
-            XElement showsElement = doc.Root.Element("Shows");
+            XElement showsElement = doc.Root;
             if (showsElement == null)
             {
                 throw new Exception("XML file is invalid");
@@ -395,10 +333,14 @@ namespace TVSorter.Storage
 
             foreach (XElement show in shows)
             {
+                // Group the show's episodes by season number.
                 IEnumerable<IGrouping<int, XElement>> seasons =
-                    show.Descendants("Episode").GroupBy(x => int.Parse(GetAttribute(x, "seasonnum", "-1")));
+                    show.Descendants("Episode").GroupBy(x => int.Parse(x.GetAttribute("seasonnum", "-1")));
 
-                results.Add(CreateTvShow(show), seasons.ToDictionary(x => x.Key, x => x.Count()));
+                var tvShow = new TvShow();
+                LoadTvShow(show, tvShow);
+
+                results.Add(tvShow, seasons.ToDictionary(x => x.Key, x => x.Count()));
             }
 
             return results;
@@ -416,7 +358,7 @@ namespace TVSorter.Storage
 
             XElement episodeElement =
                 doc.Descendants("Episode").FirstOrDefault(
-                    element => GetAttribute(element, "tvdbid", string.Empty).Equals(episode.TvdbId));
+                    element => element.GetAttribute("tvdbid", string.Empty).Equals(episode.TvdbId));
 
             if (episodeElement == null)
             {
@@ -433,52 +375,6 @@ namespace TVSorter.Storage
         #endregion
 
         #region Methods
-
-        /// <summary>
-        /// Creates an XElement from the specified settings.
-        /// </summary>
-        /// <param name="settings">
-        /// The settings to convert. 
-        /// </param>
-        /// <returns>
-        /// The XElement of the settings. 
-        /// </returns>
-        private static XElement CreateElement(Settings settings)
-        {
-            var settingsNode = new XElement("Settings");
-            var sourceDirectory = new XAttribute("sourcedirectory", settings.SourceDirectory);
-            var defaultFormat = new XAttribute("defaultformat", settings.DefaultOutputFormat);
-            var recurseSubdirectories = new XAttribute("recursesubdirectories", settings.RecurseSubdirectories);
-            var deleteEmptySubdirectories = new XAttribute(
-                "deleteemptysubdirectories", settings.DeleteEmptySubdirectories);
-            var renameIfExists = new XAttribute("renameifexists", settings.RenameIfExists);
-
-            IEnumerable<XElement> directories =
-                settings.DestinationDirectories.Select(
-                    dir =>
-                    new XElement("Destination", new XAttribute("selected", dir == settings.DestinationDirectory), dir));
-
-            var destinationDirectory = new XElement("DestinationDirectories", directories);
-            var fileExtensions = new XElement(
-                "FileExtensions", from ext in settings.FileExtensions select new XElement("Extension", ext));
-            var regularExpress = new XElement(
-                "RegularExpression", 
-                from regularExpression in settings.RegularExpressions select new XElement("RegEx", regularExpression));
-            var overwriteKeywords = new XElement(
-                "OverwriteKeywords", from keyword in settings.OverwriteKeywords select new XElement("Keyword", keyword));
-
-            settingsNode.Add(
-                sourceDirectory, 
-                defaultFormat, 
-                recurseSubdirectories, 
-                deleteEmptySubdirectories, 
-                renameIfExists, 
-                destinationDirectory, 
-                fileExtensions, 
-                regularExpress, 
-                overwriteKeywords);
-            return settingsNode;
-        }
 
         /// <summary>
         /// Converts the specified episode into an XElement.
@@ -557,124 +453,142 @@ namespace TVSorter.Storage
 
             return new Episode
                 {
-                    Name = GetAttribute(episode, "name", string.Empty), 
-                    TvdbId = GetAttribute(episode, "tvdbid", string.Empty), 
-                    SeasonNumber = int.Parse(GetAttribute(episode, "seasonnum", "-1")), 
-                    EpisodeNumber = int.Parse(GetAttribute(episode, "episodenum", "-1")), 
-                    FirstAir = DateTime.Parse(GetAttribute(episode, "firstair", "1970-01-01 00:00:00")), 
-                    FileCount = int.Parse(GetAttribute(episode, "filecount", "0")), 
-                    Show = episode.Parent == null ? null : CreateTvShow(episode.Parent.Parent), 
+                    Name = episode.GetAttribute("name", string.Empty), 
+                    TvdbId = episode.GetAttribute("tvdbid", string.Empty), 
+                    SeasonNumber = int.Parse(episode.GetAttribute("seasonnum", "-1")), 
+                    EpisodeNumber = int.Parse(episode.GetAttribute("episodenum", "-1")), 
+                    FirstAir = DateTime.Parse(episode.GetAttribute("firstair", "1970-01-01 00:00:00")), 
+                    FileCount = int.Parse(episode.GetAttribute("filecount", "0")), 
                 };
         }
 
         /// <summary>
-        /// Converts the XElement into a Settings object.
+        /// Gets the episodes element from the specified document.
         /// </summary>
-        /// <param name="settingsNode">
-        /// The settings node. 
+        /// <param name="show">
+        /// The show to get the episodes for.
+        /// </param>
+        /// <param name="doc">
+        /// The doc to get the episodes from.
         /// </param>
         /// <returns>
-        /// The settings object. 
+        /// The Episodes element.
         /// </returns>
-        private static Settings CreateSettings(XElement settingsNode)
+        private static XElement GetEpisodesElement(TvShow show, XDocument doc)
         {
-            if (settingsNode == null)
+            if (doc.Root == null)
             {
-                return null;
+                throw new Exception("XML file is invalid");
             }
 
-            var settings = new Settings
-                {
-                    SourceDirectory = GetAttribute(settingsNode, "sourcedirectory", string.Empty), 
-                    DefaultOutputFormat = GetAttribute(settingsNode, "defaultformat", string.Empty), 
-                    RecurseSubdirectories = bool.Parse(GetAttribute(settingsNode, "recursesubdirectories", "false")), 
-                    DeleteEmptySubdirectories =
-                        bool.Parse(GetAttribute(settingsNode, "deleteemptysubdirectories", "false")), 
-                    RenameIfExists = bool.Parse(GetAttribute(settingsNode, "renameifexists", "false")), 
-                    DestinationDirectories = new List<string>(), 
-                    DestinationDirectory = string.Empty
-                };
-
-            XElement destinationDirectories = settingsNode.Element("DestinationDirectories");
-
-            if (destinationDirectories != null)
+            // Ensure that Shows exists in the file
+            XElement showsElement = doc.Root.Element("Shows");
+            if (showsElement == null)
             {
-                foreach (XElement dir in destinationDirectories.Descendants("Destination"))
-                {
-                    settings.DestinationDirectories.Add(dir.Value);
-                    XAttribute attribute = dir.Attribute("selected");
-                    if (attribute != null && bool.Parse(attribute.Value))
+                throw new Exception("XML file is invalid");
+            }
+
+            // Find the specified show
+            XElement showElement = showsElement.Descendants("Show").Where(
+                x =>
                     {
-                        settings.DestinationDirectory = dir.Value;
-                    }
-                }
+                        XAttribute tvdbid = x.Attribute("tvdbid");
+                        return tvdbid != null && tvdbid.Value.Equals(show.TvdbId);
+                    }).FirstOrDefault();
+            if (showElement == null)
+            {
+                throw new Exception("Show cannot be found.");
             }
 
-            settings.FileExtensions =
-                (from extension in settingsNode.Descendants("Extension") select extension.Value).ToList();
+            // Ensure that the Episodes element exists and add it if it doesn't
+            XElement episodesElement = showElement.Element("Episodes");
+            if (episodesElement == null)
+            {
+                episodesElement = new XElement("Episodes");
+                showElement.Add(episodesElement);
+            }
 
-            settings.RegularExpressions = (from regex in settingsNode.Descendants("RegEx") select regex.Value).ToList();
-
-            settings.OverwriteKeywords =
-                (from keyword in settingsNode.Descendants("Keyword") select keyword.Value).ToList();
-            return settings;
+            return episodesElement;
         }
 
         /// <summary>
         /// Creates a TV show object from the specified XElement.
         /// </summary>
-        /// <param name="show">
-        /// The show element. 
-        /// </param>
-        /// <returns>
-        /// The TvShow object. 
-        /// </returns>
-        private static TvShow CreateTvShow(XElement show)
-        {
-            if (show == null)
-            {
-                return null;
-            }
-
-            return new TvShow
-                {
-                    Name = GetAttribute(show, "name", string.Empty), 
-                    FolderName = GetAttribute(show, "foldername", string.Empty), 
-                    TvdbId = GetAttribute(show, "tvdbid", string.Empty), 
-                    Banner = GetAttribute(show, "banner", string.Empty), 
-                    CustomFormat = GetAttribute(show, "customformat", string.Empty), 
-                    UseCustomFormat = bool.Parse(GetAttribute(show, "usecustomformat", "false")), 
-                    UseDvdOrder = bool.Parse(GetAttribute(show, "usedvdorder", "false")), 
-                    Locked = bool.Parse(GetAttribute(show, "locked", "false")), 
-                    LastUpdated = DateTime.Parse(GetAttribute(show, "lastupdated", "1970-01-01 00:00:00")), 
-                    AlternateNames = show.Descendants("AlternateName").Select(altName => altName.Value).ToList()
-                };
-        }
-
-        /// <summary>
-        /// Gets the value of the specified attribute from the specified element.
-        /// </summary>
         /// <param name="element">
-        /// The element to read the attribute from. 
+        /// The element to load from.
         /// </param>
-        /// <param name="name">
-        /// The name of the attribute. 
+        /// <param name="show">
+        /// The show to load into.
         /// </param>
-        /// <param name="defaultValue">
-        /// The value to return if the attribute doesn't exist. 
-        /// </param>
-        /// <returns>
-        /// The value of the specified attribute or default value if it does not exist. 
-        /// </returns>
-        private static string GetAttribute(XElement element, string name, string defaultValue)
+        private static void LoadTvShow(XElement element, TvShow show)
         {
             if (element == null)
             {
-                throw new ArgumentNullException("element");
+                throw new ArgumentNullException("element", "Element cannot be null");
             }
 
-            XAttribute attribute = element.Attribute(name);
-            return attribute != null ? attribute.Value : defaultValue;
+            if (show == null)
+            {
+                throw new ArgumentNullException("show", "Show cannot be null");
+            }
+
+            show.Name = element.GetAttribute("name", string.Empty);
+            show.FolderName = element.GetAttribute("foldername", string.Empty);
+            show.TvdbId = element.GetAttribute("tvdbid", string.Empty);
+            show.Banner = element.GetAttribute("banner", string.Empty);
+            show.CustomFormat = element.GetAttribute("customformat", string.Empty);
+            show.UseCustomFormat = bool.Parse(element.GetAttribute("usecustomformat", "false"));
+            show.UseDvdOrder = bool.Parse(element.GetAttribute("usedvdorder", "false"));
+            show.Locked = bool.Parse(element.GetAttribute("locked", "false"));
+            show.LastUpdated = DateTime.Parse(element.GetAttribute("lastupdated", "1970-01-01 00:00:00"));
+            show.AlternateNames = element.Descendants("AlternateName").Select(altName => altName.Value).ToList();
+            show.Episodes = element.Descendants("Episode").Select(CreateEpisode);
+        }
+
+        /// <summary>
+        /// Saves the specified episode into the specified element.
+        /// </summary>
+        /// <param name="retainFileCount">
+        /// A value indicating whether the file count should be retained.
+        /// </param>
+        /// <param name="episode">
+        /// The episode to save.
+        /// </param>
+        /// <param name="episodesElement">
+        /// The parent element to save the episode to.
+        /// </param>
+        private static void SaveEpisode(bool retainFileCount, Episode episode, XElement episodesElement)
+        {
+            // Create the XML element
+            XElement episodeElement = CreateElement(episode);
+
+            // Check to see if this episode already exists.
+            XElement existingElement = episodesElement.Descendants("Episode").Where(
+                x =>
+                    {
+                        XAttribute tvdbid = x.Attribute("tvdbid");
+                        return tvdbid != null && tvdbid.Value.Equals(episode.TvdbId);
+                    }).FirstOrDefault();
+
+            // Replace the elment if it exists and add it if it does.
+            if (existingElement != null)
+            {
+                if (retainFileCount)
+                {
+                    XAttribute newCount = episodeElement.Attribute("filecount");
+                    XAttribute existingCount = existingElement.Attribute("filecount");
+                    if (newCount != null && existingCount != null)
+                    {
+                        newCount.Value = existingCount.Value;
+                    }
+                }
+
+                existingElement.ReplaceWith(episodeElement);
+            }
+            else
+            {
+                episodesElement.Add(episodeElement);
+            }
         }
 
         /// <summary>
@@ -691,11 +605,43 @@ namespace TVSorter.Storage
             XDocument doc = XDocument.Load(XmlFile);
 
             return from element in doc.Descendants("Episode")
-                   where fileCountSelector(int.Parse(GetAttribute(element, "filecount", "0")))
+                   where fileCountSelector(int.Parse(element.GetAttribute("filecount", "0")))
                    let episodesElement = element.Parent
                    where episodesElement != null
-                   let show = CreateTvShow(episodesElement.Parent)
                    select CreateEpisode(element);
+        }
+
+        /// <summary>
+        /// Gets all the possible show names from the specified show element.
+        /// </summary>
+        /// <param name="show">
+        /// The show element to search.
+        /// </param>
+        /// <returns>
+        /// The possible names for the show.
+        /// </returns>
+        private IEnumerable<string> GetShowsNames(XElement show)
+        {
+            // Return the show's name and file safe name.
+            yield return show.GetAttribute("name");
+            yield return TvShow.GetFileSafeName(show.GetAttribute("name"));
+
+            // Return the show's folder name and file safe name.
+            yield return show.GetAttribute("foldername");
+            yield return TvShow.GetFileSafeName(show.GetAttribute("foldername"));
+
+            // If the show has alternate names, return them and file safe names.
+            XElement alternateNames = show.Element("AlternateNames");
+            if (alternateNames == null)
+            {
+                yield break;
+            }
+
+            foreach (XElement alternateName in alternateNames.Elements("AlternateName"))
+            {
+                yield return alternateName.Value;
+                yield return TvShow.GetFileSafeName(alternateName.Value);
+            }
         }
 
         /// <summary>
@@ -708,78 +654,51 @@ namespace TVSorter.Storage
                 // Check that the file exists
                 if (!File.Exists(XmlFile))
                 {
-                    Settings settings = Settings.Default;
-
                     // Create the file and populate with default settings.
                     var doc = new XDocument(new XDeclaration("1.0", "utf-8", "yes"));
 
-                    var root = new XElement("TVSorter");
-                    XElement settingsNode = CreateElement(settings);
-
-                    var showsNode = new XElement("Shows");
-
-                    root.Add(settingsNode, showsNode);
+                    var root = new XElement("Shows");
 
                     doc.Add(root);
                     doc.Save(XmlFile);
                 }
+
+                ValidateXml.Validate(XmlFile);
             }
             catch (Exception e)
             {
-                this.OnLogMessage("Unable to open XML file. {0}", e.Message);
+                throw new IOException("Unable to load XML file.", e);
             }
         }
 
         /// <summary>
-        /// Raises a settings changed event.
-        /// </summary>
-        private void OnSettingsChanged()
-        {
-            if (this.SettingsChanged != null)
-            {
-                this.SettingsChanged(this, EventArgs.Empty);
-            }
-        }
-
-        /// <summary>
-        /// Raises an on show added event.
+        /// Saves the specified collection of episodes for the specified show. Updates them if they already exist or adds if they do not.
         /// </summary>
         /// <param name="show">
-        /// The show that has been added. 
+        /// The show to save the episode of. 
         /// </param>
-        private void OnShowAdded(TvShow show)
+        /// <param name="showNode">
+        /// The node to save into. 
+        /// </param>
+        /// <param name="retainFileCount">
+        /// A value indicating whether the file count in the XML should be retained. 
+        /// </param>
+        private void SaveEpisodes(TvShow show, XElement showNode, bool retainFileCount)
         {
-            if (this.ShowAdded != null)
+            if (show == null)
             {
-                this.ShowAdded(this, new ShowEventArgs(show));
+                throw new ArgumentNullException("show");
             }
-        }
 
-        /// <summary>
-        /// Raises an on show removed event.
-        /// </summary>
-        /// <param name="show">
-        /// The show that has been removed. 
-        /// </param>
-        private void OnShowRemoved(TvShow show)
-        {
-            if (this.ShowRemoved != null)
-            {
-                this.ShowRemoved(this, new ShowEventArgs(show));
-            }
-        }
+            XElement episodesElement = showNode.Element("Episodes");
 
-        /// <summary>
-        /// Raises an on show updated event.
-        /// </summary>
-        /// <param name="show">
-        /// The show that has been updated. 
-        /// </param>
-        private void OnShowUpdated(TvShow show)
-        {
-            if (this.ShowUpdated != null)
+            if (show.Episodes != null)
             {
-                this.ShowUpdated(this, new ShowEventArgs(show));
+                // Loop through each episode
+                foreach (Episode episode in show.Episodes.Where(x => x != null))
+                {
+                    SaveEpisode(retainFileCount, episode, episodesElement);
+                }
             }
         }
 
@@ -811,13 +730,13 @@ namespace TVSorter.Storage
                 }
 
                 showNode.ReplaceWith(element);
-                this.OnShowUpdated(show);
             }
             else
             {
                 shows.Add(element);
-                this.OnShowAdded(show);
             }
+
+            this.SaveEpisodes(show, element, true);
         }
 
         #endregion

@@ -40,34 +40,39 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DALBase.cs" />
-    <Compile Include="Data\BannerDownloadRequiredEventArgs.cs" />
-    <Compile Include="Data\IDataProvider.cs" />
-    <Compile Include="Data\Tvdb\Tvdb.cs" />
-    <Compile Include="Data\Tvdb\TvdbDownload.cs" />
-    <Compile Include="Data\Tvdb\TvdbProcess.cs" />
-    <Compile Include="Data\UpdateShowsCompletedEventArgs.cs" />
-    <Compile Include="Factory.cs" />
-    <Compile Include="Files\FileManager.cs" />
-    <Compile Include="Files\FileOperationEventArgs.cs" />
-    <Compile Include="Files\IFileManager.cs" />
-    <Compile Include="Scanning\IScanManager.cs" />
-    <Compile Include="Storage\IStorageProvider.cs" />
+    <Compile Include="Data\BannerDownloadRequiredEventArgs.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\Tvdb\Tvdb.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\Tvdb\TvdbDownload.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\Tvdb\TvdbProcess.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Files\FileManager.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Logger.cs" />
     <Compile Include="LogMessageEventArgs.cs" />
-    <Compile Include="LogMessageEventHandler.cs" />
-    <Compile Include="ProgressChangedEventArgs.cs" />
-    <Compile Include="Scanning\RefreshCompleteEventArgs.cs" />
-    <Compile Include="Scanning\RefreshFileCountsCompleteEventArgs.cs" />
-    <Compile Include="Scanning\ScanManager.cs" />
-    <Compile Include="Storage\ShowEventArgs.cs" />
-    <Compile Include="Storage\ShowUpdatedEventArgs.cs" />
-    <Compile Include="Storage\Xml.cs" />
+    <Compile Include="Files\ScanManager.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Types\Episode.cs" />
-    <Compile Include="Types\FileResult.cs" />
-    <Compile Include="Types\Settings.cs" />
-    <Compile Include="Types\TvShow.cs" />
+    <Compile Include="Storage\Xml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Storage\ValidateXml.cs" />
+    <Compile Include="Storage\XElementExtensions.cs" />
+    <Compile Include="Episode.cs" />
+    <Compile Include="FileResult.cs" />
+    <Compile Include="FileSearch.cs" />
+    <Compile Include="Settings.cs" />
+    <Compile Include="TvShow.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

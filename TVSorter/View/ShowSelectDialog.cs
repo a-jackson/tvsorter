@@ -6,7 +6,6 @@
 //   Dialog for selecting a show.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace TVSorter.View
 {
     #region Using Directives
@@ -14,8 +13,6 @@ namespace TVSorter.View
     using System;
     using System.Collections.Generic;
     using System.Windows.Forms;
-
-    using TVSorter.Types;
 
     #endregion
 

@@ -6,7 +6,6 @@
 //   A dialog that shows a list of strings and allows adding and removing.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace TVSorter.View
 {
     #region Using Directives

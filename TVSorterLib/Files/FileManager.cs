@@ -6,38 +6,27 @@
 //   The file manager.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace TVSorter.Files
 {
     #region Using Directives
 
-    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Threading.Tasks;
-
-    using TVSorter.Storage;
-    using TVSorter.Types;
 
     #endregion
 
     /// <summary>
     /// The file manager.
     /// </summary>
-    internal class FileManager : DalBase, IFileManager
+    internal class FileManager
     {
         #region Fields
 
         /// <summary>
-        ///   The storage.
-        /// </summary>
-        private readonly IStorageProvider storage;
-
-        /// <summary>
         ///   The settings.
         /// </summary>
-        private Settings settings;
+        private readonly Settings settings;
 
         #endregion
 
@@ -49,29 +38,8 @@ namespace TVSorter.Files
         /// </summary>
         public FileManager()
         {
-            this.storage = Factory.StorageProvider;
-            this.storage.SettingsChanged += (sender, args) => this.settings = this.storage.LoadSettings();
-            this.settings = this.storage.LoadSettings();
+            this.settings = new Settings();
         }
-
-        #endregion
-
-        #region Public Events
-
-        /// <summary>
-        ///   Occurs when a copy file operation completes.
-        /// </summary>
-        public event EventHandler<FileOperationEventArgs> CopyFileComplete;
-
-        /// <summary>
-        ///   Occurs when a move file operation completes.
-        /// </summary>
-        public event EventHandler<FileOperationEventArgs> MoveFileComplete;
-
-        /// <summary>
-        ///   Occurs when progress changing on a running operation.
-        /// </summary>
-        public event EventHandler<ProgressChangedEventArgs> ProgressChanged;
 
         #endregion
 
@@ -105,33 +73,7 @@ namespace TVSorter.Files
         /// </param>
         public void CopyFile(List<FileResult> files)
         {
-            this.ProcessFiles(files, SortType.Copy, null);
-        }
-
-        /// <summary>
-        /// Performs a copy file operation on the specified files asynchronously.
-        /// </summary>
-        /// <param name="files">
-        /// The files to copy. 
-        /// </param>
-        /// <param name="userState">
-        /// The user's state object. 
-        /// </param>
-        public void CopyFileAsync(List<FileResult> files, object userState)
-        {
-            Task.Factory.StartNew(
-                () =>
-                    {
-                        try
-                        {
-                            this.ProcessFiles(files, SortType.Copy, userState);
-                            this.OnCopyFileComplete(userState);
-                        }
-                        catch (Exception e)
-                        {
-                            this.OnCopyFileComplete(e, userState);
-                        }
-                    });
+            this.ProcessFiles(files, SortType.Copy);
         }
 
         /// <summary>
@@ -142,120 +84,12 @@ namespace TVSorter.Files
         /// </param>
         public void MoveFile(List<FileResult> files)
         {
-            this.ProcessFiles(files, SortType.Move, null);
-        }
-
-        /// <summary>
-        /// Performs a move file operation on the specfied files asynchronously.
-        /// </summary>
-        /// <param name="files">
-        /// The files to move. 
-        /// </param>
-        /// <param name="userState">
-        /// The user's state object. 
-        /// </param>
-        public void MoveFileAsync(List<FileResult> files, object userState)
-        {
-            Task.Factory.StartNew(
-                () =>
-                    {
-                        try
-                        {
-                            this.ProcessFiles(files, SortType.Move, userState);
-                            this.OnMoveFileComplete(userState);
-                        }
-                        catch (Exception e)
-                        {
-                            this.OnMoveFileComplete(e, userState);
-                        }
-                    });
+            this.ProcessFiles(files, SortType.Move);
         }
 
         #endregion
 
         #region Methods
-
-        /// <summary>
-        /// Raises a copy file complete event.
-        /// </summary>
-        /// <param name="userState">
-        /// The user's state object. 
-        /// </param>
-        private void OnCopyFileComplete(object userState)
-        {
-            if (this.CopyFileComplete != null)
-            {
-                this.CopyFileComplete(this, new FileOperationEventArgs(userState));
-            }
-        }
-
-        /// <summary>
-        /// Raises a copy file complete event with an error.
-        /// </summary>
-        /// <param name="e">
-        /// The error. 
-        /// </param>
-        /// <param name="userState">
-        /// The user's state object. 
-        /// </param>
-        private void OnCopyFileComplete(Exception e, object userState)
-        {
-            if (this.CopyFileComplete != null)
-            {
-                this.CopyFileComplete(this, new FileOperationEventArgs(e, userState));
-            }
-        }
-
-        /// <summary>
-        /// Raises a move file complete event.
-        /// </summary>
-        /// <param name="userState">
-        /// The user's state object 
-        /// </param>
-        private void OnMoveFileComplete(object userState)
-        {
-            if (this.MoveFileComplete != null)
-            {
-                this.MoveFileComplete(this, new FileOperationEventArgs(userState));
-            }
-        }
-
-        /// <summary>
-        /// Raises a move file complete event with an error.
-        /// </summary>
-        /// <param name="e">
-        /// The error. 
-        /// </param>
-        /// <param name="userState">
-        /// The user's state object. 
-        /// </param>
-        private void OnMoveFileComplete(Exception e, object userState)
-        {
-            if (this.MoveFileComplete != null)
-            {
-                this.MoveFileComplete(this, new FileOperationEventArgs(e, userState));
-            }
-        }
-
-        /// <summary>
-        /// Raises a progress changed event.
-        /// </summary>
-        /// <param name="max">
-        /// The maximum value of the progress. 
-        /// </param>
-        /// <param name="value">
-        /// The current value of the progress. 
-        /// </param>
-        /// <param name="userState">
-        /// The user's state object. 
-        /// </param>
-        private void OnProgressChanaged(int max, int value, object userState)
-        {
-            if (this.ProgressChanged != null)
-            {
-                this.ProgressChanged(this, new ProgressChangedEventArgs(max, value, userState));
-            }
-        }
 
         /// <summary>
         /// Processes the specified list of files.
@@ -266,19 +100,13 @@ namespace TVSorter.Files
         /// <param name="type">
         /// The operation to perform on the files. 
         /// </param>
-        /// <param name="userState">
-        /// The user's state object. 
-        /// </param>
-        private void ProcessFiles(List<FileResult> files, SortType type, object userState)
+        private void ProcessFiles(List<FileResult> files, SortType type)
         {
-            int value = 0;
-            int max = files.Count;
             foreach (FileResult file in files)
             {
                 FileResult file1 = file;
                 if (file1.Incomplete)
                 {
-                    this.OnLogMessage("Skipped {0}. - Not enough information.", file1.InputFile.Name);
                     continue;
                 }
 
@@ -319,7 +147,6 @@ namespace TVSorter.Files
 
                 if (!continueFile)
                 {
-                    this.OnLogMessage("Skiped {0} - Already exists.", file1.InputFile.Name);
                     continue;
                 }
 
@@ -342,28 +169,14 @@ namespace TVSorter.Files
                             }
                         }
 
-                        this.OnLogMessage("Moved {0} to {1}", file1.InputFile.Name, destinationInfo.Name);
                         break;
                     case SortType.Copy:
-                        this.OnLogMessage("Copying {0} to {1}", file1.InputFile.Name, destinationInfo.Name);
-                        try
-                        {
-                            File.Copy(file1.InputFile.FullName, destination);
-                        }
-                        catch
-                        {
-                            this.OnLogMessage("Failed to copy {0}", file1.InputFile.Name);
-                        }
-
-                        this.OnLogMessage("Copied {0} to {1}", file1.InputFile.Name, destinationInfo.Name);
+                        File.Copy(file1.InputFile.FullName, destination);
                         break;
                 }
 
                 file.Episode.FileCount++;
-                this.storage.UpdateEpisode(file.Episode);
-
-                value++;
-                this.OnProgressChanaged(max, value, userState);
+                file.Episode.Save();
             }
         }
 

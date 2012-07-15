@@ -6,7 +6,6 @@
 //   The settings tab.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace TVSorter.View
 {
     #region Using Directives

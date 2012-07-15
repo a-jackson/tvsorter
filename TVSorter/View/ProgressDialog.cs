@@ -2,11 +2,7 @@
 // <copyright company="TVSorter" file="ProgressDialog.cs">
 //   2012 - Andrew Jackson
 // </copyright>
-// <summary>
-//   The dialog showing the progress bar.
-// </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace TVSorter.View
 {
     #region Using Directives
@@ -44,8 +40,8 @@ namespace TVSorter.View
         {
             this.InitializeComponent();
             this.progressTask = task;
-            this.progressTask.ProgressChanged += this.OnProgressTaskOnProgressChanged;
             this.progressTask.TaskComplete += this.OnProgressTaskOnTaskComplete;
+            Logger.LogMessage += this.OnLogMessage;
         }
 
         #endregion
@@ -53,23 +49,17 @@ namespace TVSorter.View
         #region Methods
 
         /// <summary>
-        /// Handles the task progress changing.
+        /// Handles the receipt of a log message.
         /// </summary>
         /// <param name="sender">
-        /// The sender of the event. 
+        /// The sender of the event.
         /// </param>
         /// <param name="e">
-        /// The arguments of the event. 
+        /// The arguments of the event.
         /// </param>
-        private void OnProgressTaskOnProgressChanged(object sender, EventArgs e)
+        private void OnLogMessage(object sender, LogMessageEventArgs e)
         {
-            this.Invoke(
-                new Action(
-                    () =>
-                        {
-                            this.taskProgress.Maximum = this.progressTask.MaxValue;
-                            this.taskProgress.Value = this.progressTask.Value;
-                        }));
+            this.Invoke(new Action(() => this.log.Items.Add(e.ToString())));
         }
 
         /// <summary>
@@ -83,24 +73,9 @@ namespace TVSorter.View
         /// </param>
         private void OnProgressTaskOnTaskComplete(object sender, EventArgs e)
         {
-            this.progressTask.ProgressChanged -= this.OnProgressTaskOnProgressChanged;
             this.progressTask.TaskComplete -= this.OnProgressTaskOnTaskComplete;
+            Logger.LogMessage -= this.OnLogMessage;
             this.Invoke(new Action(this.Close));
-        }
-
-        /// <summary>
-        /// Handles the Progress dialog loading.
-        /// </summary>
-        /// <param name="sender">
-        /// The sender of the event. 
-        /// </param>
-        /// <param name="e">
-        /// The arguments of the event. 
-        /// </param>
-        private void ProgressDialogLoad(object sender, EventArgs e)
-        {
-            this.taskProgress.Maximum = this.progressTask.MaxValue;
-            this.taskProgress.Value = 0;
         }
 
         #endregion

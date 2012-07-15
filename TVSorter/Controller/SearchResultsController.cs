@@ -6,7 +6,6 @@
 //   The controller for displaying search results.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace TVSorter.Controller
 {
     #region Using Directives
@@ -14,7 +13,6 @@ namespace TVSorter.Controller
     using System.Collections.Generic;
     using System.ComponentModel;
 
-    using TVSorter.Types;
     using TVSorter.View;
 
     #endregion

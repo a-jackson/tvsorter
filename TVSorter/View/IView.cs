@@ -6,7 +6,6 @@
 //   The public interface of a view.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace TVSorter.View
 {
     #region Using Directives

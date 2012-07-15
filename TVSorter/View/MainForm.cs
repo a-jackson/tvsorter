@@ -6,7 +6,6 @@
 //   The main form of the program.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace TVSorter.View
 {
     #region Using Directives

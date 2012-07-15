@@ -6,7 +6,6 @@
 //   Downloads the XML files from the TVDB.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace TVSorter.Data.Tvdb
 {
     #region Using Directives
@@ -17,8 +16,6 @@ namespace TVSorter.Data.Tvdb
     using System.Net;
     using System.Threading.Tasks;
     using System.Xml.Linq;
-
-    using TVSorter.Types;
 
     #endregion
 
@@ -166,7 +163,7 @@ namespace TVSorter.Data.Tvdb
                     webClient.DownloadFile(showAddress, savePath);
                     return savePath;
                 }
-                catch (WebException e)
+                catch (WebException)
                 {
                     // Suppress any exceptions so the download can be retried.
                 }

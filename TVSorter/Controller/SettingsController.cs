@@ -6,15 +6,13 @@
 //   The controller for the settings tab.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace TVSorter.Controller
 {
     #region Using Directives
 
-    using TVSorter.Storage;
     using TVSorter.View;
 
-    using Settings = TVSorter.Types.Settings;
+    using Settings = TVSorter.Settings;
 
     #endregion
 
@@ -24,11 +22,6 @@ namespace TVSorter.Controller
     public class SettingsController : ControllerBase
     {
         #region Fields
-
-        /// <summary>
-        ///   The storage provider.
-        /// </summary>
-        private IStorageProvider provider;
 
         /// <summary>
         ///   The current settings.
@@ -68,7 +61,6 @@ namespace TVSorter.Controller
         /// </param>
         public override void Initialise(IView view)
         {
-            this.provider = Factory.StorageProvider;
             this.Revert();
         }
 
@@ -77,7 +69,7 @@ namespace TVSorter.Controller
         /// </summary>
         public void Revert()
         {
-            this.Settings = this.provider.LoadSettings();
+            this.Settings = new Settings();
         }
 
         /// <summary>
@@ -85,7 +77,7 @@ namespace TVSorter.Controller
         /// </summary>
         public void Save()
         {
-            this.provider.SaveSettings(this.settings);
+            this.settings.Save();
         }
 
         #endregion

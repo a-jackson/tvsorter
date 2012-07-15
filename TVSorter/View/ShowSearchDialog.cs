@@ -6,7 +6,6 @@
 //   Dialog for searching for a show.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace TVSorter.View
 {
     #region Using Directives
@@ -16,7 +15,6 @@ namespace TVSorter.View
     using System.Windows.Forms;
 
     using TVSorter.Controller;
-    using TVSorter.Types;
 
     #endregion
 

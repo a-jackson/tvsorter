@@ -11,21 +11,15 @@ namespace TVSorter.Controller
 {
     #region Using Directives
 
+    using System;
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Globalization;
     using System.IO;
     using System.Linq;
-    using System.Windows.Forms;
-
-    using TVSorter.Files;
-    using TVSorter.Scanning;
-    using TVSorter.Storage;
-    using TVSorter.Types;
     using TVSorter.View;
 
-    using ProgressChangedEventArgs = TVSorter.ProgressChangedEventArgs;
-    using Settings = TVSorter.Types.Settings;
+    using Settings = TVSorter.Settings;
 
     #endregion
 
@@ -37,39 +31,19 @@ namespace TVSorter.Controller
         #region Fields
 
         /// <summary>
-        ///   The file manager.
-        /// </summary>
-        private IFileManager fileManager;
-
-        /// <summary>
         ///   The last subdirectory scanned.
         /// </summary>
         private string lastSubdirectoryScanned;
-
-        /// <summary>
-        ///   The results.
-        /// </summary>
-        private List<FileResult> results;
-
-        /// <summary>
-        ///   The scanner.
-        /// </summary>
-        private IScanManager scanner;
-
-        /// <summary>
-        ///   The settings.
-        /// </summary>
-        private Settings settings;
-
+        
         /// <summary>
         ///   The sort view.
         /// </summary>
         private IView sortView;
 
         /// <summary>
-        ///   The storage.
+        /// The file searcher.
         /// </summary>
-        private IStorageProvider storage;
+        private FileSearch fileSearch;
 
         /// <summary>
         ///   The sub directories.
@@ -87,13 +61,7 @@ namespace TVSorter.Controller
         {
             get
             {
-                return this.results;
-            }
-
-            private set
-            {
-                this.results = value;
-                this.OnPropertyChanged("Results");
+                return this.fileSearch.Results;
             }
         }
 
@@ -104,13 +72,7 @@ namespace TVSorter.Controller
         {
             get
             {
-                return this.settings;
-            }
-
-            private set
-            {
-                this.settings = value;
-                this.OnPropertyChanged("Settings");
+                return new Settings();
             }
         }
 
@@ -121,7 +83,7 @@ namespace TVSorter.Controller
         {
             get
             {
-                return this.storage.LoadTvShows();
+                return TvShow.GetTvShows().ToList();
             }
         }
 
@@ -149,16 +111,11 @@ namespace TVSorter.Controller
         /// <summary>
         /// Copies the episodes at the specified indices.
         /// </summary>
-        /// <param name="indices">
-        /// The selected indices. 
-        /// </param>
-        public void CopyEpisodes(IEnumerable<int> indices)
+        public void CopyEpisodes()
         {
-            List<FileResult> checkedResults = indices.Select(index => this.Results[index]).ToList();
-            this.MaxValue = checkedResults.Count;
-            this.Value = 0;
-            this.fileManager.CopyFileAsync(checkedResults, this);
-            this.sortView.StartTaskProgress(this, "Copying Episodes");
+            var task = new BackgroundTask(() => this.fileSearch.Copy());
+            task.Start();
+            this.sortView.StartTaskProgress(task, "Copying Episodes");
         }
 
         /// <summary>
@@ -170,37 +127,21 @@ namespace TVSorter.Controller
         public override void Initialise(IView view)
         {
             this.lastSubdirectoryScanned = Path.DirectorySeparatorChar.ToString(CultureInfo.InvariantCulture);
+            this.fileSearch = new FileSearch();
 
             this.sortView = view;
-
-            this.storage = Factory.StorageProvider;
-            this.scanner = Factory.Scanner;
-            this.fileManager = Factory.FileManager;
-
-            this.scanner.RefreshComplete += this.OnRefreshComplete;
-            this.scanner.ProgressChanged += this.OnProgressChanged;
-            this.storage.SettingsChanged += (sender, args) => this.LoadSettings();
-
-            this.fileManager.CopyFileComplete += this.OnFileOperationComplete;
-            this.fileManager.MoveFileComplete += this.OnFileOperationComplete;
-            this.fileManager.ProgressChanged += this.OnProgressChanged;
-
+            
             this.LoadSettings();
         }
 
         /// <summary>
         /// Moves the episodes at the specified indices.
         /// </summary>
-        /// <param name="indices">
-        /// The selected indices. 
-        /// </param>
-        public void MoveEpisodes(IEnumerable<int> indices)
+        public void MoveEpisodes()
         {
-            List<FileResult> checkedResults = indices.Select(index => this.Results[index]).ToList();
-            this.MaxValue = checkedResults.Count;
-            this.Value = 0;
-            this.fileManager.MoveFileAsync(checkedResults, this);
-            this.sortView.StartTaskProgress(this, "Moving Episodes");
+            var task = new BackgroundTask(() => this.fileSearch.Move());
+            task.Start();
+            this.sortView.StartTaskProgress(task, "Moving Episodes");
             this.ScanEpisodes(this.lastSubdirectoryScanned);
         }
 
@@ -212,11 +153,14 @@ namespace TVSorter.Controller
         /// </param>
         public void ScanEpisodes(string subdirectory)
         {
-            this.MaxValue = 1;
-            this.Value = 1;
-            this.lastSubdirectoryScanned = subdirectory;
-            this.scanner.RefreshAsync(subdirectory, this);
-            this.sortView.StartTaskProgress(this, "Scanning episodes");
+            var task = new BackgroundTask(
+                () =>
+                    {
+                        this.fileSearch.Search(subdirectory);
+                        this.OnPropertyChanged("Results");
+                    });
+            task.Start();
+            this.sortView.StartTaskProgress(task, "Scanning episodes");
         }
 
         /// <summary>
@@ -230,6 +174,7 @@ namespace TVSorter.Controller
         /// </param>
         public void SetEpisodeNum(IEnumerable<int> indices, int episodeNum)
         {
+            throw new NotImplementedException();
             IEnumerable<FileResult> checkedResults = indices.Select(index => this.Results[index]);
             foreach (FileResult result in checkedResults)
             {
@@ -238,7 +183,7 @@ namespace TVSorter.Controller
                     continue;
                 }
 
-                this.scanner.ResetEpsiode(result, result.Episode.SeasonNumber, episodeNum);
+                // this.scanner.ResetEpsiode(result, result.Episode.SeasonNumber, episodeNum);
             }
         }
 
@@ -253,6 +198,7 @@ namespace TVSorter.Controller
         /// </param>
         public void SetSeasonNum(IEnumerable<int> indices, int seasonNum)
         {
+            throw new NotImplementedException();
             IEnumerable<FileResult> checkedResults = indices.Select(index => this.Results[index]);
             foreach (FileResult result in checkedResults)
             {
@@ -261,7 +207,7 @@ namespace TVSorter.Controller
                     continue;
                 }
 
-                this.scanner.ResetEpsiode(result, seasonNum, result.Episode.EpisodeNumber);
+                // this.scanner.ResetEpsiode(result, seasonNum, result.Episode.EpisodeNumber);
             }
         }
 
@@ -276,11 +222,12 @@ namespace TVSorter.Controller
         /// </param>
         public void SetShow(IEnumerable<int> indices, TvShow show)
         {
+            throw new NotImplementedException();
             IEnumerable<FileResult> checkedResults = indices.Select(index => this.Results[index]);
             foreach (FileResult result in checkedResults)
             {
                 result.Show = show;
-                this.scanner.ResetEpisode(result);
+                // this.scanner.ResetEpisode(result);
             }
         }
 
@@ -293,7 +240,6 @@ namespace TVSorter.Controller
         /// </summary>
         private void LoadSettings()
         {
-            this.Settings = this.storage.LoadSettings();
             this.SubDirectories = this.LoadSubDirectories();
         }
 
@@ -309,7 +255,7 @@ namespace TVSorter.Controller
 
             try
             {
-                var source = new DirectoryInfo(this.settings.SourceDirectory);
+                var source = new DirectoryInfo(this.Settings.SourceDirectory);
                 if (source.Exists)
                 {
                     dirs.Add(Path.DirectorySeparatorChar.ToString(CultureInfo.InvariantCulture));
@@ -325,72 +271,7 @@ namespace TVSorter.Controller
 
             return dirs;
         }
-
-        /// <summary>
-        /// Handles a file operation completing.
-        /// </summary>
-        /// <param name="sender">
-        /// The sender of the event. 
-        /// </param>
-        /// <param name="e">
-        /// The arguments of the event. 
-        /// </param>
-        private void OnFileOperationComplete(object sender, FileOperationEventArgs e)
-        {
-            if (e.UserState != this)
-            {
-                return;
-            }
-
-            this.OnTaskComplete();
-
-            if (!e.Successful)
-            {
-                MessageBox.Show(e.Error.Message);
-            }
-        }
-
-        /// <summary>
-        /// Handles the process changed event.
-        /// </summary>
-        /// <param name="sender">
-        /// The sender of the event. 
-        /// </param>
-        /// <param name="e">
-        /// The arguments of the event. 
-        /// </param>
-        private void OnProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            if (e.UserState != this)
-            {
-                return;
-            }
-
-            this.MaxValue = e.MaxValue;
-            this.Value = e.Value;
-            this.OnProgressChanged();
-        }
-
-        /// <summary>
-        /// Handles a scanner refresh complete event.
-        /// </summary>
-        /// <param name="sender">
-        /// The sender of the event. 
-        /// </param>
-        /// <param name="e">
-        /// The arguments of the event. 
-        /// </param>
-        private void OnRefreshComplete(object sender, RefreshCompleteEventArgs e)
-        {
-            if (e.UserState != this)
-            {
-                return;
-            }
-
-            this.Results = e.Results;
-            this.OnTaskComplete();
-        }
-
+        
         #endregion
     }
 }

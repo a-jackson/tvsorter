@@ -6,7 +6,6 @@
 //   A dialog for number entry.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace TVSorter.View
 {
     #region Using Directives

@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controller\AddShowController.cs" />
+    <Compile Include="Controller\BackgroundTask.cs" />
     <Compile Include="Controller\ControllerBase.cs" />
     <Compile Include="Controller\IProgressTask.cs" />
     <Compile Include="Controller\ListController.cs" />

@@ -6,7 +6,6 @@
 //   The tvdb process.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace TVSorter.Data.Tvdb
 {
     #region Using Directives
@@ -16,8 +15,6 @@ namespace TVSorter.Data.Tvdb
     using System.IO;
     using System.Linq;
     using System.Xml.Linq;
-
-    using TVSorter.Types;
 
     #endregion
 
@@ -58,7 +55,6 @@ namespace TVSorter.Data.Tvdb
                     new TvShow
                         {
                             Name = this.GetElementValue(series, "SeriesName", string.Empty), 
-                            FolderName = name, 
                             TvdbId = this.GetElementValue(series, "seriesid", string.Empty)
                         }).ToList();
         }
@@ -72,13 +68,10 @@ namespace TVSorter.Data.Tvdb
         /// <param name="filePath">
         /// The path to its XML file. 
         /// </param>
-        /// <param name="onLogMessage">
-        /// The on Log Message. 
-        /// </param>
         /// <param name="serverTime">
         /// The time of the server. 
         /// </param>
-        public void ProcessShow(TvShow show, string filePath, LogMessageEventHandler onLogMessage, DateTime serverTime)
+        public void ProcessShow(TvShow show, string filePath, DateTime serverTime)
         {
             if (show == null)
             {
@@ -126,26 +119,22 @@ namespace TVSorter.Data.Tvdb
                 seasonElement = "DVD_season";
             }
 
-            IEnumerable<Episode> episodes = from episode in data.Descendants("Episode")
-                                            let episodeNum = this.GetElementValue(episode, episodeElement, "-1")
-                                            let seasonNum = this.GetElementValue(episode, seasonElement, "-1")
-                                            select
-                                                new Episode
-                                                    {
-                                                        TvdbId = this.GetElementValue(episode, "id", string.Empty), 
-                                                        EpisodeNumber = this.ParseInt(episodeNum), 
-                                                        SeasonNumber = this.ParseInt(seasonNum), 
-                                                        FirstAir =
-                                                            DateTime.Parse(
-                                                                this.GetElementValue(episode, "FirstAired", "1970-01-01")), 
-                                                        Name = this.GetElementValue(episode, "EpisodeName", string.Empty), 
-                                                        Show = show, 
-                                                    };
+            show.Episodes = from episode in data.Descendants("Episode")
+                            let episodeNum = this.GetElementValue(episode, episodeElement, "-1")
+                            let seasonNum = this.GetElementValue(episode, seasonElement, "-1")
+                            select
+                                new Episode
+                                    {
+                                        TvdbId = this.GetElementValue(episode, "id", string.Empty), 
+                                        EpisodeNumber = this.ParseInt(episodeNum), 
+                                        SeasonNumber = this.ParseInt(seasonNum), 
+                                        FirstAir =
+                                            DateTime.Parse(this.GetElementValue(episode, "FirstAired", "1970-01-01")), 
+                                        Name = this.GetElementValue(episode, "EpisodeName", string.Empty), 
+                                        Show = show, 
+                                    };
 
             show.LastUpdated = serverTime;
-            Factory.StorageProvider.SaveShow(show);
-            Factory.StorageProvider.SaveEpisodes(show, episodes, true);
-            onLogMessage("Update show {0}", show.Name);
         }
 
         /// <summary>

@@ -6,21 +6,18 @@
 //   The event args for the banner download required event.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace TVSorter.Data
 {
     #region Using Directives
 
     using System;
 
-    using TVSorter.Types;
-
     #endregion
 
     /// <summary>
     /// The event args for the banner download required event.
     /// </summary>
-    public class BannerDownloadRequiredEventArgs : EventArgs
+    internal class BannerDownloadRequiredEventArgs : EventArgs
     {
         #region Constructors and Destructors
 

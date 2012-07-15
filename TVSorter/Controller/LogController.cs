@@ -6,7 +6,6 @@
 //   Controller for the Log.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace TVSorter.Controller
 {
     #region Using Directives
@@ -40,9 +39,7 @@ namespace TVSorter.Controller
         public LogController()
         {
             this.Log = new List<string>();
-            Factory.DataProvider.LogMessage += this.OnLogMessageReceived;
-            Factory.Scanner.LogMessage += this.OnLogMessageReceived;
-            Factory.FileManager.LogMessage += this.OnLogMessageReceived;
+            Logger.LogMessage += this.OnLogMessageReceived;
             this.initialised = false;
         }
 

@@ -6,12 +6,13 @@
 //   The episode.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
-namespace TVSorter.Types
+namespace TVSorter
 {
     #region Using Directives
 
     using System;
+
+    using TVSorter.Storage;
 
     #endregion
 
@@ -125,6 +126,15 @@ namespace TVSorter.Types
         public override int GetHashCode()
         {
             return this.TvdbId != null ? this.TvdbId.GetHashCode() : 0;
+        }
+
+        /// <summary>
+        /// Saves the episode.
+        /// </summary>
+        public void Save()
+        {
+            var xml = new Xml();
+            xml.SaveEpisode(this);
         }
 
         #endregion

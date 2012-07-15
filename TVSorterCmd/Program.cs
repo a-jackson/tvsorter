@@ -6,22 +6,13 @@
 //   TVSorterCmd's program.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace TVSorter
 {
     #region Using Directives
 
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
-    using System.IO;
     using System.Linq;
-
-    using TVSorter.Data;
-    using TVSorter.Files;
-    using TVSorter.Scanning;
-    using TVSorter.Storage;
-    using TVSorter.Types;
 
     #endregion
 
@@ -40,35 +31,34 @@ namespace TVSorter
         /// </param>
         public static void Main(string[] args)
         {
-            IStorageProvider storage = Factory.StorageProvider;
-            IScanManager scanner = Factory.Scanner;
-            IFileManager fileManager = Factory.FileManager;
-            IDataProvider data = Factory.DataProvider;
-
-            data.LogMessage += LogMessageReceived;
-            scanner.LogMessage += LogMessageReceived;
-            fileManager.LogMessage += LogMessageReceived;
-
-            List<TvShow> shows = storage.LoadTvShows();
-
             foreach (string arg in args)
             {
                 switch (arg.ToLower())
                 {
                     case "-update_all":
-                        data.UpdateShows(shows.Where(x => !x.Locked).ToList());
+                        IEnumerable<TvShow> shows = TvShow.GetTvShows();
+                        foreach (TvShow show in shows.Where(x => !x.Locked))
+                        {
+                            show.Update();
+                        }
+
                         break;
                     case "-copy":
                     case "-move":
-                        List<FileResult> results =
-                            scanner.Refresh(Path.DirectorySeparatorChar.ToString(CultureInfo.InvariantCulture));
+                        var fileSearch = new FileSearch();
+                        fileSearch.Search(null);
+                        foreach (FileResult result in fileSearch.Results)
+                        {
+                            result.Checked = true;
+                        }
+
                         if (arg.Equals("-copy"))
                         {
-                            fileManager.CopyFile(results);
+                            fileSearch.Copy();
                         }
                         else
                         {
-                            fileManager.MoveFile(results);
+                            fileSearch.Move();
                         }
 
                         break;
@@ -77,24 +67,6 @@ namespace TVSorter
                         return;
                 }
             }
-        }
-
-        #endregion
-
-        #region Methods
-
-        /// <summary>
-        /// Handles a log message being received.
-        /// </summary>
-        /// <param name="sender">
-        /// The sender of the event. 
-        /// </param>
-        /// <param name="e">
-        /// The arguments of the event. 
-        /// </param>
-        private static void LogMessageReceived(object sender, LogMessageEventArgs e)
-        {
-            Console.WriteLine(e.ToString());
         }
 
         #endregion
