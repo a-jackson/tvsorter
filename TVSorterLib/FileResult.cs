@@ -30,19 +30,25 @@ namespace TVSorter
         public bool Checked { get; set; }
 
         /// <summary>
-        ///   Gets or sets Episode.
+        ///   Gets the file's episode.
         /// </summary>
-        public Episode Episode { get; set; }
+        public Episode Episode { get; internal set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the result is incomplete.
+        /// Gets a value indicating whether the result is incomplete.
         /// </summary>
-        public bool Incomplete { get; set; }
+        public bool Incomplete
+        {
+            get
+            {
+                return this.Show == null | this.Episode == null;
+            }
+        }
 
         /// <summary>
-        ///   Gets or sets InputFile.
+        ///   Gets the file.
         /// </summary>
-        public FileInfo InputFile { get; set; }
+        public FileInfo InputFile { get; internal set; }
 
         /// <summary>
         ///   Gets the OutputPath.
@@ -56,9 +62,14 @@ namespace TVSorter
         }
 
         /// <summary>
-        ///   Gets or sets Show.
+        ///   Gets the file's show.
         /// </summary>
-        public TvShow Show { get; set; }
+        public TvShow Show { get; internal set; }
+
+        /// <summary>
+        /// Gets the name of the show as seen by the program.
+        /// </summary>
+        public string ShowName { get; internal set; }
 
         #endregion
 

@@ -91,11 +91,6 @@ namespace TVSorter.View
         private Button setEpisodeButton;
 
         /// <summary>
-        ///   The set season button.
-        /// </summary>
-        private Button setSeasonButton;
-
-        /// <summary>
         ///   The set show button.
         /// </summary>
         private Button setShowButton;
@@ -162,7 +157,6 @@ namespace TVSorter.View
             this.selectAllButton = new System.Windows.Forms.Button();
             this.deselectAllButton = new System.Windows.Forms.Button();
             this.setShowButton = new System.Windows.Forms.Button();
-            this.setSeasonButton = new System.Windows.Forms.Button();
             this.setEpisodeButton = new System.Windows.Forms.Button();
             this.topButtonsFlow.SuspendLayout();
             this.selectButtonsFlow.SuspendLayout();
@@ -236,6 +230,7 @@ namespace TVSorter.View
             this.resultsList.TabIndex = 2;
             this.resultsList.UseCompatibleStateImageBehavior = false;
             this.resultsList.View = System.Windows.Forms.View.Details;
+            this.resultsList.ItemChecked += new System.Windows.Forms.ItemCheckedEventHandler(this.ResultsListItemChecked);
             // 
             // sourceFileColumn
             // 
@@ -272,7 +267,6 @@ namespace TVSorter.View
             this.selectButtonsFlow.Controls.Add(this.selectAllButton);
             this.selectButtonsFlow.Controls.Add(this.deselectAllButton);
             this.selectButtonsFlow.Controls.Add(this.setShowButton);
-            this.selectButtonsFlow.Controls.Add(this.setSeasonButton);
             this.selectButtonsFlow.Controls.Add(this.setEpisodeButton);
             this.selectButtonsFlow.Dock = System.Windows.Forms.DockStyle.Top;
             this.selectButtonsFlow.Location = new System.Drawing.Point(0, 31);
@@ -310,19 +304,9 @@ namespace TVSorter.View
             this.setShowButton.UseVisualStyleBackColor = true;
             this.setShowButton.Click += new System.EventHandler(this.SetShowButtonClick);
             // 
-            // setSeasonButton
-            // 
-            this.setSeasonButton.Location = new System.Drawing.Point(250, 3);
-            this.setSeasonButton.Name = "setSeasonButton";
-            this.setSeasonButton.Size = new System.Drawing.Size(75, 23);
-            this.setSeasonButton.TabIndex = 3;
-            this.setSeasonButton.Text = "Set Season";
-            this.setSeasonButton.UseVisualStyleBackColor = true;
-            this.setSeasonButton.Click += new System.EventHandler(this.SetSeasonButtonClick);
-            // 
             // setEpisodeButton
             // 
-            this.setEpisodeButton.Location = new System.Drawing.Point(331, 3);
+            this.setEpisodeButton.Location = new System.Drawing.Point(250, 3);
             this.setEpisodeButton.Name = "setEpisodeButton";
             this.setEpisodeButton.Size = new System.Drawing.Size(75, 23);
             this.setEpisodeButton.TabIndex = 4;

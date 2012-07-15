@@ -2,9 +2,6 @@
 // <copyright company="TVSorter" file="Xml.cs">
 //   2012 - Andrew Jackson
 // </copyright>
-// <summary>
-//   Class that manages access to the XML file.
-// </summary>
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter.Storage
 {
@@ -33,14 +30,18 @@ namespace TVSorter.Storage
         private const string XmlFile = "TVSorter.xml";
 
         /// <summary>
+        /// The current verison of the XML file.
+        /// </summary>
+        private const int XmlVersion = 1;
+
+        /// <summary>
         /// The file path of the XSD file. Contains the version number of the XML file.
         /// </summary>
         private const string XsdFile = "TVSorter-{0}.xsd";
 
-        /// <summary>
-        /// The current verison of the XML file.
-        /// </summary>
-        private const int XmlVersion = 1;
+        #endregion
+
+        #region Static Fields
 
         /// <summary>
         /// The namespace of the XML.
@@ -66,45 +67,15 @@ namespace TVSorter.Storage
         /// <summary>
         /// Gets the XName for a name.
         /// </summary>
-        /// <param name="name">The name to get.</param>
-        /// <returns>The XName.</returns>
+        /// <param name="name">
+        /// The name to get.
+        /// </param>
+        /// <returns>
+        /// The XName.
+        /// </returns>
         public static XName GetName(string name)
         {
             return XmlNamespace + name;
-        }
-
-        /// <summary>
-        /// Finds a TV Show in the file and loads it.
-        /// </summary>
-        /// <param name="show">
-        /// The TV Show to load data into.
-        /// </param>
-        /// <param name="name">
-        /// The name of the show to search.
-        /// </param>
-        /// <param name="results">
-        /// The number of matches found.
-        /// </param>
-        public void FindTvShow(TvShow show, string name, out int results)
-        {
-            // Remove any duplicate spaces
-            name =
-                name.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).Aggregate(
-                    (x, y) => string.Concat(x, " ", y));
-
-            XDocument doc = this.GetDocument();
-
-            List<XElement> showElements = (from element in doc.Descendants(GetName("Show"))
-                                           let tvShow = new TvShow(element)
-                                           let showNames = tvShow.GetShowNames()
-                                           where showNames.Contains(name, StringComparer.InvariantCultureIgnoreCase)
-                                           select element).ToList();
-            results = showElements.Count;
-
-            if (showElements.Count != 0 && showElements.Count <= 1)
-            {
-                TvShow.FromXml(showElements[0], show);
-            }
         }
 
         /// <summary>
@@ -217,21 +188,22 @@ namespace TVSorter.Storage
 
             XDocument doc = this.GetDocument();
 
-            var show = doc.Descendants(GetName("Show")).FirstOrDefault(x => x.GetAttribute("tvdbid") == episode.Show.TvdbId);
+            XElement show =
+                doc.Descendants(GetName("Show")).FirstOrDefault(x => x.GetAttribute("tvdbid") == episode.Show.TvdbId);
 
             if (show == null)
             {
                 throw new InvalidOperationException("The specified show is not saved.");
             }
 
-            var episodes = show.Element(GetName("Episodes"));
+            XElement episodes = show.Element(GetName("Episodes"));
 
             if (episodes == null)
             {
                 throw new XmlException("XML is invalid.");
             }
-            
-            var episodeElement =
+
+            XElement episodeElement =
                 episodes.Elements(GetName("Episode")).FirstOrDefault(x => x.GetAttribute("tvdbid") == episode.TvdbId);
 
             if (episodeElement != null)
@@ -242,7 +214,7 @@ namespace TVSorter.Storage
             {
                 episodes.Add(episode.ToXml());
             }
-            
+
             doc.Save(XmlFile);
         }
 
@@ -261,12 +233,12 @@ namespace TVSorter.Storage
                 throw new XmlException("XML is invalid.");
             }
 
-            var settingsNode = doc.Root.Element(GetName("Settings"));
+            XElement settingsNode = doc.Root.Element(GetName("Settings"));
             if (settingsNode == null)
             {
                 throw new XmlException("Xml is invalid");
             }
-            
+
             settingsNode.ReplaceWith(settings.ToXml());
             doc.Save(XmlFile);
         }
@@ -281,7 +253,8 @@ namespace TVSorter.Storage
         {
             XDocument doc = this.GetDocument();
 
-            var showElement = doc.Descendants(GetName("Show")).FirstOrDefault(x => x.GetAttribute("tvdbid") == show.TvdbId);
+            XElement showElement =
+                doc.Descendants(GetName("Show")).FirstOrDefault(x => x.GetAttribute("tvdbid") == show.TvdbId);
 
             if (showElement != null)
             {
@@ -289,12 +262,12 @@ namespace TVSorter.Storage
             }
             else
             {
-                var shows = doc.Descendants(GetName("Shows")).FirstOrDefault();
+                XElement shows = doc.Descendants(GetName("Shows")).FirstOrDefault();
                 if (shows == null)
                 {
                     throw new XmlException("XML is invalid.");
                 }
-                
+
                 shows.Add(show.ToXml());
             }
 
@@ -302,35 +275,83 @@ namespace TVSorter.Storage
         }
 
         /// <summary>
-        /// Gets the number of episodes in every season.
+        /// Saves a collection of shows.
         /// </summary>
-        /// <returns>
-        /// The number of episodes in each season.
-        /// </returns>
-        public Dictionary<TvShow, Dictionary<int, int>> SeasonEpisodeCount()
+        /// <param name="shows">
+        /// The shows to save.
+        /// </param>
+        public void SaveShows(IEnumerable<TvShow> shows)
         {
             XDocument doc = this.GetDocument();
 
-            var results = new Dictionary<TvShow, Dictionary<int, int>>();
-
-            IEnumerable<XElement> shows = doc.Descendants(GetName("Show"));
-
-            foreach (XElement show in shows)
+            XElement showsElement = doc.Descendants(GetName("Shows")).FirstOrDefault();
+            if (showsElement == null)
             {
-                // Group the show's episodes by season number.
-                IEnumerable<IGrouping<int, XElement>> seasons =
-                    show.Descendants(GetName("Episode")).GroupBy(x => int.Parse(x.GetAttribute("seasonnum", "-1")));
-
-                var tvShow = new TvShow(show);
-                results.Add(tvShow, seasons.ToDictionary(x => x.Key, x => x.Count()));
+                throw new XmlException("XML is invalid.");
             }
 
-            return results;
+            foreach (var show in shows)
+            {
+                // Check if the show already exists. Else add it.
+                XElement showElement =
+                    doc.Descendants(GetName("Show")).FirstOrDefault(x => x.GetAttribute("tvdbid") == show.TvdbId);
+
+                if (showElement != null)
+                {
+                    showElement.ReplaceWith(show.ToXml());
+                }
+                else
+                {
+                    showsElement.Add(show.ToXml());
+                }
+            }
+
+            doc.Save(XmlFile);
         }
-        
+
         #endregion
 
         #region Methods
+
+        /// <summary>
+        /// Get the XDocument instance of the XML file.
+        /// </summary>
+        /// <returns>The XDocument.</returns>
+        private XDocument GetDocument()
+        {
+            XDocument doc = XDocument.Load(XmlFile);
+            var version = (int)float.Parse(doc.Declaration.Version);
+
+            // Check that the XML is up to date.
+            if (version < XmlVersion)
+            {
+                // Update the latest version
+            }
+
+            string schema = string.Format(XsdFile, doc.Declaration.Version);
+
+            if (File.Exists(schema))
+            {
+                // Get the schemas to validate against.
+                var settings = new XmlReaderSettings() { ValidationType = ValidationType.Schema };
+                settings.Schemas.Add(XmlNamespace.NamespaceName, schema);
+                settings.ValidationEventHandler +=
+                    (sender, args) => { throw new XmlSchemaValidationException(args.Message, args.Exception); };
+
+                using (var reader = XmlReader.Create(XmlFile, settings))
+                {
+                    while (reader.Read())
+                    {
+                    }
+                }
+            }
+            else
+            {
+                throw new FileNotFoundException("The XSD schema could not be found.", schema);
+            }
+
+            return doc;
+        }
 
         /// <summary>
         /// Gets the episodes based on the specified function of file count.
@@ -343,13 +364,8 @@ namespace TVSorter.Storage
         /// </returns>
         private IEnumerable<Episode> GetEpisodes(Func<int, bool> fileCountSelector)
         {
-            XDocument doc = this.GetDocument();
-
-            return from element in doc.Descendants(GetName("Episode"))
-                   where fileCountSelector(int.Parse(element.GetAttribute("filecount", "0")))
-                   let episodesElement = element.Parent
-                   where episodesElement != null
-                   select new Episode(element);
+            IEnumerable<TvShow> tvshows = this.LoadTvShows();
+            return tvshows.SelectMany(x => x.Episodes).Where(x => fileCountSelector(x.FileCount));
         }
 
         /// <summary>
@@ -364,7 +380,7 @@ namespace TVSorter.Storage
                 {
                     // Create the file and populate with default settings.
                     var doc = new XDocument(
-                        new XDeclaration(XmlVersion + ".0", "utf-8", "yes"),
+                        new XDeclaration(XmlVersion + ".0", "utf-8", "yes"), 
                         new XElement(GetName("TVSorter"), new Settings(true).ToXml(), new XElement(GetName("Shows"))));
 
                     doc.Save(XmlFile);
@@ -374,40 +390,6 @@ namespace TVSorter.Storage
             {
                 throw new IOException("Unable to load XML file.", e);
             }
-        }
-       
-        /// <summary>
-        /// Get the XDocument instance of the XML file.
-        /// </summary>
-        /// <returns>The XDocument.</returns>
-        private XDocument GetDocument()
-        {
-            var doc = XDocument.Load(XmlFile);
-            var version = (int)float.Parse(doc.Declaration.Version);
-
-            // Check that the XML is up to date.
-            if (version < XmlVersion)
-            {
-                // Update the latest version
-            }
-
-            string schema = string.Format(XsdFile, doc.Declaration.Version);
-
-            if (File.Exists(schema))
-            {
-                // Get the schemas to validate against.
-                var schemas = new XmlSchemaSet();
-                schemas.Add(XmlNamespace.NamespaceName, schema);
-
-                doc.Validate(
-                    schemas, (sender, args) => { throw new XmlSchemaValidationException(args.Message, args.Exception); });
-            }
-            else
-            {
-                throw new FileNotFoundException("The XSD schema could not be found.", schema);
-            }
-
-            return doc;
         }
 
         #endregion

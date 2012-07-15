@@ -36,12 +36,7 @@ namespace TVSorter.Data.Tvdb
         #endregion
 
         #region Fields
-
-        /// <summary>
-        ///   The tvdb download.
-        /// </summary>
-        private readonly TvdbDownload tvdbDownload;
-
+        
         /// <summary>
         ///   The tvdb process.
         /// </summary>
@@ -56,7 +51,6 @@ namespace TVSorter.Data.Tvdb
         /// </summary>
         public Tvdb()
         {
-            this.tvdbDownload = new TvdbDownload();
             this.tvdbProcess = new TvdbProcess();
             this.tvdbProcess.BannerDownloadRequired += this.BannerDownloadRequired;
         }
@@ -76,7 +70,7 @@ namespace TVSorter.Data.Tvdb
         /// </returns>
         public List<TvShow> SearchShow(string name)
         {
-            StringReader result = this.tvdbDownload.SearchShow(name);
+            StringReader result = TvdbDownload.SearchShow(name);
             return this.tvdbProcess.ProcessSearch(result, name);
         }
 
@@ -88,8 +82,8 @@ namespace TVSorter.Data.Tvdb
         /// </param>
         public void UpdateShow(TvShow show)
         {
-            DateTime serverTime = this.tvdbDownload.GetServerTime();
-            string xmlFile = this.tvdbDownload.DownloadShowEpisodes(show);
+            DateTime serverTime = TvdbDownload.GetServerTime();
+            string xmlFile = TvdbDownload.DownloadShowEpisodes(show);
             this.tvdbProcess.ProcessShow(show, xmlFile, serverTime);
         }
 
@@ -109,7 +103,7 @@ namespace TVSorter.Data.Tvdb
         private void BannerDownloadRequired(object sender, BannerDownloadRequiredEventArgs e)
         {
             e.Show.Banner = e.NewBanner;
-            this.tvdbDownload.DownloadBanner(e.Show);
+            TvdbDownload.DownloadBanner(e.Show);
         }
 
         #endregion

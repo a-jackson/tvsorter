@@ -11,6 +11,7 @@ namespace TVSorter
     #region Using Directives
 
     using System;
+    using System.Collections.Generic;
     using System.Xml.Linq;
 
     using TVSorter.Storage;
@@ -22,6 +23,8 @@ namespace TVSorter
     /// </summary>
     public class Episode : IEquatable<Episode>
     {
+        #region Constructors and Destructors
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Episode"/> class.
         /// </summary>
@@ -39,6 +42,8 @@ namespace TVSorter
         {
             FromXml(element, this);
         }
+
+        #endregion
 
         #region Public Properties
 
@@ -80,6 +85,26 @@ namespace TVSorter
         #endregion
 
         #region Public Methods and Operators
+
+        /// <summary>
+        /// Gets the duplicate episodes.
+        /// </summary>
+        /// <returns>A collection of episodes.</returns>
+        public static IEnumerable<Episode> GetDuplicateEpisodes()
+        {
+            var xml = new Xml();
+            return xml.GetDuplicateEpisodes();
+        }
+
+        /// <summary>
+        /// Gets the missing episodes.
+        /// </summary>
+        /// <returns>A collection of episodes.</returns>
+        public static IEnumerable<Episode> GetMissingEpisodes()
+        {
+            var xml = new Xml();
+            return xml.GetMissingEpisodes();
+        }
 
         /// <summary>
         /// Determines whether the specified <see cref="T:System.Object"/> is equal to the current <see cref="T:System.Object"/> .
@@ -156,11 +181,19 @@ namespace TVSorter
             xml.SaveEpisode(this);
         }
 
+        #endregion
+
+        #region Methods
+
         /// <summary>
         /// Loads the episode from XML.
         /// </summary>
-        /// <param name="episodeNode">The Episode element to load.</param>
-        /// <param name="episode">The episode to load into.</param>
+        /// <param name="episodeNode">
+        /// The Episode element to load.
+        /// </param>
+        /// <param name="episode">
+        /// The episode to load into.
+        /// </param>
         internal static void FromXml(XElement episodeNode, Episode episode)
         {
             episode.Name = episodeNode.GetAttribute("name", string.Empty);
@@ -178,12 +211,12 @@ namespace TVSorter
         internal XElement ToXml()
         {
             var episodeElement = new XElement(
-                Xml.GetName("Episode"),
-                new XAttribute("name", this.Name),
-                new XAttribute("tvdbid", this.TvdbId),
-                new XAttribute("seasonnum", this.SeasonNumber),
-                new XAttribute("episodenum", this.EpisodeNumber),
-                new XAttribute("firstair", this.FirstAir),
+                Xml.GetName("Episode"), 
+                new XAttribute("name", this.Name), 
+                new XAttribute("tvdbid", this.TvdbId), 
+                new XAttribute("seasonnum", this.SeasonNumber), 
+                new XAttribute("episodenum", this.EpisodeNumber), 
+                new XAttribute("firstair", this.FirstAir), 
                 new XAttribute("filecount", this.FileCount));
             return episodeElement;
         }

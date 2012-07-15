@@ -16,6 +16,9 @@ namespace TVSorter.Files
     using System.Linq;
     using System.Text.RegularExpressions;
 
+    using TVSorter.Data.Tvdb;
+    using TVSorter.Storage;
+
     #endregion
 
     /// <summary>
@@ -39,6 +42,11 @@ namespace TVSorter.Files
         /// </summary>
         private readonly Settings settings;
 
+        /// <summary>
+        /// The list of the tvshows.
+        /// </summary>
+        private readonly List<TvShow> tvShows; 
+
         #endregion
 
         #region Constructors and Destructors
@@ -50,6 +58,7 @@ namespace TVSorter.Files
         public ScanManager()
         {
             this.settings = new Settings();
+            this.tvShows = TvShow.GetTvShows().ToList();
         }
 
         #endregion
@@ -76,7 +85,6 @@ namespace TVSorter.Files
         /// </summary>
         public void RefreshFileCounts()
         {
-            // TODO Fix this method.
             List<string> directories = this.settings.DestinationDirectories;
             var results = new List<FileResult>();
 
@@ -102,21 +110,55 @@ namespace TVSorter.Files
                 }
             }
 
-            // Group the result by show for saving them.
-            IEnumerable<IGrouping<TvShow, FileResult>> showGroups = results.GroupBy(x => x.Show);
-            foreach (var group in showGroups)
+            var shows = from result in results
+                        group result by result.Show into showGroup
+                        where showGroup.Key != null 
+                        select showGroup.Key;
+
+            shows.Save();
+        }
+
+        /// <summary>
+        /// Resets the show of the specified result.
+        /// </summary>
+        /// <param name="result">
+        /// The result to modify.
+        /// </param>
+        /// <param name="show">
+        /// The show to set the result to.
+        /// </param>
+        public void ResetShow(FileResult result, TvShow show)
+        {
+            result.Show = show;
+            Match match = this.GetFirstMatch(result.InputFile);
+            if (match == null)
             {
-                if (group.Key != null)
-                {
-                    // Save the episodes for each show.
-                    // this.storage.SaveEpisodes(group.Key, group.Select(x => x.Episode), false);
-                }
+                result.Episode = null;
             }
+
+            result.Episode = this.ProcessEpisode(match, show);
         }
 
         #endregion
 
         #region Methods
+
+        /// <summary>
+        /// Gets the first match for the specified file.
+        /// </summary>
+        /// <param name="file">
+        /// The file to match.
+        /// </param>
+        /// <returns>
+        /// The first succcessful match. Null if none.
+        /// </returns>
+        private Match GetFirstMatch(FileInfo file)
+        {
+            return (from regex in this.settings.RegularExpressions
+                    let match = Regex.Match(file.Name, regex, RegexOptions.IgnoreCase)
+                    where match.Success
+                    select match).FirstOrDefault();
+        }
 
         /// <summary>
         /// Attempts to match the file name to to a show in storage.
@@ -127,28 +169,21 @@ namespace TVSorter.Files
         /// <param name="matchIndex">
         /// The index that the season and epsiode were identified in the file name. 
         /// </param>
+        /// <param name="showName">
+        /// The name of the show as seen by the program. 
+        /// </param>
         /// <returns>
         /// The TV show that was found. 
         /// </returns>
-        private TvShow MatchShow(string fileName, int matchIndex)
+        private TvShow MatchShow(string fileName, int matchIndex, out string showName)
         {
-            string showName = fileName.Substring(0, matchIndex - 1);
+            showName = fileName.Substring(0, matchIndex - 1);
 
             // Replace any spacer characters with spaces
             showName = SpacerChars.Aggregate(showName, (current, ch) => current.Replace(ch, ' '));
 
-            try
-            {
-                return new TvShow(showName, true);
-            }
-            catch (ArgumentException)
-            {
-                throw;
-            }
-            catch (Exception)
-            {
-                return null;
-            }
+            var name = showName;
+            return this.tvShows.FirstOrDefault(x => x.GetShowNames().Contains(name));
         }
 
         /// <summary>
@@ -250,17 +285,16 @@ namespace TVSorter.Files
         private FileResult ProcessFile(FileInfo file)
         {
             // Attempt to match to a regular express
-            Match firstMatch = (from regex in this.settings.RegularExpressions
-                                let match = Regex.Match(file.Name, regex, RegexOptions.IgnoreCase)
-                                where match.Success
-                                select match).FirstOrDefault();
+            Match firstMatch = this.GetFirstMatch(file);
 
             if (firstMatch == null)
             {
                 return null;
             }
 
-            TvShow show = this.MatchShow(file.Name, firstMatch.Index);
+            string showname;
+
+            TvShow show = this.MatchShow(file.Name, firstMatch.Index, out showname);
 
             Episode episode = null;
 
@@ -269,10 +303,7 @@ namespace TVSorter.Files
                 episode = this.ProcessEpisode(firstMatch, show);
             }
 
-            return new FileResult
-                {
-                   Episode = episode, InputFile = file, Show = show, Incomplete = show == null || episode == null 
-                };
+            return new FileResult { Episode = episode, InputFile = file, Show = show, ShowName = showname };
         }
 
         #endregion

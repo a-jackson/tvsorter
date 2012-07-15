@@ -2,6 +2,9 @@
 // <copyright company="TVSorter" file="TvShow.cs">
 //   2012 - Andrew Jackson
 // </copyright>
+// <summary>
+//   The tv show.
+// </summary>
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter
 {
@@ -23,38 +26,8 @@ namespace TVSorter
     /// </summary>
     public class TvShow : IEquatable<TvShow>
     {
-        #region Fields
-
-        /// <summary>
-        /// A value indicating whether the data can be from cache or not.
-        /// </summary>
-        private readonly bool allowCached;
-
-        /// <summary>
-        /// The name of the show.
-        /// </summary>
-        private readonly string name;
-
-        #endregion
-
         #region Constructors and Destructors
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TvShow"/> class.
-        /// </summary>
-        /// <param name="name">
-        /// The name of the show.
-        /// </param>
-        /// <param name="allowCached">
-        /// A value indcating whether cached data is ok.
-        /// </param>
-        public TvShow(string name, bool allowCached)
-        {
-            this.name = name;
-            this.allowCached = allowCached;
-            this.Initialise();
-        }
-
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="TvShow"/> class from a search result.
         /// </summary>
@@ -109,7 +82,7 @@ namespace TVSorter
         /// <summary>
         /// Gets the episodes of the show.
         /// </summary>
-        public IEnumerable<Episode> Episodes { get; internal set; }
+        public List<Episode> Episodes { get; internal set; }
 
         /// <summary>
         ///   Gets or sets FolderName.
@@ -388,7 +361,7 @@ namespace TVSorter
             show.Locked = bool.Parse(showNode.GetAttribute("locked", "false"));
             show.LastUpdated = DateTime.Parse(showNode.GetAttribute("lastupdated", "1970-01-01 00:00:00"));
             show.AlternateNames = showNode.Descendants("AlternateName").Select(altName => altName.Value).ToList();
-            show.Episodes = showNode.Descendants(Xml.GetName("Episode")).Select(x => new Episode(x));
+            show.Episodes = showNode.Descendants(Xml.GetName("Episode")).Select(x => new Episode(x) { Show = show }).ToList();
         }
 
         /// <summary>
@@ -455,49 +428,6 @@ namespace TVSorter
                 episodes);
 
             return element;
-        }
-
-        /// <summary>
-        /// Initialises the object.
-        /// </summary>
-        private void Initialise()
-        {
-            // Search the XMl for the show.
-            var showXml = new Xml();
-
-            int count;
-            showXml.FindTvShow(this, this.name, out count);
-            if (count > 1)
-            {
-                throw new ArgumentException("There was more than one TV Show found for " + this.name);
-            }
-
-            var tvdb = new Tvdb();
-
-            if (count == 0)
-            {
-                // Show could not be found. Attempt to add.
-                List<TvShow> results = tvdb.SearchShow(this.name);
-                if (results.Count == 0)
-                {
-                    throw new Exception("TV Show could not be found.");
-                }
-
-                if (results.Count == 1 || results[0].GetShowNames().Contains(this.name))
-                {
-                    this.Name = results[0].Name;
-                    this.FolderName = GetFileSafeName(results[0].Name);
-                    this.TvdbId = results[0].TvdbId;
-                    this.InitialiseDefaultData();
-                }
-            }
-
-            // If caching is not allowed or the data is more than 30 days old. Download new data.
-            if (!this.allowCached || DateTime.Now - this.LastUpdated > TimeSpan.FromDays(30))
-            {
-                tvdb.UpdateShow(this);
-                showXml.SaveShow(this);
-            }
         }
 
         /// <summary>

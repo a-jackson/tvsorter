@@ -10,7 +10,6 @@ namespace TVSorter.Controller
 {
     #region Using Directives
 
-    using System;
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Globalization;
@@ -164,72 +163,28 @@ namespace TVSorter.Controller
         }
 
         /// <summary>
-        /// Sets the episode number of the specified indices.
+        /// Sets the episode of the checked results.
         /// </summary>
-        /// <param name="indices">
-        /// The indices to set. 
+        /// <param name="seasonNum">
+        /// The season number.
         /// </param>
         /// <param name="episodeNum">
-        /// The episode Num. 
+        /// The episode number.
         /// </param>
-        public void SetEpisodeNum(IEnumerable<int> indices, int episodeNum)
+        public void SetEpisode(int seasonNum, int episodeNum)
         {
-            throw new NotImplementedException();
-            IEnumerable<FileResult> checkedResults = indices.Select(index => this.Results[index]);
-            foreach (FileResult result in checkedResults)
-            {
-                if (result.Episode == null)
-                {
-                    continue;
-                }
-
-                // this.scanner.ResetEpsiode(result, result.Episode.SeasonNumber, episodeNum);
-            }
-        }
-
-        /// <summary>
-        /// Sets the season number of the specified indices.
-        /// </summary>
-        /// <param name="indices">
-        /// The indices. 
-        /// </param>
-        /// <param name="seasonNum">
-        /// The season num. 
-        /// </param>
-        public void SetSeasonNum(IEnumerable<int> indices, int seasonNum)
-        {
-            throw new NotImplementedException();
-            IEnumerable<FileResult> checkedResults = indices.Select(index => this.Results[index]);
-            foreach (FileResult result in checkedResults)
-            {
-                if (result.Episode == null)
-                {
-                    continue;
-                }
-
-                // this.scanner.ResetEpsiode(result, seasonNum, result.Episode.EpisodeNumber);
-            }
+            this.fileSearch.SetEpisode(seasonNum, episodeNum);
         }
 
         /// <summary>
         /// Sets the show of the specified indices.
         /// </summary>
-        /// <param name="indices">
-        /// The indices to set. 
-        /// </param>
         /// <param name="show">
         /// The show to set them to. 
         /// </param>
-        public void SetShow(IEnumerable<int> indices, TvShow show)
+        public void SetShow(TvShow show)
         {
-            throw new NotImplementedException();
-            IEnumerable<FileResult> checkedResults = indices.Select(index => this.Results[index]);
-            foreach (FileResult result in checkedResults)
-            {
-                result.Show = show;
-
-                // this.scanner.ResetEpisode(result);
-            }
+            this.fileSearch.SetShow(show);
         }
 
         #endregion

@@ -2,9 +2,6 @@
 // <copyright company="TVSorter" file="TvdbDownload.cs">
 //   2012 - Andrew Jackson
 // </copyright>
-// <summary>
-//   Downloads the XML files from the TVDB.
-// </summary>
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter.Data.Tvdb
 {
@@ -58,25 +55,27 @@ namespace TVSorter.Data.Tvdb
 
         #endregion
 
-        #region Fields
+        #region Static Fields
 
         /// <summary>
         ///   The task that determines the mirror.
         /// </summary>
-        private readonly Task<string> mirrorTask;
+        private static readonly Task<string> MirrorTask;
 
         #endregion
 
         #region Constructors and Destructors
 
         /// <summary>
-        ///   Initializes a new instance of the <see cref="TvdbDownload" /> class.
+        /// Initializes static members of the <see cref="TvdbDownload"/> class. 
         /// </summary>
-        /// <exception cref="Exception">Throws an exception if a mirror cannot be found.</exception>
-        public TvdbDownload()
+        /// <exception cref="Exception">
+        /// Throws an exception if a mirror cannot be found.
+        /// </exception>
+        static TvdbDownload()
         {
             // Initialise the class on a background thread.
-            this.mirrorTask = Task<string>.Factory.StartNew(this.InitialiseMirror);
+            MirrorTask = Task<string>.Factory.StartNew(InitialiseMirror);
         }
 
         #endregion
@@ -86,16 +85,16 @@ namespace TVSorter.Data.Tvdb
         /// <summary>
         ///   Gets the mirror to use.
         /// </summary>
-        private string Mirror
+        private static string Mirror
         {
             get
             {
-                if (this.mirrorTask.Result == null)
+                if (MirrorTask.Result == null)
                 {
                     throw new Exception("Unable to determine mirror.");
                 }
 
-                return this.mirrorTask.Result;
+                return MirrorTask.Result;
             }
         }
 
@@ -109,10 +108,10 @@ namespace TVSorter.Data.Tvdb
         /// <param name="tvShow">
         /// The show to download the banner for. 
         /// </param>
-        public void DownloadBanner(TvShow tvShow)
+        public static void DownloadBanner(TvShow tvShow)
         {
             var webClient = new WebClient();
-            string bannerAddress = this.Mirror + "/banners/" + tvShow.Banner;
+            string bannerAddress = Mirror + "/banners/" + tvShow.Banner;
             string saveAddress = Tvdb.ImageDirectory + tvShow.TvdbId + ".jpg";
 
             if (!Directory.Exists(Tvdb.ImageDirectory))
@@ -137,22 +136,19 @@ namespace TVSorter.Data.Tvdb
         /// <returns>
         /// The path to the downloaded file. 
         /// </returns>
-        public string DownloadShowEpisodes(TvShow show)
+        public static string DownloadShowEpisodes(TvShow show)
         {
             for (int i = 0; i < RetryCount; i++)
             {
                 try
                 {
                     var webClient = new WebClient();
-                    string showAddress = this.Mirror + ApiLoc + "/series/" + show.TvdbId + "/all/en.xml";
+                    string showAddress = Mirror + ApiLoc + "/series/" + show.TvdbId + "/all/en.xml";
                     string savePath = Tvdb.CacheDirectory + show.TvdbId + ".xml";
 
-                    lock (this)
+                    if (!Directory.Exists(Tvdb.CacheDirectory))
                     {
-                        if (!Directory.Exists(Tvdb.CacheDirectory))
-                        {
-                            Directory.CreateDirectory(Tvdb.CacheDirectory);
-                        }
+                        Directory.CreateDirectory(Tvdb.CacheDirectory);
                     }
 
                     if (File.Exists(savePath))
@@ -181,11 +177,11 @@ namespace TVSorter.Data.Tvdb
         /// <returns>
         /// The XML with the updates. 
         /// </returns>
-        public StringReader DownloadUpdates(DateTime time)
+        public static StringReader DownloadUpdates(DateTime time)
         {
             var timestamp = (int)(time - new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds;
             string updatesUrl = SiteAddress + "/api/Updates.php?type=all&time=" + timestamp;
-            return this.DownloadXml(updatesUrl);
+            return DownloadXml(updatesUrl);
         }
 
         /// <summary>
@@ -194,9 +190,9 @@ namespace TVSorter.Data.Tvdb
         /// <returns>
         /// The time of the server. 
         /// </returns>
-        public DateTime GetServerTime()
+        public static DateTime GetServerTime()
         {
-            StringReader timeXml = this.DownloadXml(TimeAddress);
+            StringReader timeXml = DownloadXml(TimeAddress);
             XDocument time = XDocument.Load(timeXml);
             string timestamp = time.Descendants("Time").First().Value;
 
@@ -212,9 +208,9 @@ namespace TVSorter.Data.Tvdb
         /// <returns>
         /// A string reader of the XML downloaded. 
         /// </returns>
-        public StringReader SearchShow(string name)
+        public static StringReader SearchShow(string name)
         {
-            return this.DownloadXml(this.Mirror + "/api/GetSeries.php?seriesname=" + name);
+            return DownloadXml(Mirror + "/api/GetSeries.php?seriesname=" + name);
         }
 
         #endregion
@@ -230,7 +226,7 @@ namespace TVSorter.Data.Tvdb
         /// <returns>
         /// A stringreader of the XML file. 
         /// </returns>
-        private StringReader DownloadXml(string url)
+        private static StringReader DownloadXml(string url)
         {
             var client = new WebClient();
             string xml = client.DownloadString(url);
@@ -243,10 +239,10 @@ namespace TVSorter.Data.Tvdb
         /// <returns>
         /// The selected mirror URL. Null if one cannot be determined. 
         /// </returns>
-        private string InitialiseMirror()
+        private static string InitialiseMirror()
         {
             // Download the mirrors 
-            StringReader mirrorString = this.DownloadXml(MirrorsAddress);
+            StringReader mirrorString = DownloadXml(MirrorsAddress);
             XDocument mirrors = XDocument.Load(mirrorString);
 
             // Randomly select one that has a typemask of 7 

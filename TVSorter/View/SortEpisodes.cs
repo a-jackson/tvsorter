@@ -11,10 +11,7 @@ namespace TVSorter.View
     #region Using Directives
 
     using System;
-    using System.Collections.Generic;
     using System.ComponentModel;
-    using System.Drawing;
-    using System.Globalization;
     using System.Linq;
     using System.Windows.Forms;
 
@@ -152,69 +149,32 @@ namespace TVSorter.View
         private void ProcessResults()
         {
             this.resultsList.Items.Clear();
-            foreach (FileResult result in this.controller.Results)
-            {
-                var listItem =
-                    new ListViewItem(
-                        new[]
-                            {
-                                result.InputFile.Name, result.Show == null ? string.Empty : result.Show.Name, 
-                                result.Episode == null
-                                    ? string.Empty
-                                    : result.Episode.SeasonNumber.ToString(CultureInfo.InvariantCulture), 
-                                result.Episode == null
-                                    ? string.Empty
-                                    : result.Episode.EpisodeNumber.ToString(CultureInfo.InvariantCulture), 
-                                result.Episode == null ? string.Empty : result.Episode.Name, result.OutputPath
-                            });
-                if (result.Incomplete)
-                {
-                    listItem.BackColor = Color.Red;
-                }
-                else
-                {
-                    listItem.BackColor = Color.White;
-                }
-
-                this.resultsList.Items.Add(listItem);
-            }
+            this.resultsList.Items.AddRange(this.controller.Results.Select(x => x.GetListViewItem()).ToArray());
         }
 
         /// <summary>
         /// Resets the data for the specified items.
         /// </summary>
-        /// <param name="checkedResults">
-        /// The collection of indices of items to update. 
-        /// </param>
-        private void ResetListItems(IEnumerable<int> checkedResults)
+        private void ResetListItems()
         {
-            foreach (int result in checkedResults)
+            for (int i = 0; i < this.controller.Results.Count; i++)
             {
-                ListViewItem item = this.resultsList.Items[result];
-                item.SubItems[0].Text = this.controller.Results[result].InputFile.FullName;
-                item.SubItems[1].Text = this.controller.Results[result].Show.Name;
-                item.SubItems[2].Text = this.controller.Results[result].Episode != null
-                                            ? this.controller.Results[result].Episode.EpisodeNumber.ToString(
-                                                CultureInfo.InvariantCulture)
-                                            : string.Empty;
-                item.SubItems[3].Text = this.controller.Results[result].Episode != null
-                                            ? this.controller.Results[result].Episode.SeasonNumber.ToString(
-                                                CultureInfo.InvariantCulture)
-                                            : string.Empty;
-                item.SubItems[4].Text = this.controller.Results[result].Episode != null
-                                            ? this.controller.Results[result].Episode.Name
-                                            : string.Empty;
-                item.SubItems[5].Text = this.controller.Results[result].OutputPath;
-                if (this.controller.Results[result].Show == null || this.controller.Results[result].Episode == null
-                    || string.IsNullOrEmpty(this.controller.Results[result].Episode.Name))
-                {
-                    item.BackColor = Color.Red;
-                }
-                else
-                {
-                    item.BackColor = Color.White;
-                }
+                this.resultsList.Items[i] = this.controller.Results[i].GetListViewItem();
             }
+        }
+
+        /// <summary>
+        /// Handles an item being checked or unchecked in the results list.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender of the event.
+        /// </param>
+        /// <param name="e">
+        /// The arguments of the event.
+        /// </param>
+        private void ResultsListItemChecked(object sender, ItemCheckedEventArgs e)
+        {
+            this.controller.Results[e.Item.Index].Checked = e.Item.Checked;
         }
 
         /// <summary>
@@ -259,32 +219,11 @@ namespace TVSorter.View
         /// </param>
         private void SetEpisodeButtonClick(object sender, EventArgs e)
         {
-            var dialog = new NumberInputDialog { Text = "Set episode" };
+            var dialog = new NumberInputDialog();
             if (dialog.ShowDialog(this) == DialogResult.OK)
             {
-                List<int> checkedResults = this.resultsList.CheckedIndices.Cast<int>().ToList();
-                this.controller.SetEpisodeNum(checkedResults, dialog.Number);
-                this.ResetListItems(checkedResults);
-            }
-        }
-
-        /// <summary>
-        /// Handles the Set Season button being clicked.
-        /// </summary>
-        /// <param name="sender">
-        /// The sender of the event. 
-        /// </param>
-        /// <param name="e">
-        /// The arguments of the event. 
-        /// </param>
-        private void SetSeasonButtonClick(object sender, EventArgs e)
-        {
-            var dialog = new NumberInputDialog { Text = "Set season" };
-            if (dialog.ShowDialog(this) == DialogResult.OK)
-            {
-                List<int> checkedResults = this.resultsList.CheckedIndices.Cast<int>().ToList();
-                this.controller.SetSeasonNum(checkedResults, dialog.Number);
-                this.ResetListItems(checkedResults);
+                this.controller.SetEpisode(dialog.SeasonNumber, dialog.EpisodeNumber);
+                this.ResetListItems();
             }
         }
 
@@ -302,11 +241,10 @@ namespace TVSorter.View
             var dialog = new ShowSelectDialog(this.controller.Shows);
             if (dialog.ShowDialog(this) == DialogResult.OK)
             {
-                List<int> checkedResults = this.resultsList.CheckedIndices.Cast<int>().ToList();
-                this.controller.SetShow(checkedResults, dialog.SelectedShow);
+                this.controller.SetShow(dialog.SelectedShow);
 
                 // Update the listitems with the altered results
-                this.ResetListItems(checkedResults);
+                this.ResetListItems();
             }
         }
 

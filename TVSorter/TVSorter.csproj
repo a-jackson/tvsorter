@@ -55,6 +55,7 @@
     <Compile Include="Controller\ShowSearchController.cs" />
     <Compile Include="Controller\SortEpisodesController.cs" />
     <Compile Include="Controller\TvShowsController.cs" />
+    <Compile Include="FileResultExtensions.cs" />
     <Compile Include="View\IView.cs" />
     <Compile Include="View\ListDialog.cs">
       <SubType>Form</SubType>

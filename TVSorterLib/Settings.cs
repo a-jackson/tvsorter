@@ -2,6 +2,9 @@
 // <copyright company="TVSorter" file="Settings.cs">
 //   2012 - Andrew Jackson
 // </copyright>
+// <summary>
+//   The settings.
+// </summary>
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter
 {
@@ -145,14 +148,17 @@ namespace TVSorter
         /// <summary>
         /// Populates the specified settings object from the XElement.
         /// </summary>
-        /// <param name="settingsNode">The settings element.</param>
-        /// <param name="settings">The settings object.</param>
+        /// <param name="settingsNode">
+        /// The settings element.
+        /// </param>
+        /// <param name="settings">
+        /// The settings object.
+        /// </param>
         internal static void FromXml(XElement settingsNode, Settings settings)
         {
             settings.SourceDirectory = settingsNode.GetAttribute("sourcedirectory", string.Empty);
             settings.DefaultOutputFormat = settingsNode.GetAttribute("defaultformat", string.Empty);
-            settings.RecurseSubdirectories =
-                bool.Parse(settingsNode.GetAttribute("recursesubdirectories", "false"));
+            settings.RecurseSubdirectories = bool.Parse(settingsNode.GetAttribute("recursesubdirectories", "false"));
             settings.DeleteEmptySubdirectories =
                 bool.Parse(settingsNode.GetAttribute("deleteemptysubdirectories", "false"));
             settings.RenameIfExists = bool.Parse(settingsNode.GetAttribute("renameifexists", "false"));
@@ -189,36 +195,34 @@ namespace TVSorter
         internal XElement ToXml()
         {
             var destinationDirectories = new XElement(
-                Xml.GetName("DestinationDirectories"),
+                Xml.GetName("DestinationDirectories"), 
                 this.DestinationDirectories.Select(
                     dir =>
                     new XElement(
-                        Xml.GetName("Destination"),
-                        new XAttribute("selected", dir == this.DestinationDirectory),
-                        dir)));
+                        Xml.GetName("Destination"), new XAttribute("selected", dir == this.DestinationDirectory), dir)));
 
             var fileExtensions = new XElement(
-                Xml.GetName("FileExtensions"),
+                Xml.GetName("FileExtensions"), 
                 this.FileExtensions.Select(ext => new XElement(Xml.GetName("Extension"), ext)));
 
             var regularExpressions = new XElement(
-                Xml.GetName("RegularExpression"),
+                Xml.GetName("RegularExpression"), 
                 this.RegularExpressions.Select(exp => new XElement(Xml.GetName("RegEx"), exp)));
 
             var overwriteKeywords = new XElement(
-                Xml.GetName("OverwriteKeywords"),
+                Xml.GetName("OverwriteKeywords"), 
                 this.OverwriteKeywords.Select(key => new XElement(Xml.GetName("Keyword"), key)));
 
             return new XElement(
-                Xml.GetName("Settings"),
-                new XAttribute("sourcedirectory", this.SourceDirectory),
-                new XAttribute("defaultformat", this.DefaultOutputFormat),
-                new XAttribute("recursesubdirectories", this.RecurseSubdirectories),
-                new XAttribute("deleteemptysubdirectories", this.DeleteEmptySubdirectories),
-                new XAttribute("renameifexists", this.RenameIfExists),
-                destinationDirectories,
-                fileExtensions,
-                regularExpressions,
+                Xml.GetName("Settings"), 
+                new XAttribute("sourcedirectory", this.SourceDirectory), 
+                new XAttribute("defaultformat", this.DefaultOutputFormat), 
+                new XAttribute("recursesubdirectories", this.RecurseSubdirectories), 
+                new XAttribute("deleteemptysubdirectories", this.DeleteEmptySubdirectories), 
+                new XAttribute("renameifexists", this.RenameIfExists), 
+                destinationDirectories, 
+                fileExtensions, 
+                regularExpressions, 
                 overwriteKeywords);
         }
 
@@ -236,11 +240,6 @@ namespace TVSorter
             {
                 // Settings file does not exist. Use default settings.
                 this.SetDefault();
-            }
-            catch (XmlSchemaException ex)
-            {
-                // Settings file is invalidate
-                throw new FileLoadException("The settings file is not valid.", ex);
             }
         }
 

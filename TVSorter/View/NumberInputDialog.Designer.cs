@@ -38,7 +38,7 @@ namespace TVSorter.View
         /// <summary>
         ///   The input text.
         /// </summary>
-        private TextBox inputText;
+        private TextBox seasonNumber;
 
         /// <summary>
         ///   The ok button.
@@ -71,21 +71,33 @@ namespace TVSorter.View
         /// </summary>
         private void InitializeComponent()
         {
-            this.inputText = new System.Windows.Forms.TextBox();
+            System.Windows.Forms.TableLayoutPanel table;
+            System.Windows.Forms.FlowLayoutPanel flowButtons;
+            System.Windows.Forms.Label seasonLabel;
+            System.Windows.Forms.Label episodeLabel;
+            this.seasonNumber = new System.Windows.Forms.TextBox();
             this.okButton = new System.Windows.Forms.Button();
             this.cancelButton = new System.Windows.Forms.Button();
+            this.episodeNumber = new System.Windows.Forms.TextBox();
+            table = new System.Windows.Forms.TableLayoutPanel();
+            flowButtons = new System.Windows.Forms.FlowLayoutPanel();
+            seasonLabel = new System.Windows.Forms.Label();
+            episodeLabel = new System.Windows.Forms.Label();
+            table.SuspendLayout();
+            flowButtons.SuspendLayout();
             this.SuspendLayout();
             // 
-            // inputText
+            // seasonNumber
             // 
-            this.inputText.Location = new System.Drawing.Point(12, 12);
-            this.inputText.Name = "inputText";
-            this.inputText.Size = new System.Drawing.Size(260, 20);
-            this.inputText.TabIndex = 0;
+            this.seasonNumber.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.seasonNumber.Location = new System.Drawing.Point(96, 3);
+            this.seasonNumber.Name = "seasonNumber";
+            this.seasonNumber.Size = new System.Drawing.Size(114, 20);
+            this.seasonNumber.TabIndex = 0;
             // 
             // okButton
             // 
-            this.okButton.Location = new System.Drawing.Point(197, 38);
+            this.okButton.Location = new System.Drawing.Point(135, 3);
             this.okButton.Name = "okButton";
             this.okButton.Size = new System.Drawing.Size(75, 23);
             this.okButton.TabIndex = 1;
@@ -95,7 +107,7 @@ namespace TVSorter.View
             // 
             // cancelButton
             // 
-            this.cancelButton.Location = new System.Drawing.Point(116, 38);
+            this.cancelButton.Location = new System.Drawing.Point(54, 3);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(75, 23);
             this.cancelButton.TabIndex = 2;
@@ -103,26 +115,89 @@ namespace TVSorter.View
             this.cancelButton.UseVisualStyleBackColor = true;
             this.cancelButton.Click += new System.EventHandler(this.CancelButtonClick);
             // 
+            // table
+            // 
+            table.ColumnCount = 2;
+            table.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 93F));
+            table.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            table.Controls.Add(flowButtons, 0, 2);
+            table.Controls.Add(this.episodeNumber, 1, 1);
+            table.Controls.Add(this.seasonNumber, 1, 0);
+            table.Controls.Add(seasonLabel, 0, 0);
+            table.Controls.Add(episodeLabel, 0, 1);
+            table.Dock = System.Windows.Forms.DockStyle.Fill;
+            table.Location = new System.Drawing.Point(0, 0);
+            table.Name = "table";
+            table.RowCount = 2;
+            table.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
+            table.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
+            table.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 56F));
+            table.Size = new System.Drawing.Size(213, 81);
+            table.TabIndex = 3;
+            // 
+            // flowButtons
+            // 
+            table.SetColumnSpan(flowButtons, 2);
+            flowButtons.Controls.Add(this.okButton);
+            flowButtons.Controls.Add(this.cancelButton);
+            flowButtons.Dock = System.Windows.Forms.DockStyle.Fill;
+            flowButtons.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft;
+            flowButtons.Location = new System.Drawing.Point(0, 50);
+            flowButtons.Margin = new System.Windows.Forms.Padding(0);
+            flowButtons.Name = "flowButtons";
+            flowButtons.Size = new System.Drawing.Size(213, 56);
+            flowButtons.TabIndex = 0;
+            // 
+            // episodeNumber
+            // 
+            this.episodeNumber.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.episodeNumber.Location = new System.Drawing.Point(96, 28);
+            this.episodeNumber.Name = "episodeNumber";
+            this.episodeNumber.Size = new System.Drawing.Size(114, 20);
+            this.episodeNumber.TabIndex = 1;
+            // 
+            // seasonLabel
+            // 
+            seasonLabel.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            seasonLabel.AutoSize = true;
+            seasonLabel.Location = new System.Drawing.Point(6, 6);
+            seasonLabel.Name = "seasonLabel";
+            seasonLabel.Size = new System.Drawing.Size(84, 13);
+            seasonLabel.TabIndex = 2;
+            seasonLabel.Text = "Season number:";
+            // 
+            // episodeLabel
+            // 
+            episodeLabel.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            episodeLabel.AutoSize = true;
+            episodeLabel.Location = new System.Drawing.Point(4, 31);
+            episodeLabel.Name = "episodeLabel";
+            episodeLabel.Size = new System.Drawing.Size(86, 13);
+            episodeLabel.TabIndex = 3;
+            episodeLabel.Text = "Episode number:";
+            // 
             // NumberInputDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(284, 68);
+            this.ClientSize = new System.Drawing.Size(213, 81);
             this.ControlBox = false;
-            this.Controls.Add(this.cancelButton);
-            this.Controls.Add(this.okButton);
-            this.Controls.Add(this.inputText);
+            this.Controls.Add(table);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Name = "NumberInputDialog";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Number Input";
+            this.Text = "Set Episode";
+            table.ResumeLayout(false);
+            table.PerformLayout();
+            flowButtons.ResumeLayout(false);
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
+
+        private TextBox episodeNumber;
     }
 }

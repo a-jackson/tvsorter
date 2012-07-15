@@ -35,9 +35,14 @@ namespace TVSorter.View
         #region Public Properties
 
         /// <summary>
-        ///   Gets Number.
+        /// Gets the episode number.
         /// </summary>
-        public int Number { get; private set; }
+        public int EpisodeNumber { get; private set; }
+
+        /// <summary>
+        ///   Gets the season number.
+        /// </summary>
+        public int SeasonNumber { get; private set; }
 
         #endregion
 
@@ -70,16 +75,27 @@ namespace TVSorter.View
         private void OkButtonClick(object sender, EventArgs e)
         {
             int number;
-            if (int.TryParse(this.inputText.Text, out number))
+            if (int.TryParse(this.seasonNumber.Text, out number))
             {
-                this.Number = number;
-                this.DialogResult = DialogResult.OK;
-                this.Close();
+                this.SeasonNumber = number;
             }
             else
             {
-                MessageBox.Show("Not a valid number");
+                MessageBox.Show("Season number is not a valid number.");
+                return;
             }
+
+            if (int.TryParse(this.episodeNumber.Text, out number))
+            {
+                this.EpisodeNumber = number;
+            }
+            else
+            {
+                MessageBox.Show("Episode number is not a valid number.");
+            }
+
+            this.DialogResult = DialogResult.OK;
+            this.Close();
         }
 
         #endregion

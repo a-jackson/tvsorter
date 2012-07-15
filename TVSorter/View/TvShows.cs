@@ -90,7 +90,7 @@ namespace TVSorter.View
         {
             var dialog = new ShowSearchDialog(new AddShowController());
             dialog.ShowDialog(this);
-            controller.RefreshShows();
+            this.controller.RefreshShows();
         }
 
         /// <summary>

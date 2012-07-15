@@ -12,6 +12,7 @@ namespace TVSorter.Controller
 
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 
     using TVSorter.View;
 
@@ -79,10 +80,10 @@ namespace TVSorter.Controller
         /// </summary>
         public void RefreshFileCounts()
         {
-            throw new NotImplementedException();
+            var task = new BackgroundTask(FileSearch.RefreshFileCounts);
+            task.Start();
 
-            // this.scanner.RefreshFileCountsAsync(this);
-            // this.View.StartTaskProgress(this, "Refreshing file counts");
+            this.View.StartTaskProgress(task, "Refreshing file counts");
         }
 
         /// <summary>
@@ -90,9 +91,7 @@ namespace TVSorter.Controller
         /// </summary>
         public void SearchDuplicateEpisodes()
         {
-            throw new NotImplementedException();
-
-            // this.Episodes = this.storage.GetDuplicateEpisodes().ToList();
+            this.Episodes = Episode.GetDuplicateEpisodes().ToList();
         }
 
         /// <summary>
@@ -116,50 +115,80 @@ namespace TVSorter.Controller
         public void SearchMissingEpisodes(
             bool hideUnaired, bool hideSeason0, bool hidePart2, bool hideLocked, bool hideWholeSeasons)
         {
-            throw new NotImplementedException();
+            List<Episode> missingEpisodes = Episode.GetMissingEpisodes().ToList();
 
-            // List<Episode> missingEpisodes = this.storage.GetMissingEpisodes().ToList();
+            if (hideUnaired)
+            {
+                missingEpisodes =
+                    missingEpisodes.Where(
+                        ep => ep.FirstAir < DateTime.Today && !ep.FirstAir.Equals(new DateTime(1970, 1, 1))).ToList();
+            }
 
-            // if (hideUnaired)
-            // {
-            // missingEpisodes =
-            // missingEpisodes.Where(
-            // ep => ep.FirstAir < DateTime.Today && !ep.FirstAir.Equals(new DateTime(1970, 1, 1))).ToList();
-            // }
+            if (hideSeason0)
+            {
+                missingEpisodes = missingEpisodes.Where(ep => ep.SeasonNumber != 0).ToList();
+            }
 
-            // if (hideSeason0)
-            // {
-            // missingEpisodes = missingEpisodes.Where(ep => ep.SeasonNumber != 0).ToList();
-            // }
+            if (hidePart2)
+            {
+                missingEpisodes = missingEpisodes.Where(ep => !ep.Name.EndsWith("(2)")).ToList();
+            }
 
-            // if (hidePart2)
-            // {
-            // missingEpisodes = missingEpisodes.Where(ep => !ep.Name.EndsWith("(2)")).ToList();
-            // }
+            if (hideLocked)
+            {
+                missingEpisodes = missingEpisodes.Where(ep => !ep.Show.Locked).ToList();
+            }
 
-            // if (hideLocked)
-            // {
-            // missingEpisodes = missingEpisodes.Where(ep => !ep.Show.Locked).ToList();
-            // }
+            if (hideWholeSeasons)
+            {
+                List<Episode> episodesWithEntireSeasonMissing =
+                    this.GetEpisodesWithEntireSeasonMissing(missingEpisodes).ToList();
+                missingEpisodes = missingEpisodes.Except(episodesWithEntireSeasonMissing).ToList();
+            }
 
-            // if (hideWholeSeasons)
-            // {
-            // Dictionary<TvShow, Dictionary<int, int>> seasonCounts = this.storage.SeasonEpisodeCount();
-            // var removeEpsiodes = new List<Episode>();
-            // IEnumerable<IGrouping<TvShow, Episode>> showGroups = missingEpisodes.GroupBy(x => x.Show);
-            // foreach (var seasonGroup in from showGroup in showGroups
-            // let seasonGroups = showGroup.GroupBy(x => x.SeasonNumber)
-            // from seasonGroup in seasonGroups
-            // where seasonGroup.Count() == seasonCounts[showGroup.Key][seasonGroup.Key]
-            // select seasonGroup)
-            // {
-            // removeEpsiodes.AddRange(seasonGroup);
-            // }
+            this.Episodes = missingEpisodes.OrderBy(x => x.Show.Name).ToList();
+        }
 
-            // missingEpisodes = missingEpisodes.Where(x => !removeEpsiodes.Contains(x)).ToList();
-            // }
+        #endregion
 
-            // this.Episodes = missingEpisodes.OrderBy(x => x.Show.Name).ToList();
+        #region Methods
+
+        /// <summary>
+        /// Returns the episodes from missingEpisodes where the entire season is missing.
+        /// </summary>
+        /// <param name="missingEpisodes">
+        /// The missing episodes.
+        /// </param>
+        /// <returns>
+        /// The episodes from seasons where the entire season is missing.
+        /// </returns>
+        private IEnumerable<Episode> GetEpisodesWithEntireSeasonMissing(IEnumerable<Episode> missingEpisodes)
+        {
+            return
+                (from show in missingEpisodes.GroupBy(x => x.Show)
+                 select this.GetEpisodesWithEntireSeasonMissing(show.Key, show)).SelectMany(episodeList => episodeList);
+        }
+
+        /// <summary>
+        /// Returns the episodes from missingEpisodes where the entire season is missing.
+        /// </summary>
+        /// <param name="show">
+        /// The show the episodes are for.
+        /// </param>
+        /// <param name="missingEpisodes">
+        /// The missing episodes.
+        /// </param>
+        /// <returns>
+        /// The collection of episodes with their entire season missing.
+        /// </returns>
+        private IEnumerable<Episode> GetEpisodesWithEntireSeasonMissing(
+            TvShow show, IEnumerable<Episode> missingEpisodes)
+        {
+            return from season in missingEpisodes.GroupBy(x => x.SeasonNumber)
+                   let seasonSize = show.Episodes.Count(x => x.SeasonNumber == season.Key)
+                   where season.Count() == seasonSize
+                   from episode in season
+                   select episode;
         }
 
         #endregion

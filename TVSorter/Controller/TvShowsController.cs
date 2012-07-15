@@ -121,6 +121,14 @@ namespace TVSorter.Controller
         }
 
         /// <summary>
+        /// Refreshes the list of TVShows.
+        /// </summary>
+        public void RefreshShows()
+        {
+            this.Shows = new BindingList<TvShow>(TvShow.GetTvShows().ToList());
+        }
+
+        /// <summary>
         /// Removes the selected show.
         /// </summary>
         public void RemoveSelectedShow()
@@ -211,6 +219,7 @@ namespace TVSorter.Controller
                         {
                             show.Update();
                         }
+
                         this.OnPropertyChanged("SelectedShow");
                     });
             task.Start();
@@ -254,13 +263,5 @@ namespace TVSorter.Controller
         }
 
         #endregion
-
-        /// <summary>
-        /// Refreshes the list of TVShows.
-        /// </summary>
-        public void RefreshShows()
-        {
-            this.Shows = new BindingList<TvShow>(TvShow.GetTvShows().ToList());
-        }
     }
 }

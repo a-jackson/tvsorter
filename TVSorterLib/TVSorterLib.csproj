@@ -55,6 +55,7 @@
     <Compile Include="Files\FileManager.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="LogMessageEventArgs.cs" />
     <Compile Include="Files\ScanManager.cs">
