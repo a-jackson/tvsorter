@@ -1,7 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-
-<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
-           xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://code.google.com/p/tvsorter">
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://code.google.com/p/tvsorter" xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:element name="TVSorter">
     <xs:complexType>
       <xs:sequence>
@@ -11,7 +9,7 @@
               <xs:element name="DestinationDirectories">
                 <xs:complexType>
                   <xs:sequence>
-                    <xs:element minOccurs="0" maxOccurs="unbounded" name="Destination">
+                    <xs:element maxOccurs="unbounded" name="Destination">
                       <xs:complexType>
                         <xs:simpleContent>
                           <xs:extension base="xs:string">
@@ -52,28 +50,37 @@
             <xs:attribute name="renameifexists" type="xs:boolean" use="required" />
           </xs:complexType>
         </xs:element>
+        <xs:element name="MissingEpisodeSettings">
+          <xs:complexType>
+            <xs:attribute name="hidenotaired" type="xs:boolean" use="required" />
+            <xs:attribute name="hidelocked" type="xs:boolean" use="required" />
+            <xs:attribute name="hidepart2" type="xs:boolean" use="required" />
+            <xs:attribute name="hideseason0" type="xs:boolean" use="required" />
+            <xs:attribute name="hidemissingseasons" type="xs:boolean" use="required" />
+          </xs:complexType>
+        </xs:element>
         <xs:element name="Shows">
           <xs:complexType>
-            <xs:sequence minOccurs="0">
+            <xs:sequence>
               <xs:element maxOccurs="unbounded" name="Show">
                 <xs:complexType>
                   <xs:sequence>
                     <xs:element name="AlternateNames">
                       <xs:complexType>
                         <xs:sequence minOccurs="0">
-                          <xs:element maxOccurs="unbounded" name="AlternateName" type="xs:string" />
+                          <xs:element name="AlternateName" type="xs:string" />
                         </xs:sequence>
                       </xs:complexType>
                     </xs:element>
                     <xs:element name="Episodes">
                       <xs:complexType>
-                        <xs:sequence minOccurs="0">
+                        <xs:sequence>
                           <xs:element maxOccurs="unbounded" name="Episode">
                             <xs:complexType>
                               <xs:attribute name="name" type="xs:string" use="required" />
                               <xs:attribute name="tvdbid" type="xs:unsignedInt" use="required" />
-                              <xs:attribute name="seasonnum" type="xs:short" use="required" />
-                              <xs:attribute name="episodenum" type="xs:short" use="required" />
+                              <xs:attribute name="seasonnum" type="xs:unsignedShort" use="required" />
+                              <xs:attribute name="episodenum" type="xs:unsignedByte" use="required" />
                               <xs:attribute name="firstair" type="xs:dateTime" use="required" />
                               <xs:attribute name="filecount" type="xs:unsignedByte" use="required" />
                             </xs:complexType>
@@ -97,7 +104,7 @@
           </xs:complexType>
         </xs:element>
       </xs:sequence>
-      <xs:attribute name="version" type="xs:unsignedByte" use="required" fixed="1" />
+      <xs:attribute name="version" type="xs:unsignedByte" use="required" fixed="2" />
     </xs:complexType>
   </xs:element>
 </xs:schema>

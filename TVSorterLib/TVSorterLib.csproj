@@ -61,6 +61,7 @@
     <Compile Include="Files\ScanManager.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MissingEpisodeSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Storage\Xml.cs">
       <SubType>Code</SubType>
@@ -74,6 +75,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="TVSorter-1.0.xsd">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TVSorter-2.0.xsd">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

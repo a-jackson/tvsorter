@@ -56,6 +56,11 @@ namespace TVSorter.Controller
         #region Properties
 
         /// <summary>
+        /// Gets or sets the settings.
+        /// </summary>
+        public MissingEpisodeSettings Settings { get; set; }
+
+        /// <summary>
         ///   Gets or sets the View.
         /// </summary>
         private IView View { get; set; }
@@ -73,6 +78,7 @@ namespace TVSorter.Controller
         public override void Initialise(IView view)
         {
             this.View = view;
+            this.Settings = new MissingEpisodeSettings();
         }
 
         /// <summary>
@@ -97,49 +103,35 @@ namespace TVSorter.Controller
         /// <summary>
         /// Searches for missing episodes.
         /// </summary>
-        /// <param name="hideUnaired">
-        /// A value indicating whether the hide unaired episodes.
-        /// </param>
-        /// <param name="hideSeason0">
-        /// A value indicating whether to hide season 0.
-        /// </param>
-        /// <param name="hidePart2">
-        /// A value indicating whether to hide part 2 episodes.
-        /// </param>
-        /// <param name="hideLocked">
-        /// A value indicating whether to hide locked shows.
-        /// </param>
-        /// <param name="hideWholeSeasons">
-        /// A value indicating whether to hide entire missing seasons. 
-        /// </param>
-        public void SearchMissingEpisodes(
-            bool hideUnaired, bool hideSeason0, bool hidePart2, bool hideLocked, bool hideWholeSeasons)
+        public void SearchMissingEpisodes()
         {
+            this.Settings.Save();
+
             List<Episode> missingEpisodes = Episode.GetMissingEpisodes().ToList();
 
-            if (hideUnaired)
+            if (this.Settings.HideNotYetAired)
             {
                 missingEpisodes =
                     missingEpisodes.Where(
                         ep => ep.FirstAir < DateTime.Today && !ep.FirstAir.Equals(new DateTime(1970, 1, 1))).ToList();
             }
 
-            if (hideSeason0)
+            if (this.Settings.HideSeason0)
             {
                 missingEpisodes = missingEpisodes.Where(ep => ep.SeasonNumber != 0).ToList();
             }
 
-            if (hidePart2)
+            if (this.Settings.HidePart2)
             {
                 missingEpisodes = missingEpisodes.Where(ep => !ep.Name.EndsWith("(2)")).ToList();
             }
 
-            if (hideLocked)
+            if (this.Settings.HideLocked)
             {
                 missingEpisodes = missingEpisodes.Where(ep => !ep.Show.Locked).ToList();
             }
 
-            if (hideWholeSeasons)
+            if (this.Settings.HideMissingSeasons)
             {
                 List<Episode> episodesWithEntireSeasonMissing =
                     this.GetEpisodesWithEntireSeasonMissing(missingEpisodes).ToList();

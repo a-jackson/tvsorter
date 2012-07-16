@@ -10,6 +10,8 @@ namespace TVSorter
 {
     #region Using Directives
 
+    using System;
+    using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
     using System.Linq;
@@ -70,6 +72,32 @@ namespace TVSorter
         /// Gets the name of the show as seen by the program.
         /// </summary>
         public string ShowName { get; internal set; }
+
+        /// <summary>
+        /// Gets the full path of the file for the specified destination.
+        /// </summary>
+        /// <param name="destination">The destination directory.</param>
+        /// <returns>The full path of the file.</returns>
+        internal string GetFullPath(string destination)
+        {
+            if (this.Incomplete)
+            {
+                throw new InvalidOperationException("There is not enough data to get the file path.");
+            }
+
+            destination = destination.TrimEnd(Path.DirectorySeparatorChar);
+            return string.Concat(destination, Path.DirectorySeparatorChar, this.OutputPath);
+        }
+
+        /// <summary>
+        /// Determines the file's name contains any of the specified keywords.
+        /// </summary>
+        /// <param name="keywords">The keywords to check for.</param>
+        /// <returns>A value indicating whether the file name contains the keywords.</returns>
+        internal bool ContainsKeyword(IEnumerable<string> keywords)
+        {
+            return keywords.Any(keyword => this.InputFile.Name.ToLower().Contains(keyword.ToLower()));
+        }
 
         #endregion
 

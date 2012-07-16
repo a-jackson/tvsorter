@@ -9,6 +9,7 @@ namespace TVSorter.Storage
 
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Xml;
@@ -32,12 +33,12 @@ namespace TVSorter.Storage
         /// <summary>
         /// The current verison of the XML file.
         /// </summary>
-        private const int XmlVersion = 1;
+        private const int XmlVersion = 2;
 
         /// <summary>
         /// The file path of the XSD file. Contains the version number of the XML file.
         /// </summary>
-        private const string XsdFile = "TVSorter-{0}.xsd";
+        private const string XsdFile = "TVSorter-{0}.0.xsd";
 
         #endregion
 
@@ -121,6 +122,27 @@ namespace TVSorter.Storage
             }
 
             Settings.FromXml(settingsNode, settings);
+        }
+
+        /// <summary>
+        /// Loads the missing episode settings from the XML file.
+        /// </summary>
+        /// <param name="settings">The settings to load into.</param>
+        public void LoadMissingEpisodeSettings(MissingEpisodeSettings settings)
+        {
+            XDocument doc = this.GetDocument();
+            if (doc.Root == null)
+            {
+                throw new XmlException("XML is invalid.");
+            }
+
+            XElement settingsNode = doc.Root.Element(GetName("MissingEpisodeSettings"));
+            if (settingsNode == null)
+            {
+                throw new XmlSchemaException("The XML file is invalid.");
+            }
+
+            MissingEpisodeSettings.FromXml(settingsNode, settings);  
         }
 
         /// <summary>
@@ -216,6 +238,29 @@ namespace TVSorter.Storage
             }
 
             doc.Save(XmlFile);
+        }
+
+        /// <summary>
+        /// Saves the missing episode settings into the XML file.
+        /// </summary>
+        /// <param name="settings">The settings to save.</param>
+        public void SaveMissingEpisodeSettings(MissingEpisodeSettings settings)
+        {
+            XDocument doc = this.GetDocument();
+
+            if (doc.Root == null)
+            {
+                throw new XmlException("XML is invalid.");
+            }
+
+            XElement settingsNode = doc.Root.Element(GetName("MissingEpisodeSettings"));
+            if (settingsNode == null)
+            {
+                throw new XmlException("Xml is invalid");
+            }
+
+            settingsNode.ReplaceWith(settings.ToXml());
+            doc.Save(XmlFile);           
         }
 
         /// <summary>
@@ -320,20 +365,58 @@ namespace TVSorter.Storage
         private XDocument GetDocument()
         {
             XDocument doc = XDocument.Load(XmlFile);
-            var version = (int)float.Parse(doc.Declaration.Version);
+            if (doc.Root == null)
+            {
+                throw new XmlSchemaValidationException("The XML file is invalid.");
+            }
+
+            var version = int.Parse(doc.Root.GetAttribute("version", "1"));
 
             // Check that the XML is up to date.
             if (version < XmlVersion)
             {
-                // Update the latest version
+                // Ensure that the file is valid for it's version
+                this.ValidateXml(string.Format(XsdFile, version));
+
+                if (version < 2)
+                {
+                    var settingsNode = doc.Root.Element("Settings");
+                    if (settingsNode != null)
+                    {
+                        settingsNode.AddAfterSelf(
+                            new XElement(
+                                GetName("MissingEpisodeSettings"),
+                                new XAttribute("hidenotaired", false),
+                                new XAttribute("hidelocked", false),
+                                new XAttribute("hidepart2", false),
+                                new XAttribute("hideseason0", false),
+                                new XAttribute("hidemissingseasons", false)));
+                    }
+                }
+
+                var versionAttribute = doc.Root.Attribute("version");
+                if (versionAttribute != null)
+                {
+                    versionAttribute.Value = XmlVersion.ToString(CultureInfo.InvariantCulture);
+                }
+
+                doc.Save(XmlFile);
             }
 
-            string schema = string.Format(XsdFile, doc.Declaration.Version);
+            this.ValidateXml(string.Format(XsdFile, XmlVersion));
+            return doc;
+        }
 
+        /// <summary>
+        /// Validates the XML file against the specified schema.
+        /// </summary>
+        /// <param name="schema">The schama to validate against.</param>
+        private void ValidateXml(string schema)
+        {
             if (File.Exists(schema))
             {
                 // Get the schemas to validate against.
-                var settings = new XmlReaderSettings() { ValidationType = ValidationType.Schema };
+                var settings = new XmlReaderSettings { ValidationType = ValidationType.Schema };
                 settings.Schemas.Add(XmlNamespace.NamespaceName, schema);
                 settings.ValidationEventHandler +=
                     (sender, args) => { throw new XmlSchemaValidationException(args.Message, args.Exception); };
@@ -349,8 +432,6 @@ namespace TVSorter.Storage
             {
                 throw new FileNotFoundException("The XSD schema could not be found.", schema);
             }
-
-            return doc;
         }
 
         /// <summary>
@@ -380,8 +461,13 @@ namespace TVSorter.Storage
                 {
                     // Create the file and populate with default settings.
                     var doc = new XDocument(
-                        new XDeclaration(XmlVersion + ".0", "utf-8", "yes"), 
-                        new XElement(GetName("TVSorter"), new Settings(true).ToXml(), new XElement(GetName("Shows"))));
+                        new XDeclaration("1.0", "utf-8", "yes"),
+                        new XElement(
+                            GetName("TVSorter"),
+                            new XAttribute("version", XmlVersion),
+                            new Settings(true).ToXml(),
+                            new MissingEpisodeSettings(true).ToXml(),
+                            new XElement(GetName("Shows"))));
 
                     doc.Save(XmlFile);
                 }

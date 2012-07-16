@@ -55,7 +55,7 @@ namespace TVSorter
         public void Copy()
         {
             var fileManager = new FileManager();
-            fileManager.CopyFile(this.Results.Where(x => x.Checked && !x.Incomplete).ToList());
+            fileManager.CopyFile(this.Results.Where(x => x.Checked).ToList());
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace TVSorter
         public void Move()
         {
             var fileManager = new FileManager();
-            fileManager.MoveFile(this.Results.Where(x => x.Checked && !x.Incomplete).ToList());
+            fileManager.MoveFile(this.Results.Where(x => x.Checked).ToList());
         }
 
         /// <summary>

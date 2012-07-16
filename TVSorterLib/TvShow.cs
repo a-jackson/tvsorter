@@ -360,7 +360,7 @@ namespace TVSorter
             show.UseDvdOrder = bool.Parse(showNode.GetAttribute("usedvdorder", "false"));
             show.Locked = bool.Parse(showNode.GetAttribute("locked", "false"));
             show.LastUpdated = DateTime.Parse(showNode.GetAttribute("lastupdated", "1970-01-01 00:00:00"));
-            show.AlternateNames = showNode.Descendants("AlternateName").Select(altName => altName.Value).ToList();
+            show.AlternateNames = showNode.Descendants(Xml.GetName("AlternateName")).Select(altName => altName.Value).ToList();
             show.Episodes = showNode.Descendants(Xml.GetName("Episode")).Select(x => new Episode(x) { Show = show }).ToList();
         }
 

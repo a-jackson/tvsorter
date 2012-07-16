@@ -102,84 +102,83 @@ namespace TVSorter.Files
         /// </param>
         private void ProcessFiles(IEnumerable<FileResult> files, SortType type)
         {
-            foreach (FileResult file in files)
+            foreach (var file in files)
             {
-                FileResult file1 = file;
-                if (file1.Incomplete)
+                this.ProcessFile(type, file);
+            }
+        }
+
+        /// <summary>
+        /// Processes a single file.
+        /// </summary>
+        /// <param name="type">The sort type to use.</param>
+        /// <param name="file">The file to process.</param>
+        private void ProcessFile(SortType type, FileResult file)
+        {
+            if (file.Incomplete)
+            {
+                Logger.OnLogMessage(this, "Skipping {0}. Not enough information.", file.InputFile.Name);
+                return;
+            }
+
+            var destinationInfo = new FileInfo(file.GetFullPath(this.settings.DestinationDirectory));
+            if (destinationInfo.Directory != null && !destinationInfo.Directory.Exists)
+            {
+                destinationInfo.Directory.Create();
+            }
+
+            // If the file name contains any overwrite keywords.
+            if (file.ContainsKeyword(this.settings.OverwriteKeywords))
+            {
+                // Get the new path for all the destination directories.
+                IEnumerable<string> destinationFiles = this.settings.DestinationDirectories.Select(file.GetFullPath);
+
+                // If the file exists at any of the destinations. Then delete it.
+                foreach (var oldFile in destinationFiles.Where(File.Exists))
                 {
-                    continue;
+                    File.Delete(oldFile);
                 }
+            }
 
-                string destination = string.Format(
-                    "{0}{1}{2}", this.settings.DestinationDirectory, Path.DirectorySeparatorChar, file1.OutputPath);
-
-                var destinationInfo = new FileInfo(destination);
-                if (destinationInfo.Directory != null && !destinationInfo.Directory.Exists)
-                {
-                    destinationInfo.Directory.Create();
-                }
-
-                // Get the path for all the destination directories.
-                IEnumerable<string> destinationFiles = from dest in this.settings.DestinationDirectories
-                                                       select
-                                                           string.Format(
-                                                               "{0}{1}{2}", 
-                                                               dest, 
-                                                               Path.DirectorySeparatorChar, 
-                                                               file1.OutputPath);
-                bool continueFile = true;
-
-                // Check if the destination exists in any of the destinations
-                foreach (bool any in
-                    destinationFiles.Where(File.Exists).Select(
-                        dest =>
-                        this.settings.OverwriteKeywords.Any(
-                            keyword => file1 != null && file1.InputFile.Name.ToLower().Contains(keyword.ToLower()))))
-                {
-                    if (any)
+            switch (type)
+            {
+                case SortType.Move:
+                    file.InputFile.MoveTo(destinationInfo.FullName);
+                    Logger.OnLogMessage(this, "Moved {0}", file.InputFile.Name);
+                    if (this.settings.DeleteEmptySubdirectories)
                     {
-                        destinationInfo.Delete();
-                        break;
+                        this.DeleteEmptySubdirectories(file);
                     }
 
-                    continueFile = false;
-                }
+                    break;
+                case SortType.Copy:
+                    file.InputFile.CopyTo(destinationInfo.Name);
+                    Logger.OnLogMessage(this, "Copied {0}", file.InputFile.Name);
+                    break;
+            }
 
-                if (!continueFile)
+            file.Episode.FileCount++;
+            file.Episode.Save();
+        }
+
+        /// <summary>
+        /// Deletes the subdirectories of the file if they are empty.
+        /// </summary>
+        /// <param name="file">The file to check.</param>
+        private void DeleteEmptySubdirectories(FileResult file)
+        {
+            // If no files exist in the directory
+            if (file.InputFile.Directory != null && !file.InputFile.Directory.GetFiles().Any()
+                && !file.InputFile.Directory.GetDirectories().Any())
+            {
+                // If this isn't the source directory
+                if (
+                    !file.InputFile.Directory.FullName.TrimEnd(Path.DirectorySeparatorChar).Equals(
+                        this.settings.SourceDirectory.TrimEnd(Path.DirectorySeparatorChar)))
                 {
-                    continue;
+                    file.InputFile.Directory.Delete(true);
+                    Logger.OnLogMessage(this, "Delete directory: {0}", file.InputFile.DirectoryName);
                 }
-
-                switch (type)
-                {
-                    case SortType.Move:
-                        File.Move(file1.InputFile.FullName, destination);
-                        Logger.OnLogMessage(this, "Moved {0}", file1.InputFile.Name);
-                        if (this.settings.DeleteEmptySubdirectories)
-                        {
-                            // If no files exist in the directory
-                            if (file1.InputFile.Directory != null && !file1.InputFile.Directory.GetFiles().Any())
-                            {
-                                // If this isn't the source directory
-                                if (
-                                    !file1.InputFile.Directory.FullName.TrimEnd(Path.DirectorySeparatorChar).Equals(
-                                        this.settings.SourceDirectory.TrimEnd(Path.DirectorySeparatorChar)))
-                                {
-                                    file1.InputFile.Directory.Delete(true);
-                                    Logger.OnLogMessage(this, "Delete directory: {0}", file1.InputFile.DirectoryName);
-                                }
-                            }
-                        }
-
-                        break;
-                    case SortType.Copy:
-                        File.Copy(file1.InputFile.FullName, destination);
-                        Logger.OnLogMessage(this, "Copied {0}", file1.InputFile.Name);
-                        break;
-                }
-
-                file.Episode.FileCount++;
-                file.Episode.Save();
             }
         }
 

@@ -94,12 +94,13 @@ namespace TVSorter.View
         /// </param>
         private void MissingButtonClick(object sender, EventArgs e)
         {
-            this.controller.SearchMissingEpisodes(
-                this.hideUnaired.Checked, 
-                this.hideSeason0.Checked, 
-                this.hidePart2.Checked, 
-                this.hideLocked.Checked, 
-                this.hideWholeSeasons.Checked);
+            this.controller.Settings.HideLocked = this.hideLocked.Checked;
+            this.controller.Settings.HidePart2 = this.hidePart2.Checked;
+            this.controller.Settings.HideSeason0 = this.hideSeason0.Checked;
+            this.controller.Settings.HideNotYetAired = this.hideUnaired.Checked;
+            this.controller.Settings.HideMissingSeasons = this.hideWholeSeasons.Checked;
+
+            this.controller.SearchMissingEpisodes();
         }
 
         /// <summary>
@@ -114,6 +115,11 @@ namespace TVSorter.View
         private void MissingDuplicateEpisodesLoad(object sender, EventArgs e)
         {
             this.controller.Initialise(this);
+            this.hideLocked.Checked = this.controller.Settings.HideLocked;
+            this.hidePart2.Checked = this.controller.Settings.HidePart2;
+            this.hideSeason0.Checked = this.controller.Settings.HideSeason0;
+            this.hideUnaired.Checked = this.controller.Settings.HideNotYetAired;
+            this.hideWholeSeasons.Checked = this.controller.Settings.HideMissingSeasons;
         }
 
         /// <summary>
