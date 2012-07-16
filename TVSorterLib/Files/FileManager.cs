@@ -140,6 +140,12 @@ namespace TVSorter.Files
                 }
             }
 
+            if (destinationInfo.Exists)
+            {
+                Logger.OnLogMessage(this, "Skipping {0}. Already exists.", destinationInfo.Name);
+                return;
+            }
+
             switch (type)
             {
                 case SortType.Move:
@@ -152,7 +158,7 @@ namespace TVSorter.Files
 
                     break;
                 case SortType.Copy:
-                    file.InputFile.CopyTo(destinationInfo.Name);
+                    file.InputFile.CopyTo(destinationInfo.FullName);
                     Logger.OnLogMessage(this, "Copied {0}", file.InputFile.Name);
                     break;
             }

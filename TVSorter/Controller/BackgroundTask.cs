@@ -10,6 +10,7 @@ namespace TVSorter.Controller
 {
     using System;
     using System.Threading.Tasks;
+    using System.Windows.Forms;
 
     /// <summary>
     /// A task that runs in the background
@@ -56,7 +57,18 @@ namespace TVSorter.Controller
         /// </summary>
         public void Start()
         {
-            Task task = Task.Factory.StartNew(this.action);
+            Task task = Task.Factory.StartNew(
+                () =>
+                    {
+                        try
+                        {
+                            this.action();
+                        }
+                        catch (Exception e)
+                        {
+                            MessageBox.Show(e.Message);
+                        }
+                    });
             task.ContinueWith(delegate { this.TaskComplete(this, EventArgs.Empty); });
         }
 
