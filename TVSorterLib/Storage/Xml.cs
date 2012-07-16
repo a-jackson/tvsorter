@@ -370,7 +370,23 @@ namespace TVSorter.Storage
                 throw new XmlSchemaValidationException("The XML file is invalid.");
             }
 
-            var version = int.Parse(doc.Root.GetAttribute("version", "1"));
+            var root = doc.Root;
+
+            var version = int.Parse(doc.Root.GetAttribute("version", "0"));
+            if (version == 0)
+            {
+                // Verison 0 is the XML before it was verisoned from 1.0b.
+                // Add the version and namespace declaration so it will match verison 1.
+                doc.Root.Add(new XAttribute("version", 1));
+
+                foreach (var element in doc.Descendants())
+                {
+                    element.Name = GetName(element.Name.LocalName);
+                }
+
+                version = 1;
+                doc.Save(XmlFile);
+            }
 
             // Check that the XML is up to date.
             if (version < XmlVersion)
@@ -380,21 +396,23 @@ namespace TVSorter.Storage
 
                 if (version < 2)
                 {
-                    var settingsNode = doc.Root.Element("Settings");
-                    if (settingsNode != null)
+                    var settingsNode = root.Element(GetName("Settings"));
+                    if (settingsNode == null)
                     {
-                        settingsNode.AddAfterSelf(
-                            new XElement(
-                                GetName("MissingEpisodeSettings"),
-                                new XAttribute("hidenotaired", false),
-                                new XAttribute("hidelocked", false),
-                                new XAttribute("hidepart2", false),
-                                new XAttribute("hideseason0", false),
-                                new XAttribute("hidemissingseasons", false)));
+                        throw new XmlException("XML is not valid.");
                     }
+
+                    settingsNode.AddAfterSelf(
+                        new XElement(
+                            GetName("MissingEpisodeSettings"),
+                            new XAttribute("hidenotaired", false),
+                            new XAttribute("hidelocked", false),
+                            new XAttribute("hidepart2", false),
+                            new XAttribute("hideseason0", false),
+                            new XAttribute("hidemissingseasons", false)));
                 }
 
-                var versionAttribute = doc.Root.Attribute("version");
+                var versionAttribute = root.Attribute("version");
                 if (versionAttribute != null)
                 {
                     versionAttribute.Value = XmlVersion.ToString(CultureInfo.InvariantCulture);
