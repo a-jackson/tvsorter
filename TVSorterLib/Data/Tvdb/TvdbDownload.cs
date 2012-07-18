@@ -2,6 +2,9 @@
 // <copyright company="TVSorter" file="TvdbDownload.cs">
 //   2012 - Andrew Jackson
 // </copyright>
+// <summary>
+//   Downloads the XML files from the TVDB.
+// </summary>
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter.Data.Tvdb
 {

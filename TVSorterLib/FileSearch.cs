@@ -2,6 +2,9 @@
 // <copyright file="FileSearch.cs" company="TVSorter">
 //   2012 - Andrew Jackson
 // </copyright>
+// <summary>
+//   Searches the files and presents the results.
+// </summary>
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter
 {
@@ -45,7 +48,7 @@ namespace TVSorter
         /// </summary>
         public static void RefreshFileCounts()
         {
-            var scanManager = new ScanManager();
+            var scanManager = new ScanManager(Factory.StorageProvider);
             scanManager.RefreshFileCounts();
         }
 
@@ -54,7 +57,7 @@ namespace TVSorter
         /// </summary>
         public void Copy()
         {
-            var fileManager = new FileManager();
+            var fileManager = new FileManager(Factory.StorageProvider);
             fileManager.CopyFile(this.Results.Where(x => x.Checked).ToList());
         }
 
@@ -63,7 +66,7 @@ namespace TVSorter
         /// </summary>
         public void Move()
         {
-            var fileManager = new FileManager();
+            var fileManager = new FileManager(Factory.StorageProvider);
             fileManager.MoveFile(this.Results.Where(x => x.Checked).ToList());
         }
 
@@ -80,7 +83,7 @@ namespace TVSorter
                 subDirectory = Path.DirectorySeparatorChar.ToString(CultureInfo.InvariantCulture);
             }
 
-            var scanManager = new ScanManager();
+            var scanManager = new ScanManager(Factory.StorageProvider);
             this.Results = scanManager.Refresh(subDirectory);
             Logger.OnLogMessage(this, "Scan complete. Found {0} files.", this.Results.Count);
         }
@@ -112,7 +115,7 @@ namespace TVSorter
         /// </param>
         public void SetShow(TvShow show)
         {
-            var scanManager = new ScanManager();
+            var scanManager = new ScanManager(Factory.StorageProvider);
             foreach (FileResult result in this.Results.Where(x => x.Checked))
             {
                 scanManager.ResetShow(result, show);
@@ -124,7 +127,7 @@ namespace TVSorter
         /// </summary>
         public void UpdateFileCounts()
         {
-            var scanManager = new ScanManager();
+            var scanManager = new ScanManager(Factory.StorageProvider);
             scanManager.RefreshFileCounts();
         }
 

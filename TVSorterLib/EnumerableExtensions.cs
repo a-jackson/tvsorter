@@ -2,6 +2,9 @@
 // <copyright file="EnumerableExtensions.cs" company="TVSorter">
 //   2012 - Andrew Jackson
 // </copyright>
+// <summary>
+//   Extenstions to the IEnumerable interface.
+// </summary>
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter
 {
@@ -22,10 +25,10 @@ namespace TVSorter
         /// <param name="shows">
         /// The shows to save.
         /// </param>
-        internal static void Save(this IEnumerable<TvShow> shows)
+        /// <param name="provider">The provider to save the shows with. </param>
+        internal static void Save(this IEnumerable<TvShow> shows, IStorageProvider provider)
         {
-            var xml = new Xml();
-            xml.SaveShows(shows);
+            provider.SaveShows(shows);
         }
 
         #endregion

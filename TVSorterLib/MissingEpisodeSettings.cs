@@ -5,9 +5,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter
 {
-    using System.IO;
-    using System.Xml.Linq;
-
     using TVSorter.Storage;
 
     /// <summary>
@@ -20,38 +17,9 @@ namespace TVSorter
         /// <summary>
         /// Initializes a new instance of the <see cref="MissingEpisodeSettings"/> class.
         /// </summary>
-        public MissingEpisodeSettings()
+        internal MissingEpisodeSettings()
         {
-            this.LoadSettings();
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MissingEpisodeSettings"/> class.
-        /// </summary>
-        /// <param name="useDefault">
-        /// Indicates whether to use the default settings.
-        /// </param>
-        internal MissingEpisodeSettings(bool useDefault)
-        {
-            if (useDefault)
-            {
-                this.SetDefault();
-            }
-            else
-            {
-                this.LoadSettings();
-            }
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MissingEpisodeSettings"/> class from XML.
-        /// </summary>
-        /// <param name="element">
-        /// The element to load from.
-        /// </param>
-        internal MissingEpisodeSettings(XElement element)
-        {
-            FromXml(element, this);
+            this.SetDefault();
         }
 
         #endregion
@@ -85,65 +53,54 @@ namespace TVSorter
 
         #endregion
 
+        #region Public Methods and Operators
+
+        /// <summary>
+        /// Loads a new MissingEpisodeSettings objects.
+        /// </summary>
+        /// <returns>The new MissingEpisodeSettings object.</returns>
+        public static MissingEpisodeSettings LoadSettings()
+        {
+            return LoadSettings(Factory.StorageProvider);
+        }
+
         /// <summary>
         /// Saves the missing episode settings.
         /// </summary>
         public void Save()
         {
-            var xml = new Xml();
-            xml.SaveMissingEpisodeSettings(this);
+            this.Save(Factory.StorageProvider);
         }
+
+        #endregion
 
         #region Methods
 
         /// <summary>
-        /// Loads the specified missing episode settings from XML.
+        /// Loads the settings.
         /// </summary>
-        /// <param name="missingEpsiodeElement">
-        /// The XML element to load from.
+        /// <param name="provider">
+        /// The storage provider to load the settings from.
         /// </param>
-        /// <param name="settings">
-        /// The settings to load into.
-        /// </param>
-        internal static void FromXml(XElement missingEpsiodeElement, MissingEpisodeSettings settings)
+        /// <returns>
+        /// The new MissingEpisodeSettings object.
+        /// </returns>
+        internal static MissingEpisodeSettings LoadSettings(IStorageProvider provider)
         {
-            settings.HideNotYetAired = bool.Parse(missingEpsiodeElement.GetAttribute("hidenotaired", "false"));
-            settings.HideLocked = bool.Parse(missingEpsiodeElement.GetAttribute("hidelocked", "false"));
-            settings.HidePart2 = bool.Parse(missingEpsiodeElement.GetAttribute("hidepart2", "false"));
-            settings.HideSeason0 = bool.Parse(missingEpsiodeElement.GetAttribute("hideseason0", "false"));
-            settings.HideMissingSeasons = bool.Parse(missingEpsiodeElement.GetAttribute("hidemissingseasons", "false"));
+            var settings = new MissingEpisodeSettings();
+            provider.LoadMissingEpisodeSettings(settings);
+            return settings;
         }
 
         /// <summary>
-        /// Converts the settings to XML.
+        /// Saves the missing episode settings.
         /// </summary>
-        /// <returns>The XML for the settings.</returns>
-        internal XElement ToXml()
+        /// <param name="provider">
+        /// The settings to save.
+        /// </param>
+        internal void Save(IStorageProvider provider)
         {
-            return new XElement(
-                Xml.GetName("MissingEpisodeSettings"), 
-                new XAttribute("hidenotaired", this.HideNotYetAired), 
-                new XAttribute("hidelocked", this.HideLocked), 
-                new XAttribute("hidepart2", this.HidePart2), 
-                new XAttribute("hideseason0", this.HideSeason0), 
-                new XAttribute("hidemissingseasons", this.HideMissingSeasons));
-        }
-
-        /// <summary>
-        /// Loads the settings from the XML file.
-        /// </summary>
-        private void LoadSettings()
-        {
-            try
-            {
-                var xml = new Xml();
-                xml.LoadMissingEpisodeSettings(this);
-            }
-            catch (IOException)
-            {
-                // Settings file does not exist. Use default settings.
-                this.SetDefault();
-            }
+            provider.SaveMissingEpisodeSettings(this);
         }
 
         /// <summary>

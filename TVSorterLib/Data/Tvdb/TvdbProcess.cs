@@ -16,6 +16,8 @@ namespace TVSorter.Data.Tvdb
     using System.Linq;
     using System.Xml.Linq;
 
+    using TVSorter.Storage;
+
     #endregion
 
     /// <summary>

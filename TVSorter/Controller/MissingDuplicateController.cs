@@ -78,7 +78,7 @@ namespace TVSorter.Controller
         public override void Initialise(IView view)
         {
             this.View = view;
-            this.Settings = new MissingEpisodeSettings();
+            this.Settings = MissingEpisodeSettings.LoadSettings();
         }
 
         /// <summary>

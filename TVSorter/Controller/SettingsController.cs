@@ -69,7 +69,7 @@ namespace TVSorter.Controller
         /// </summary>
         public void Revert()
         {
-            this.Settings = new Settings();
+            this.Settings = Settings.LoadSettings();
         }
 
         /// <summary>

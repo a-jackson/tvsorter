@@ -19,7 +19,7 @@ namespace TVSorter.Data.Tvdb
     /// <summary>
     /// Manages accessing show data from the TVDB.
     /// </summary>
-    internal class Tvdb
+    internal class Tvdb : IDataProvider
     {
         #region Static Fields
 
@@ -36,7 +36,7 @@ namespace TVSorter.Data.Tvdb
         #endregion
 
         #region Fields
-        
+
         /// <summary>
         ///   The tvdb process.
         /// </summary>
@@ -47,7 +47,7 @@ namespace TVSorter.Data.Tvdb
         #region Constructors and Destructors
 
         /// <summary>
-        ///   Initializes a new instance of the <see cref="Tvdb" /> class. Initialises a new instance of the <see cref="Tvdb" /> class.
+        /// Initializes a new instance of the <see cref="Tvdb"/> class.
         /// </summary>
         public Tvdb()
         {

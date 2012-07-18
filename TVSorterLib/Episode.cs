@@ -2,9 +2,6 @@
 // <copyright company="TVSorter" file="Episode.cs">
 //   2012 - Andrew Jackson
 // </copyright>
-// <summary>
-//   The episode.
-// </summary>
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter
 {
@@ -12,7 +9,6 @@ namespace TVSorter
 
     using System;
     using System.Collections.Generic;
-    using System.Xml.Linq;
 
     using TVSorter.Storage;
 
@@ -30,17 +26,6 @@ namespace TVSorter
         /// </summary>
         internal Episode()
         {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Episode"/> class from XML.
-        /// </summary>
-        /// <param name="element">
-        /// The episode element.
-        /// </param>
-        internal Episode(XElement element)
-        {
-            FromXml(element, this);
         }
 
         #endregion
@@ -92,8 +77,7 @@ namespace TVSorter
         /// <returns>A collection of episodes.</returns>
         public static IEnumerable<Episode> GetDuplicateEpisodes()
         {
-            var xml = new Xml();
-            return xml.GetDuplicateEpisodes();
+            return Factory.StorageProvider.GetDuplicateEpisodes();
         }
 
         /// <summary>
@@ -102,8 +86,7 @@ namespace TVSorter
         /// <returns>A collection of episodes.</returns>
         public static IEnumerable<Episode> GetMissingEpisodes()
         {
-            var xml = new Xml();
-            return xml.GetMissingEpisodes();
+            return Factory.StorageProvider.GetMissingEpisodes();
         }
 
         /// <summary>
@@ -172,53 +155,19 @@ namespace TVSorter
             return this.TvdbId != null ? this.TvdbId.GetHashCode() : 0;
         }
 
-        /// <summary>
-        /// Saves the episode.
-        /// </summary>
-        public void Save()
-        {
-            var xml = new Xml();
-            xml.SaveEpisode(this);
-        }
-
         #endregion
 
         #region Methods
 
         /// <summary>
-        /// Loads the episode from XML.
+        /// Saves the episode.
         /// </summary>
-        /// <param name="episodeNode">
-        /// The Episode element to load.
+        /// <param name="provider">
+        /// The provider to save the episode to.
         /// </param>
-        /// <param name="episode">
-        /// The episode to load into.
-        /// </param>
-        internal static void FromXml(XElement episodeNode, Episode episode)
+        internal void Save(IStorageProvider provider)
         {
-            episode.Name = episodeNode.GetAttribute("name", string.Empty);
-            episode.TvdbId = episodeNode.GetAttribute("tvdbid", string.Empty);
-            episode.SeasonNumber = int.Parse(episodeNode.GetAttribute("seasonnum", "-1"));
-            episode.EpisodeNumber = int.Parse(episodeNode.GetAttribute("episodenum", "-1"));
-            episode.FirstAir = DateTime.Parse(episodeNode.GetAttribute("firstair", "1970-01-01 00:00:00"));
-            episode.FileCount = int.Parse(episodeNode.GetAttribute("filecount", "0"));
-        }
-
-        /// <summary>
-        /// Converts the episode to XML.
-        /// </summary>
-        /// <returns>The XElement.</returns>
-        internal XElement ToXml()
-        {
-            var episodeElement = new XElement(
-                Xml.GetName("Episode"), 
-                new XAttribute("name", this.Name), 
-                new XAttribute("tvdbid", this.TvdbId), 
-                new XAttribute("seasonnum", this.SeasonNumber), 
-                new XAttribute("episodenum", this.EpisodeNumber), 
-                new XAttribute("firstair", this.FirstAir), 
-                new XAttribute("filecount", this.FileCount));
-            return episodeElement;
+            provider.SaveEpisode(this);
         }
 
         #endregion

@@ -31,6 +31,8 @@ namespace TVSorter
         /// </param>
         public static void Main(string[] args)
         {
+            Logger.LogMessage += (sender, e) => Console.WriteLine(e.LogMessage);
+
             foreach (string arg in args)
             {
                 switch (arg.ToLower())

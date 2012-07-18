@@ -14,6 +14,8 @@ namespace TVSorter.Files
     using System.IO;
     using System.Linq;
 
+    using TVSorter.Storage;
+
     #endregion
 
     /// <summary>
@@ -21,6 +23,11 @@ namespace TVSorter.Files
     /// </summary>
     internal class FileManager
     {
+        /// <summary>
+        /// The storage provider.
+        /// </summary>
+        private readonly IStorageProvider provider;
+
         #region Fields
 
         /// <summary>
@@ -33,12 +40,15 @@ namespace TVSorter.Files
         #region Constructors and Destructors
 
         /// <summary>
-        ///   Initializes a new instance of the <see cref="FileManager" /> class. Initialises a new instance of the <see
-        ///    cref="FileManager" /> class.
+        /// Initializes a new instance of the <see cref="FileManager"/> class. Initialises a new instance of the <see cref="FileManager"/> class.
         /// </summary>
-        public FileManager()
+        /// <param name="provider">
+        /// The provider.
+        /// </param>
+        internal FileManager(IStorageProvider provider)
         {
-            this.settings = new Settings();
+            this.provider = provider;
+            this.settings = Settings.LoadSettings(provider);
         }
 
         #endregion
@@ -92,27 +102,37 @@ namespace TVSorter.Files
         #region Methods
 
         /// <summary>
-        /// Processes the specified list of files.
+        /// Deletes the subdirectories of the file if they are empty.
         /// </summary>
-        /// <param name="files">
-        /// The list of files to process. 
+        /// <param name="file">
+        /// The file to check.
         /// </param>
-        /// <param name="type">
-        /// The operation to perform on the files. 
-        /// </param>
-        private void ProcessFiles(IEnumerable<FileResult> files, SortType type)
+        private void DeleteEmptySubdirectories(FileResult file)
         {
-            foreach (var file in files)
+            // If no files exist in the directory
+            if (file.InputFile.Directory != null && !file.InputFile.Directory.GetFiles().Any()
+                && !file.InputFile.Directory.GetDirectories().Any())
             {
-                this.ProcessFile(type, file);
+                // If this isn't the source directory
+                if (
+                    !file.InputFile.Directory.FullName.TrimEnd(Path.DirectorySeparatorChar).Equals(
+                        this.settings.SourceDirectory.TrimEnd(Path.DirectorySeparatorChar)))
+                {
+                    file.InputFile.Directory.Delete(true);
+                    Logger.OnLogMessage(this, "Delete directory: {0}", file.InputFile.DirectoryName);
+                }
             }
         }
 
         /// <summary>
         /// Processes a single file.
         /// </summary>
-        /// <param name="type">The sort type to use.</param>
-        /// <param name="file">The file to process.</param>
+        /// <param name="type">
+        /// The sort type to use.
+        /// </param>
+        /// <param name="file">
+        /// The file to process.
+        /// </param>
         private void ProcessFile(SortType type, FileResult file)
         {
             if (file.Incomplete)
@@ -134,7 +154,7 @@ namespace TVSorter.Files
                 IEnumerable<string> destinationFiles = this.settings.DestinationDirectories.Select(file.GetFullPath);
 
                 // If the file exists at any of the destinations. Then delete it.
-                foreach (var oldFile in destinationFiles.Where(File.Exists))
+                foreach (string oldFile in destinationFiles.Where(File.Exists))
                 {
                     File.Delete(oldFile);
                 }
@@ -164,27 +184,23 @@ namespace TVSorter.Files
             }
 
             file.Episode.FileCount++;
-            file.Episode.Save();
+            file.Episode.Save(this.provider);
         }
 
         /// <summary>
-        /// Deletes the subdirectories of the file if they are empty.
+        /// Processes the specified list of files.
         /// </summary>
-        /// <param name="file">The file to check.</param>
-        private void DeleteEmptySubdirectories(FileResult file)
+        /// <param name="files">
+        /// The list of files to process. 
+        /// </param>
+        /// <param name="type">
+        /// The operation to perform on the files. 
+        /// </param>
+        private void ProcessFiles(IEnumerable<FileResult> files, SortType type)
         {
-            // If no files exist in the directory
-            if (file.InputFile.Directory != null && !file.InputFile.Directory.GetFiles().Any()
-                && !file.InputFile.Directory.GetDirectories().Any())
+            foreach (FileResult file in files)
             {
-                // If this isn't the source directory
-                if (
-                    !file.InputFile.Directory.FullName.TrimEnd(Path.DirectorySeparatorChar).Equals(
-                        this.settings.SourceDirectory.TrimEnd(Path.DirectorySeparatorChar)))
-                {
-                    file.InputFile.Directory.Delete(true);
-                    Logger.OnLogMessage(this, "Delete directory: {0}", file.InputFile.DirectoryName);
-                }
+                this.ProcessFile(type, file);
             }
         }
 

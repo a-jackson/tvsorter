@@ -65,17 +65,6 @@ namespace TVSorter.Controller
         }
 
         /// <summary>
-        ///   Gets Settings.
-        /// </summary>
-        public Settings Settings
-        {
-            get
-            {
-                return new Settings();
-            }
-        }
-
-        /// <summary>
         ///   Gets Shows.
         /// </summary>
         public List<TvShow> Shows
@@ -211,7 +200,7 @@ namespace TVSorter.Controller
 
             try
             {
-                var source = new DirectoryInfo(this.Settings.SourceDirectory);
+                var source = new DirectoryInfo(Settings.LoadSettings().SourceDirectory);
                 if (source.Exists)
                 {
                     dirs.Add(Path.DirectorySeparatorChar.ToString(CultureInfo.InvariantCulture));

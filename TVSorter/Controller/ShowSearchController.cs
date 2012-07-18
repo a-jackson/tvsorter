@@ -126,7 +126,7 @@ namespace TVSorter.Controller
         /// </param>
         public virtual void Select(int index)
         {
-            var show = new TvShow(this.SearchResults[index]);
+            var show = TvShow.FromSearchResult(this.SearchResults[index]);
             show.Save();
         }
 

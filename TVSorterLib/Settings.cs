@@ -2,9 +2,6 @@
 // <copyright company="TVSorter" file="Settings.cs">
 //   2012 - Andrew Jackson
 // </copyright>
-// <summary>
-//   The settings.
-// </summary>
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter
 {
@@ -14,8 +11,6 @@ namespace TVSorter
     using System.Globalization;
     using System.IO;
     using System.Linq;
-    using System.Xml.Linq;
-    using System.Xml.Schema;
 
     using TVSorter.Storage;
 
@@ -31,38 +26,9 @@ namespace TVSorter
         /// <summary>
         /// Initializes a new instance of the <see cref="Settings"/> class. 
         /// </summary>
-        public Settings()
+        internal Settings()
         {
-            this.LoadSettings();
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Settings"/> class. With the option to use the default settings.
-        /// </summary>
-        /// <param name="useDefault">
-        /// A value indicating whether the default settings should be used.
-        /// </param>
-        internal Settings(bool useDefault)
-        {
-            if (useDefault)
-            {
-                this.SetDefault();
-            }
-            else
-            {
-                this.LoadSettings();
-            }
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Settings"/> class form XML.
-        /// </summary>
-        /// <param name="element">
-        /// The settings element.
-        /// </param>
-        internal Settings(XElement element)
-        {
-            FromXml(element, this);
+            this.SetDefault();
         }
 
         #endregion
@@ -124,6 +90,15 @@ namespace TVSorter
         #region Public Methods and Operators
 
         /// <summary>
+        /// Loads the settings from the default provider.
+        /// </summary>
+        /// <returns>The default provider.</returns>
+        public static Settings LoadSettings()
+        {
+            return LoadSettings(Factory.StorageProvider);
+        }
+
+        /// <summary>
         /// Gets the destination directories as DirectoryInfo objects checking that they exist.
         /// </summary>
         /// <returns>The collection destination directories.</returns>
@@ -137,8 +112,7 @@ namespace TVSorter
         /// </summary>
         public void Save()
         {
-            var xml = new Xml();
-            xml.SaveSettings(this);
+            this.Save(Factory.StorageProvider);
         }
 
         #endregion
@@ -146,101 +120,39 @@ namespace TVSorter
         #region Methods
 
         /// <summary>
-        /// Populates the specified settings object from the XElement.
+        /// Loads the settings from the specified provider.
         /// </summary>
-        /// <param name="settingsNode">
-        /// The settings element.
+        /// <param name="provider">
+        /// The provider to load the settings from.
         /// </param>
-        /// <param name="settings">
-        /// The settings object.
-        /// </param>
-        internal static void FromXml(XElement settingsNode, Settings settings)
+        /// <returns>
+        /// The new settings object.
+        /// </returns>
+        internal static Settings LoadSettings(IStorageProvider provider)
         {
-            settings.SourceDirectory = settingsNode.GetAttribute("sourcedirectory", string.Empty);
-            settings.DefaultOutputFormat = settingsNode.GetAttribute("defaultformat", string.Empty);
-            settings.RecurseSubdirectories = bool.Parse(settingsNode.GetAttribute("recursesubdirectories", "false"));
-            settings.DeleteEmptySubdirectories =
-                bool.Parse(settingsNode.GetAttribute("deleteemptysubdirectories", "false"));
-            settings.RenameIfExists = bool.Parse(settingsNode.GetAttribute("renameifexists", "false"));
-            settings.DestinationDirectories = new List<string>();
-            settings.DestinationDirectory = string.Empty;
-
-            XElement destinationDirectories = settingsNode.Element(Xml.GetName("DestinationDirectories"));
-
-            if (destinationDirectories != null)
-            {
-                settings.DestinationDirectories =
-                    destinationDirectories.GetElementsText(Xml.GetName("Destination")).ToList();
-                foreach (XElement dir in from dir in destinationDirectories.Descendants(Xml.GetName("Destination"))
-                                         let selected = dir.GetAttribute("selected", "false")
-                                         where bool.Parse(selected)
-                                         select dir)
-                {
-                    settings.DestinationDirectory = dir.Value;
-                }
-            }
-
-            settings.FileExtensions =
-                settingsNode.Element(Xml.GetName("FileExtensions")).GetElementsText(Xml.GetName("Extension")).ToList();
-            settings.RegularExpressions =
-                settingsNode.Element(Xml.GetName("RegularExpression")).GetElementsText(Xml.GetName("RegEx")).ToList();
-            settings.OverwriteKeywords =
-                settingsNode.Element(Xml.GetName("OverwriteKeywords")).GetElementsText(Xml.GetName("Keyword")).ToList();
-        }
-
-        /// <summary>
-        /// Gets the XML for these settings.
-        /// </summary>
-        /// <returns>The XML element that represents these settings.</returns>
-        internal XElement ToXml()
-        {
-            var destinationDirectories = new XElement(
-                Xml.GetName("DestinationDirectories"), 
-                this.DestinationDirectories.Select(
-                    dir =>
-                    new XElement(
-                        Xml.GetName("Destination"), new XAttribute("selected", dir == this.DestinationDirectory), dir)));
-
-            var fileExtensions = new XElement(
-                Xml.GetName("FileExtensions"), 
-                this.FileExtensions.Select(ext => new XElement(Xml.GetName("Extension"), ext)));
-
-            var regularExpressions = new XElement(
-                Xml.GetName("RegularExpression"), 
-                this.RegularExpressions.Select(exp => new XElement(Xml.GetName("RegEx"), exp)));
-
-            var overwriteKeywords = new XElement(
-                Xml.GetName("OverwriteKeywords"), 
-                this.OverwriteKeywords.Select(key => new XElement(Xml.GetName("Keyword"), key)));
-
-            return new XElement(
-                Xml.GetName("Settings"), 
-                new XAttribute("sourcedirectory", this.SourceDirectory), 
-                new XAttribute("defaultformat", this.DefaultOutputFormat), 
-                new XAttribute("recursesubdirectories", this.RecurseSubdirectories), 
-                new XAttribute("deleteemptysubdirectories", this.DeleteEmptySubdirectories), 
-                new XAttribute("renameifexists", this.RenameIfExists), 
-                destinationDirectories, 
-                fileExtensions, 
-                regularExpressions, 
-                overwriteKeywords);
-        }
-
-        /// <summary>
-        /// Loads the settings.
-        /// </summary>
-        private void LoadSettings()
-        {
+            var settings = new Settings();
             try
             {
-                var xml = new Xml();
-                xml.LoadSettings(this);
+                provider.LoadSettings(settings);
             }
             catch (IOException)
             {
                 // Settings file does not exist. Use default settings.
-                this.SetDefault();
+                settings.SetDefault();
             }
+
+            return settings;
+        }
+
+        /// <summary>
+        /// Saves the settings with the specified provider.
+        /// </summary>
+        /// <param name="provider">
+        /// The provider to save the settings to.
+        /// </param>
+        internal void Save(IStorageProvider provider)
+        {
+            provider.SaveSettings(this);
         }
 
         /// <summary>

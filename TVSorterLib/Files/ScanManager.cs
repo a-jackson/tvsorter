@@ -2,9 +2,6 @@
 // <copyright company="TVSorter" file="ScanManager.cs">
 //   2012 - Andrew Jackson
 // </copyright>
-// <summary>
-//   Handles the scanning of files.
-// </summary>
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter.Files
 {
@@ -16,7 +13,7 @@ namespace TVSorter.Files
     using System.Linq;
     using System.Text.RegularExpressions;
 
-    using TVSorter.Data.Tvdb;
+    using TVSorter.Data;
     using TVSorter.Storage;
 
     #endregion
@@ -38,6 +35,11 @@ namespace TVSorter.Files
         #region Fields
 
         /// <summary>
+        /// The storage provider to use.
+        /// </summary>
+        private readonly IStorageProvider provider;
+
+        /// <summary>
         ///   The current settings of the system.
         /// </summary>
         private readonly Settings settings;
@@ -45,20 +47,23 @@ namespace TVSorter.Files
         /// <summary>
         /// The list of the tvshows.
         /// </summary>
-        private readonly List<TvShow> tvShows; 
+        private readonly List<TvShow> tvShows;
 
         #endregion
 
         #region Constructors and Destructors
 
         /// <summary>
-        ///   Initializes a new instance of the <see cref="ScanManager" /> class. Initialises a new instance of the <see
-        ///    cref="ScanManager" /> class.
+        /// Initializes a new instance of the <see cref="ScanManager"/> class.
         /// </summary>
-        public ScanManager()
+        /// <param name="provider">
+        /// The provider.
+        /// </param>
+        internal ScanManager(IStorageProvider provider)
         {
-            this.settings = new Settings();
-            this.tvShows = TvShow.GetTvShows().ToList();
+            this.provider = provider;
+            this.settings = Settings.LoadSettings(provider);
+            this.tvShows = TvShow.GetTvShows(provider).ToList();
         }
 
         #endregion
@@ -110,12 +115,11 @@ namespace TVSorter.Files
                 }
             }
 
-            var shows = from result in results
-                        group result by result.Show into showGroup
-                        where showGroup.Key != null 
-                        select showGroup.Key;
+            IEnumerable<TvShow> shows = from result in results
+                                        group result by result.Show
+                                        into showGroup where showGroup.Key != null select showGroup.Key;
 
-            shows.Save();
+            shows.Save(this.provider);
         }
 
         /// <summary>
@@ -142,6 +146,61 @@ namespace TVSorter.Files
         #endregion
 
         #region Methods
+
+        /// <summary>
+        /// Searches for new TVShows.
+        /// </summary>
+        /// <param name="storageProvider">
+        /// The stroage provider
+        /// </param>
+        /// <param name="dataProvider">
+        /// The data provider. 
+        /// </param>
+        /// <returns>
+        /// The ambiguous results of the search for user selection.
+        /// </returns>
+        internal static Dictionary<string, List<TvShow>> SearchNewShows(
+            IStorageProvider storageProvider, IDataProvider dataProvider)
+        {
+            Settings settings = Settings.LoadSettings(storageProvider);
+            var showDirs = new List<string>();
+            List<string> existingShows = TvShow.GetTvShows(storageProvider).Select(x => x.FolderName).ToList();
+            foreach (DirectoryInfo dirInfo in settings.GetDestinationDirectories())
+            {
+                // Add all of dirInfo's subdirectories where they don't already exist and 
+                // there isn't already a tv show with it as a folder name.
+                showDirs.AddRange(
+                    from dir in dirInfo.GetDirectories()
+                    where !showDirs.Contains(dir.Name) && !existingShows.Contains(dir.Name)
+                    select dir.Name);
+            }
+
+            // Sort the directories so the show's are added alphabetically.
+            showDirs.Sort();
+
+            var searchResults = new Dictionary<string, List<TvShow>>();
+            foreach (string showName in showDirs)
+            {
+                // Search for each of the shows using the directory name as the show name.
+                List<TvShow> results = TvShow.SearchShow(showName, dataProvider);
+
+                // Any with only one result should be saved.
+                if (results.Count == 1)
+                {
+                    TvShow show = TvShow.FromSearchResult(results[0]);
+                    show.Save(storageProvider);
+                    Logger.OnLogMessage(show, "Found show {0}", show.Name);
+                }
+                else
+                {
+                    // Any 0 or more than 1 result should be added to the dictionary for user selection.
+                    searchResults.Add(showName, results);
+                    Logger.OnLogMessage(results, "Found {0} results for {1}", results.Count, showName);
+                }
+            }
+
+            return searchResults;
+        }
 
         /// <summary>
         /// Gets the first match for the specified file.
@@ -182,7 +241,7 @@ namespace TVSorter.Files
             // Replace any spacer characters with spaces
             showName = SpacerChars.Aggregate(showName, (current, ch) => current.Replace(ch, ' '));
 
-            var name = showName;
+            string name = showName;
             return this.tvShows.FirstOrDefault(x => x.GetShowNames().Contains(name));
         }
 

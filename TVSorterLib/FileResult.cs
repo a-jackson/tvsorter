@@ -24,6 +24,13 @@ namespace TVSorter
     /// </summary>
     public class FileResult
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileResult"/> class.
+        /// </summary>
+        internal FileResult()
+        {
+        }
+
         #region Public Properties
 
         /// <summary>
@@ -73,11 +80,33 @@ namespace TVSorter
         /// </summary>
         public string ShowName { get; internal set; }
 
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Determines the file's name contains any of the specified keywords.
+        /// </summary>
+        /// <param name="keywords">
+        /// The keywords to check for.
+        /// </param>
+        /// <returns>
+        /// A value indicating whether the file name contains the keywords.
+        /// </returns>
+        internal bool ContainsKeyword(IEnumerable<string> keywords)
+        {
+            return keywords.Any(keyword => this.InputFile.Name.ToLower().Contains(keyword.ToLower()));
+        }
+
         /// <summary>
         /// Gets the full path of the file for the specified destination.
         /// </summary>
-        /// <param name="destination">The destination directory.</param>
-        /// <returns>The full path of the file.</returns>
+        /// <param name="destination">
+        /// The destination directory.
+        /// </param>
+        /// <returns>
+        /// The full path of the file.
+        /// </returns>
         internal string GetFullPath(string destination)
         {
             if (this.Incomplete)
@@ -88,20 +117,6 @@ namespace TVSorter
             destination = destination.TrimEnd(Path.DirectorySeparatorChar);
             return string.Concat(destination, Path.DirectorySeparatorChar, this.OutputPath);
         }
-
-        /// <summary>
-        /// Determines the file's name contains any of the specified keywords.
-        /// </summary>
-        /// <param name="keywords">The keywords to check for.</param>
-        /// <returns>A value indicating whether the file name contains the keywords.</returns>
-        internal bool ContainsKeyword(IEnumerable<string> keywords)
-        {
-            return keywords.Any(keyword => this.InputFile.Name.ToLower().Contains(keyword.ToLower()));
-        }
-
-        #endregion
-
-        #region Methods
 
         /// <summary>
         /// Formatted the name of an episode or show
@@ -203,7 +218,7 @@ namespace TVSorter
                 return string.Empty;
             }
 
-            var settings = new Settings();
+            var settings = Settings.LoadSettings();
 
             string formatString = this.Show.UseCustomFormat ? this.Show.CustomFormat : settings.DefaultOutputFormat;
 

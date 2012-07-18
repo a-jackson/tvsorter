@@ -2,6 +2,9 @@
 // <copyright company="TVSorter" file="Xml.cs">
 //   2012 - Andrew Jackson
 // </copyright>
+// <summary>
+//   Class that manages access to the XML file.
+// </summary>
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter.Storage
 {
@@ -21,7 +24,7 @@ namespace TVSorter.Storage
     /// <summary>
     /// Class that manages access to the XML file.
     /// </summary>
-    internal class Xml
+    internal class Xml : IStorageProvider
     {
         #region Constants
 
@@ -102,6 +105,29 @@ namespace TVSorter.Storage
         }
 
         /// <summary>
+        /// Loads the missing episode settings from the XML file.
+        /// </summary>
+        /// <param name="settings">
+        /// The settings to load into.
+        /// </param>
+        public void LoadMissingEpisodeSettings(MissingEpisodeSettings settings)
+        {
+            XDocument doc = this.GetDocument();
+            if (doc.Root == null)
+            {
+                throw new XmlException("XML is invalid.");
+            }
+
+            XElement settingsNode = doc.Root.Element(GetName("MissingEpisodeSettings"));
+            if (settingsNode == null)
+            {
+                throw new XmlSchemaException("The XML file is invalid.");
+            }
+
+            settings.FromXml(settingsNode);
+        }
+
+        /// <summary>
         /// Reads the settings from the XML file.
         /// </summary>
         /// <param name="settings">
@@ -121,28 +147,7 @@ namespace TVSorter.Storage
                 throw new XmlSchemaException("The XML file is invalid.");
             }
 
-            Settings.FromXml(settingsNode, settings);
-        }
-
-        /// <summary>
-        /// Loads the missing episode settings from the XML file.
-        /// </summary>
-        /// <param name="settings">The settings to load into.</param>
-        public void LoadMissingEpisodeSettings(MissingEpisodeSettings settings)
-        {
-            XDocument doc = this.GetDocument();
-            if (doc.Root == null)
-            {
-                throw new XmlException("XML is invalid.");
-            }
-
-            XElement settingsNode = doc.Root.Element(GetName("MissingEpisodeSettings"));
-            if (settingsNode == null)
-            {
-                throw new XmlSchemaException("The XML file is invalid.");
-            }
-
-            MissingEpisodeSettings.FromXml(settingsNode, settings);  
+            settings.FromXml(settingsNode);
         }
 
         /// <summary>
@@ -157,7 +162,7 @@ namespace TVSorter.Storage
             {
                 XDocument doc = this.GetDocument();
 
-                return doc.Descendants(GetName("Show")).Select(x => new TvShow(x)).OrderBy(x => x.Name);
+                return doc.Descendants(GetName("Show")).Select(NewTvShow).OrderBy(x => x.Name);
             }
             catch
             {
@@ -243,7 +248,9 @@ namespace TVSorter.Storage
         /// <summary>
         /// Saves the missing episode settings into the XML file.
         /// </summary>
-        /// <param name="settings">The settings to save.</param>
+        /// <param name="settings">
+        /// The settings to save.
+        /// </param>
         public void SaveMissingEpisodeSettings(MissingEpisodeSettings settings)
         {
             XDocument doc = this.GetDocument();
@@ -260,7 +267,7 @@ namespace TVSorter.Storage
             }
 
             settingsNode.ReplaceWith(settings.ToXml());
-            doc.Save(XmlFile);           
+            doc.Save(XmlFile);
         }
 
         /// <summary>
@@ -335,7 +342,7 @@ namespace TVSorter.Storage
                 throw new XmlException("XML is invalid.");
             }
 
-            foreach (var show in shows)
+            foreach (TvShow show in shows)
             {
                 // Check if the show already exists. Else add it.
                 XElement showElement =
@@ -359,6 +366,22 @@ namespace TVSorter.Storage
         #region Methods
 
         /// <summary>
+        /// Gets a new TVShow from the specified element.
+        /// </summary>
+        /// <param name="element">
+        /// The element to load.
+        /// </param>
+        /// <returns>
+        /// The new TV Show.
+        /// </returns>
+        private static TvShow NewTvShow(XElement element)
+        {
+            var show = new TvShow();
+            show.FromXml(element);
+            return show;
+        }
+
+        /// <summary>
         /// Get the XDocument instance of the XML file.
         /// </summary>
         /// <returns>The XDocument.</returns>
@@ -370,16 +393,16 @@ namespace TVSorter.Storage
                 throw new XmlSchemaValidationException("The XML file is invalid.");
             }
 
-            var root = doc.Root;
+            XElement root = doc.Root;
 
-            var version = int.Parse(doc.Root.GetAttribute("version", "0"));
+            int version = int.Parse(doc.Root.GetAttribute("version", "0"));
             if (version == 0)
             {
                 // Verison 0 is the XML before it was verisoned from 1.0b.
                 // Add the version and namespace declaration so it will match verison 1.
                 doc.Root.Add(new XAttribute("version", 1));
 
-                foreach (var element in doc.Descendants())
+                foreach (XElement element in doc.Descendants())
                 {
                     element.Name = GetName(element.Name.LocalName);
                 }
@@ -396,23 +419,16 @@ namespace TVSorter.Storage
 
                 if (version < 2)
                 {
-                    var settingsNode = root.Element(GetName("Settings"));
+                    XElement settingsNode = root.Element(GetName("Settings"));
                     if (settingsNode == null)
                     {
                         throw new XmlException("XML is not valid.");
                     }
 
-                    settingsNode.AddAfterSelf(
-                        new XElement(
-                            GetName("MissingEpisodeSettings"),
-                            new XAttribute("hidenotaired", false),
-                            new XAttribute("hidelocked", false),
-                            new XAttribute("hidepart2", false),
-                            new XAttribute("hideseason0", false),
-                            new XAttribute("hidemissingseasons", false)));
+                    settingsNode.AddAfterSelf(new MissingEpisodeSettings().ToXml());
                 }
 
-                var versionAttribute = root.Attribute("version");
+                XAttribute versionAttribute = root.Attribute("version");
                 if (versionAttribute != null)
                 {
                     versionAttribute.Value = XmlVersion.ToString(CultureInfo.InvariantCulture);
@@ -423,33 +439,6 @@ namespace TVSorter.Storage
 
             this.ValidateXml(string.Format(XsdFile, XmlVersion));
             return doc;
-        }
-
-        /// <summary>
-        /// Validates the XML file against the specified schema.
-        /// </summary>
-        /// <param name="schema">The schama to validate against.</param>
-        private void ValidateXml(string schema)
-        {
-            if (File.Exists(schema))
-            {
-                // Get the schemas to validate against.
-                var settings = new XmlReaderSettings { ValidationType = ValidationType.Schema };
-                settings.Schemas.Add(XmlNamespace.NamespaceName, schema);
-                settings.ValidationEventHandler +=
-                    (sender, args) => { throw new XmlSchemaValidationException(args.Message, args.Exception); };
-
-                using (var reader = XmlReader.Create(XmlFile, settings))
-                {
-                    while (reader.Read())
-                    {
-                    }
-                }
-            }
-            else
-            {
-                throw new FileNotFoundException("The XSD schema could not be found.", schema);
-            }
         }
 
         /// <summary>
@@ -479,12 +468,12 @@ namespace TVSorter.Storage
                 {
                     // Create the file and populate with default settings.
                     var doc = new XDocument(
-                        new XDeclaration("1.0", "utf-8", "yes"),
+                        new XDeclaration("1.0", "utf-8", "yes"), 
                         new XElement(
-                            GetName("TVSorter"),
-                            new XAttribute("version", XmlVersion),
-                            new Settings(true).ToXml(),
-                            new MissingEpisodeSettings(true).ToXml(),
+                            GetName("TVSorter"), 
+                            new XAttribute("version", XmlVersion), 
+                            new Settings().ToXml(), 
+                            new MissingEpisodeSettings().ToXml(), 
                             new XElement(GetName("Shows"))));
 
                     doc.Save(XmlFile);
@@ -493,6 +482,35 @@ namespace TVSorter.Storage
             catch (Exception e)
             {
                 throw new IOException("Unable to load XML file.", e);
+            }
+        }
+
+        /// <summary>
+        /// Validates the XML file against the specified schema.
+        /// </summary>
+        /// <param name="schema">
+        /// The schama to validate against.
+        /// </param>
+        private void ValidateXml(string schema)
+        {
+            if (File.Exists(schema))
+            {
+                // Get the schemas to validate against.
+                var settings = new XmlReaderSettings { ValidationType = ValidationType.Schema };
+                settings.Schemas.Add(XmlNamespace.NamespaceName, schema);
+                settings.ValidationEventHandler +=
+                    (sender, args) => { throw new XmlSchemaValidationException(args.Message, args.Exception); };
+
+                using (XmlReader reader = XmlReader.Create(XmlFile, settings))
+                {
+                    while (reader.Read())
+                    {
+                    }
+                }
+            }
+            else
+            {
+                throw new FileNotFoundException("The XSD schema could not be found.", schema);
             }
         }
 
