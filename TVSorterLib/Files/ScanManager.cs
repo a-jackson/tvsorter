@@ -242,7 +242,9 @@ namespace TVSorter.Files
             showName = SpacerChars.Aggregate(showName, (current, ch) => current.Replace(ch, ' '));
 
             string name = showName;
-            return this.tvShows.FirstOrDefault(x => x.GetShowNames().Contains(name));
+            return
+                this.tvShows.FirstOrDefault(
+                    x => x.GetShowNames().Contains(name, StringComparer.InvariantCultureIgnoreCase));
         }
 
         /// <summary>

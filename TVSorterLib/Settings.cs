@@ -162,13 +162,13 @@ namespace TVSorter
         {
             var regularExpressions = new List<string>
                 {
-                    @"s(?<S>[0-9]+)e(?<E>[0-9]+)", 
-                    @"(?<Y>19\d\d|20\d\d)[.](?<M>0[1-9]|1[012])[.](?<D>0[1-9]|[12][0-9]|3[01])", 
-                    @"(?<M>Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\.(?<D>\d\d)\.(?<Y>20\d\d)", 
-                    @"(?<S>[0-9]+)\s-\s(?<E>[0-9]+)", 
-                    @"(?<S>[0-9]+)x(?<E>[0-9]+)", 
-                    @"(?<S>[0-9][0-9])(?<E>[0-9][0-9])", 
-                    @"(?<S>[0-9])(?<E>[0-9][0-9])", 
+                    @"s(?<S>[0-9]+)e(?<E>[0-9]+)",
+                    @"(?<Y>19\d\d|20\d\d)[.](?<M>0[1-9]|1[012])[.](?<D>0[1-9]|[12][0-9]|3[01])",
+                    @"(?<M>Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\.(?<D>\d\d)\.(?<Y>20\d\d)",
+                    @"(?<S>[0-9]+)\s-\s(?<E>[0-9]+)",
+                    @"(?<S>[0-9]+)x(?<E>[0-9]+)",
+                    @"(?<S>[0-9][0-9])(?<E>[0-9][0-9])",
+                    @"(?<S>[0-9])(?<E>[0-9][0-9])",
                     @"s(?<S>[0-9]+)[.]e(?<E>[0-9]+)"
                 };
 
@@ -177,7 +177,8 @@ namespace TVSorter
             this.DestinationDirectory = Path.DirectorySeparatorChar.ToString(CultureInfo.InvariantCulture);
             this.FileExtensions = new List<string> { ".avi", ".mkv", ".wmv", ".mpg", ".mp4" };
             this.RegularExpressions = regularExpressions;
-            this.DefaultOutputFormat = "{SName( )}\\Season {SNum(1)}\\{SName(.)}."
+            this.DefaultOutputFormat = "{FName}" + Path.DirectorySeparatorChar + "Season {SNum(1)}"
+                                       + Path.DirectorySeparatorChar + "{SName(.)}."
                                        + "S{SNum(2)}E{ENum(2)}.{EName(.)}{Ext}";
             this.DeleteEmptySubdirectories = false;
             this.OverwriteKeywords = new List<string> { "repack", "proper" };
