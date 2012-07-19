@@ -2,6 +2,9 @@
 // <copyright file="Factory.cs" company="TVSorter">
 //   2012 - Andrew Jackson
 // </copyright>
+// <summary>
+//   A class for getting instances of the default providers.
+// </summary>
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter
 {

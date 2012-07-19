@@ -2,6 +2,9 @@
 // <copyright company="TVSorter" file="ScanManager.cs">
 //   2012 - Andrew Jackson
 // </copyright>
+// <summary>
+//   Handles the scanning of files.
+// </summary>
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter.Files
 {
@@ -115,11 +118,8 @@ namespace TVSorter.Files
                 }
             }
 
-            IEnumerable<TvShow> shows = from result in results
-                                        group result by result.Show
-                                        into showGroup where showGroup.Key != null select showGroup.Key;
-
-            shows.Save(this.provider);
+            results.GroupBy(result => result.Show).Where(showGroup => showGroup.Key != null).Select(
+                showGroup => showGroup.Key).Save(this.provider);
         }
 
         /// <summary>

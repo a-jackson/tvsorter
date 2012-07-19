@@ -24,12 +24,16 @@ namespace TVSorter
     /// </summary>
     public class FileResult
     {
+        #region Constructors and Destructors
+
         /// <summary>
         /// Initializes a new instance of the <see cref="FileResult"/> class.
         /// </summary>
         internal FileResult()
         {
         }
+
+        #endregion
 
         #region Public Properties
 
@@ -218,7 +222,7 @@ namespace TVSorter
                 return string.Empty;
             }
 
-            var settings = Settings.LoadSettings();
+            Settings settings = Settings.LoadSettings();
 
             string formatString = this.Show.UseCustomFormat ? this.Show.CustomFormat : settings.DefaultOutputFormat;
 

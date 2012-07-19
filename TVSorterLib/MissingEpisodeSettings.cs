@@ -2,6 +2,9 @@
 // <copyright file="MissingEpisodeSettings.cs" company="TVSorter">
 //   2012 - Andrew Jackson
 // </copyright>
+// <summary>
+//   The settings for a missing episode search.
+// </summary>
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter
 {

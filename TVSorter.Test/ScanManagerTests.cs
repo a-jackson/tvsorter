@@ -2,6 +2,9 @@
 // <copyright file="ScanManagerTests.cs" company="TVSorter">
 //   2012 - Andrew Jackson
 // </copyright>
+// <summary>
+//   Tests for the <see cref="ScanManager" /> class.
+// </summary>
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter.Test
 {
@@ -14,6 +17,7 @@ namespace TVSorter.Test
 
     using NUnit.Framework;
 
+    using TVSorter.Data;
     using TVSorter.Files;
     using TVSorter.Storage;
 
@@ -35,6 +39,11 @@ namespace TVSorter.Test
         /// </summary>
         private Settings settings;
 
+        /// <summary>
+        /// The mocked storage provider.
+        /// </summary>
+        private IStorageProvider storageProvider;
+
         #endregion
 
         #region Properties
@@ -49,47 +58,47 @@ namespace TVSorter.Test
                 yield return
                     new TvShow
                         {
-                            Name = "Alpha",
-                            FolderName = "Alpha Folder",
-                            TvdbId = "1",
+                            Name = "Alpha", 
+                            FolderName = "Alpha Folder", 
+                            TvdbId = "1", 
                             Episodes =
                                 new List<Episode>
                                     {
                                         new Episode
                                             {
-                                                EpisodeNumber = 1,
-                                                SeasonNumber = 1,
-                                                FirstAir = new DateTime(2012, 1, 1),
-                                                Name = "Episode One",
+                                                EpisodeNumber = 1, 
+                                                SeasonNumber = 1, 
+                                                FirstAir = new DateTime(2012, 1, 1), 
+                                                Name = "Episode One", 
                                                 TvdbId = "111"
-                                            },
+                                            }, 
                                         new Episode
                                             {
-                                                EpisodeNumber = 2,
-                                                SeasonNumber = 1,
-                                                FirstAir = new DateTime(2012, 1, 2),
-                                                Name = "Episode Two",
+                                                EpisodeNumber = 2, 
+                                                SeasonNumber = 1, 
+                                                FirstAir = new DateTime(2012, 1, 2), 
+                                                Name = "Episode Two", 
                                                 TvdbId = "112"
                                             }
-                                    },
+                                    }, 
                             AlternateNames = new List<string> { "alt name" }
                         };
                 yield return
                     new TvShow
                         {
-                            Name = "Beta",
-                            FolderName = "Beta Folder",
-                            TvdbId = "2",
+                            Name = "Beta", 
+                            FolderName = "Beta Folder", 
+                            TvdbId = "2", 
                             Episodes =
                                 new List<Episode>
                                     {
                                         new Episode
                                             {
-                                                EpisodeNumber = 1,
-                                                SeasonNumber = 1,
-                                                FirstAir = new DateTime(2012, 2, 2),
-                                                Name = "Episode One",
-                                                TvdbId = "211",
+                                                EpisodeNumber = 1, 
+                                                SeasonNumber = 1, 
+                                                FirstAir = new DateTime(2012, 2, 2), 
+                                                Name = "Episode One", 
+                                                TvdbId = "211", 
                                             }
                                     }
                         };
@@ -101,25 +110,6 @@ namespace TVSorter.Test
         #region Public Methods and Operators
 
         /// <summary>
-        /// Tests the Refresh method can find a show with lots of different formats.
-        /// </summary>
-        /// <param name="seasonEpisodeNumber">
-        /// The season and episode number string format.
-        /// </param>
-        [Test]
-        public void RefreshFindShow(
-            [Values("S01E01", "S1E1", "1 - 1", "1x1", "01x01", "0101", "s1.e1", "2012.01.01", "Jan.01.2012")]
-            string seasonEpisodeNumber)
-        {
-            this.CreateTestFile("Alpha." + seasonEpisodeNumber + ".avi");
-
-            List<FileResult> results = this.scanManager.Refresh(string.Empty);
-
-            Assert.AreEqual(1, results.Count, "There should be 1 result");
-            this.MatchesShow1(results[0]);
-        }
-
-        /// <summary>
         /// Tests the precendece of the the regular expressions to ensure that the higher listed 
         /// match is used in the case of multiple matches.
         /// </summary>
@@ -128,11 +118,30 @@ namespace TVSorter.Test
         /// </param>
         [Test]
         public void EpisodeFormatPrecedence(
-            [Values("S01E01.2x2", "S1E1.2012-02-02", "1 - 1.2x2", "1x1.0202", "01x01.0202", 
-                "0101.s2.e2", "s1.e1.s2.e2", "2012.01.01.Feb.02.2012", "Jan.01.2012.2x2")]
-            string seasonEpisodeNumber)
+            [Values("S01E01.2x2", "S1E1.2012-02-02", "1 - 1.2x2", "1x1.0202", "01x01.0202", "0101.s2.e2", "s1.e1.s2.e2", 
+                "2012.01.01.Feb.02.2012", "Jan.01.2012.2x2")] string seasonEpisodeNumber)
         {
             this.CreateTestFile("Alpha." + seasonEpisodeNumber + ".avi");
+
+            List<FileResult> results = this.scanManager.Refresh(string.Empty);
+
+            Assert.AreEqual(1, results.Count, "There should be 1 result.");
+            this.MatchesShow1(results[0]);
+        }
+
+        /// <summary>
+        /// Tests that the system is able to match to the correct show.
+        /// Allows for variations on the name and alternate names.
+        /// </summary>
+        /// <param name="showName">
+        /// The show's name in the file name.
+        /// </param>
+        [Test]
+        public void MatchesShow(
+            [Values("Alpha", "Alpha.Folder", "ALPHA_FOLDER", "ALPHA-FOLDER", "Alt Name", "AlT.Name", "Alt_Name", 
+                "alt-name")] string showName)
+        {
+            this.CreateTestFile(showName + ".S01E01.avi");
 
             List<FileResult> results = this.scanManager.Refresh(string.Empty);
 
@@ -156,22 +165,80 @@ namespace TVSorter.Test
         }
 
         /// <summary>
-        /// Tests that the system is able to match to the correct show.
-        /// Allows for variations on the name and alternate names.
+        /// Tests the scanner is not scanning recursively when it shouldn't be.
         /// </summary>
-        /// <param name="showName">
-        /// The show's name in the file name.
+        [Test]
+        public void NotRecursiveScanning()
+        {
+            this.CreateTestDirectory("Sub");
+            this.CreateTestFile("Sub" + Path.DirectorySeparatorChar + "Alpha.S01E01.avi");
+            List<FileResult> results = this.scanManager.Refresh(string.Empty);
+            Assert.AreEqual(0, results.Count, "There should be no results.");
+        }
+
+        /// <summary>
+        /// Tests that the scanner works recursively.
+        /// </summary>
+        [Test]
+        public void RecursiveScanner()
+        {
+            this.CreateTestDirectory("Sub");
+            this.settings.RecurseSubdirectories = true;
+            this.CreateTestFile("Sub" + Path.DirectorySeparatorChar + "Alpha.S01E01.avi");
+
+            List<FileResult> results = this.scanManager.Refresh(string.Empty);
+            Assert.AreEqual(1, results.Count, "There should be 1 result.");
+            this.MatchesShow1(results[0]);
+        }
+
+        /// <summary>
+        /// Tests the refresh file counts function.
+        /// </summary>
+        [Test]
+        public void RefreshFileCountsTest()
+        {
+            // Create the folder and files to test.
+            this.CreateTestDirectory("Alpha Folder");
+            this.CreateTestDirectory("Beta Folder");
+            this.CreateTestFile("Alpha Folder", "Alpha.S01E01.avi");
+            this.CreateTestFile("Alpha Folder", "Alpha.S01E01.Name.avi");
+            this.CreateTestFile("Beta Folder", "Beta.S01E01.avi");
+
+            // When save shows is called. Assert that each episode has the correct file count.
+            this.storageProvider.SaveShows(
+                Arg.Do(
+                    new Action<IEnumerable<TvShow>>(
+                        x =>
+                            {
+                                List<TvShow> shows = x.ToList();
+                                Assert.AreEqual(2, shows[0].Episodes[0].FileCount);
+                                Assert.AreEqual(0, shows[0].Episodes[1].FileCount);
+                                Assert.AreEqual(1, shows[1].Episodes[0].FileCount);
+                            })));
+
+            // Refresh the file counts.
+            this.scanManager.RefreshFileCounts();
+
+            // Ensure that the call was made. If it was the delegate above will not have been run.
+            this.storageProvider.Received(1).SaveShows(Arg.Any<IEnumerable<TvShow>>());
+        }
+
+        /// <summary>
+        /// Tests the Refresh method can find a show with lots of different formats.
+        /// </summary>
+        /// <param name="seasonEpisodeNumber">
+        /// The season and episode number string format.
         /// </param>
         [Test]
-        public void MatchesShow(
-            [Values("Alpha", "Alpha.Folder", "ALPHA_FOLDER", "ALPHA-FOLDER", 
-                "Alt Name", "AlT.Name", "Alt_Name", "alt-name")]string showName)
+        public void RefreshFindShow(
+            [Values("S01E01", "S1E1", "1 - 1", "1x1", "01x01", "0101", "s1.e1", "2012.01.01", "Jan.01.2012")] string
+                seasonEpisodeNumber)
         {
-            this.CreateTestFile(showName + ".S01E01.avi");
+            this.CreateTestFile("Alpha." + seasonEpisodeNumber + ".avi");
 
             List<FileResult> results = this.scanManager.Refresh(string.Empty);
 
-            Assert.AreEqual(1, results.Count, "There should be 1 result.");
+            Assert.AreEqual(1, results.Count, "There should be 1 result");
             this.MatchesShow1(results[0]);
         }
 
@@ -229,37 +296,47 @@ namespace TVSorter.Test
         }
 
         /// <summary>
-        /// Tests the scanner is not scanning recursively when it shouldn't be.
+        /// Tests the search new shows function.
         /// </summary>
         [Test]
-        public void NotRecursiveScanning()
+        public void SearchShowTest()
         {
-            this.CreateTestFile("Sub" + Path.DirectorySeparatorChar + "Alpha.S01E01.avi");
-            List<FileResult> results = this.scanManager.Refresh(string.Empty);
-            Assert.AreEqual(0, results.Count, "There should be no results.");
-        }
+            var gamma = new TvShow { Name = "Gamma", TvdbId = "3", FolderName = "Gamma Folder" };
+            var delta = new TvShow { Name = "Delta", TvdbId = "4", FolderName = "Delta Folder" };
+            var delta2 = new TvShow { Name = "Delta2", TvdbId = "5", FolderName = "Delta2 Folder" };
+            var dataProvider = Substitute.For<IDataProvider>();
+            dataProvider.SearchShow("Gamma Folder").Returns(new List<TvShow> { gamma });
+            dataProvider.SearchShow("Delta Folder").Returns(new List<TvShow> { delta, delta2 });
 
-        /// <summary>
-        /// Tests that the scanner works recursively.
-        /// </summary>
-        [Test]
-        public void RecursiveScanner()
-        {
-            this.settings.RecurseSubdirectories = true;
-            this.CreateTestFile("Sub" + Path.DirectorySeparatorChar + "Alpha.S01E01.avi");
+            // Create the directories that will be searched.
+            this.CreateTestDirectory("Alpha Folder");
+            this.CreateTestDirectory("Beta Folder");
+            this.CreateTestDirectory("Gamma Folder");
+            this.CreateTestDirectory("Delta Folder");
 
-            List<FileResult> results = this.scanManager.Refresh(string.Empty);
-            Assert.AreEqual(1, results.Count, "There should be 1 result.");
-            this.MatchesShow1(results[0]);
-        }
-        
-        /// <summary>
-        /// Cleans up after the tests in the fixture.
-        /// </summary>
-        [TearDown]
-        public void Teardown()
-        {
-            Directory.Delete("TV", true);
+            Dictionary<string, List<TvShow>> results = ScanManager.SearchNewShows(this.storageProvider, dataProvider);
+
+            // Assert that dataProvider.SearchShow was not called for Alpha and Beta since they already exist in storage.
+            dataProvider.DidNotReceive().SearchShow("Alpha Folder");
+            dataProvider.DidNotReceive().SearchShow("Beta Folder");
+
+            // Assert that other shows where only searched once.
+            dataProvider.Received(1).SearchShow("Gamma Folder");
+            dataProvider.Received(1).SearchShow("Delta Folder");
+
+            // Ensure that there were only 2 calls in total.
+            dataProvider.ReceivedWithAnyArgs(2).SearchShow(Arg.Any<string>());
+
+            // Ensure that the Gamma show was saved as there was only one result.
+            this.storageProvider.Received(1).SaveShow(gamma);
+
+            // Should only have the Delta show in the results.
+            Assert.AreEqual(1, results.Count);
+            Assert.AreEqual(2, results["Delta Folder"].Count);
+
+            // Check that the results are the shows that the data provider returned.
+            Assert.AreEqual(delta, results["Delta Folder"][0]);
+            Assert.AreEqual(delta2, results["Delta Folder"][1]);
         }
 
         /// <summary>
@@ -269,47 +346,79 @@ namespace TVSorter.Test
         public void Setup()
         {
             // Create a storage provider.
-            var storage = Substitute.For<IStorageProvider>();
+            this.storageProvider = Substitute.For<IStorageProvider>();
 
             // Set Load TvShows to return the TestShows.
-            storage.LoadTvShows().Returns(this.TestShows);
+            this.storageProvider.LoadTvShows().Returns(this.TestShows);
 
             // When LoadSettings is called, set the settings.
-            storage.When(x => x.LoadSettings(Arg.Any<Settings>())).Do(
+            this.storageProvider.When(x => x.LoadSettings(Arg.Any<Settings>())).Do(
                 x =>
-                {
-                    x.Arg<Settings>().SourceDirectory = "TV";
-                    x.Arg<Settings>().RecurseSubdirectories = false;
-                    x.Arg<Settings>().FileExtensions = new List<string> { ".avi" };
-                    this.settings = x.Arg<Settings>();
-                });
+                    {
+                        x.Arg<Settings>().SourceDirectory = "TV";
+                        x.Arg<Settings>().RecurseSubdirectories = false;
+                        x.Arg<Settings>().FileExtensions = new List<string> { ".avi" };
+                        x.Arg<Settings>().DestinationDirectories = new List<string> { "TV" };
+                        x.Arg<Settings>().DestinationDirectory = "TV";
+                        this.settings = x.Arg<Settings>();
+                    });
 
             // Create the test environment.
-            Directory.CreateDirectory("TV" + Path.DirectorySeparatorChar + "Sub");
+            Directory.CreateDirectory("TV");
 
-            this.scanManager = new ScanManager(storage);
+            this.scanManager = new ScanManager(this.storageProvider);
         }
 
         /// <summary>
-        /// Asserts the result matches the first show and its first episode.
+        /// Cleans up after the tests in the fixture.
         /// </summary>
-        /// <param name="result">The result to check.</param>
-        private void MatchesShow1(FileResult result)
+        [TearDown]
+        public void Teardown()
         {
-            Assert.AreEqual(this.TestShows.First(), result.Show, "The result should be the first test show.");
-            Assert.AreEqual(
-                this.TestShows.First().Episodes.First(),
-                result.Episode,
-                "The result should match the show's first episode.");
+            Directory.Delete("TV", true);
+        }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Creates a test directory with the specified name under the TV directory.
+        /// </summary>
+        /// <param name="name">
+        /// The name of the directory to create.
+        /// </param>
+        private void CreateTestDirectory(string name)
+        {
+            Directory.CreateDirectory("TV" + Path.DirectorySeparatorChar + name);
         }
 
         /// <summary>
         /// Creates a test file with the specified name under the TV directory.
         /// </summary>
-        /// <param name="name">The name of the file to create.</param>
-        private void CreateTestFile(string name)
+        /// <param name="name">
+        /// The directory and name to the create the file under.
+        /// </param>
+        private void CreateTestFile(params string[] name)
         {
-            File.Create("TV" + Path.DirectorySeparatorChar + name).Close();
+            string path = "TV";
+            path = name.Aggregate(path, (x, y) => x + Path.DirectorySeparatorChar + y);
+            File.Create(path).Close();
+        }
+
+        /// <summary>
+        /// Asserts the result matches the first show and its first episode.
+        /// </summary>
+        /// <param name="result">
+        /// The result to check.
+        /// </param>
+        private void MatchesShow1(FileResult result)
+        {
+            Assert.AreEqual(this.TestShows.First(), result.Show, "The result should be the first test show.");
+            Assert.AreEqual(
+                this.TestShows.First().Episodes.First(), 
+                result.Episode, 
+                "The result should match the show's first episode.");
         }
 
         #endregion

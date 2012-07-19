@@ -23,12 +23,12 @@ namespace TVSorter.Files
     /// </summary>
     internal class FileManager
     {
+        #region Fields
+
         /// <summary>
         /// The storage provider.
         /// </summary>
         private readonly IStorageProvider provider;
-
-        #region Fields
 
         /// <summary>
         ///   The settings.

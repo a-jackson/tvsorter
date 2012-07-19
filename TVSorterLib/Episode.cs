@@ -2,6 +2,9 @@
 // <copyright company="TVSorter" file="Episode.cs">
 //   2012 - Andrew Jackson
 // </copyright>
+// <summary>
+//   The episode.
+// </summary>
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter
 {

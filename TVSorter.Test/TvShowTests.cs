@@ -1,18 +1,15 @@
-﻿// -----------------------------------------------------------------------
-// <copyright file="TvShowTests.cs" company="">
-// TODO: Update copyright text.
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="TvShowTests.cs" company="TVSorter">
+//   2012 - Andrew Jackson
 // </copyright>
-// -----------------------------------------------------------------------
-
+// <summary>
+//   Tests for the TVShow class.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter.Test
 {
-    using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
-    using System.Text;
-
-    using NSubstitute;
 
     using NUnit.Framework;
 
@@ -22,6 +19,8 @@ namespace TVSorter.Test
     [TestFixture]
     public class TvShowTests
     {
+        #region Public Methods and Operators
+
         /// <summary>
         /// Tests the CreateNfoFile function.
         /// </summary>
@@ -34,7 +33,7 @@ namespace TVSorter.Test
                     DestinationDirectories =
                         new List<string>
                             {
-                                "TestWorking" + Path.DirectorySeparatorChar + "TV1",
+                                "TestWorking" + Path.DirectorySeparatorChar + "TV1", 
                                 "TestWorking" + Path.DirectorySeparatorChar + "TV2"
                             }
                 };
@@ -45,15 +44,17 @@ namespace TVSorter.Test
 
             show.CreateNfoFile(settings);
 
-            var path = string.Format("TestWorking{0}TV1{0}Show{0}tvshow.nfo", Path.DirectorySeparatorChar);
-            var path2 = string.Format("TestWorking{0}TV2{0}Show{0}tvshow.nfo", Path.DirectorySeparatorChar);
+            string path = string.Format("TestWorking{0}TV1{0}Show{0}tvshow.nfo", Path.DirectorySeparatorChar);
+            string path2 = string.Format("TestWorking{0}TV2{0}Show{0}tvshow.nfo", Path.DirectorySeparatorChar);
             Assert.That(File.Exists(path), "tvshow.nfo doesn't exist.");
             Assert.That(!File.Exists(path2), "tvshow.nfo does exist.");
 
-            var contents = File.ReadAllText(path);
+            string contents = File.ReadAllText(path);
             Assert.AreEqual(contents, "http://thetvdb.com/?tab=series&id=1234&lid=7");
 
             Directory.Delete("TestWorking", true);
         }
+
+        #endregion
     }
 }

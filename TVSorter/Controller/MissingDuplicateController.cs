@@ -51,14 +51,14 @@ namespace TVSorter.Controller
             }
         }
 
-        #endregion
-
-        #region Properties
-
         /// <summary>
         /// Gets or sets the settings.
         /// </summary>
         public MissingEpisodeSettings Settings { get; set; }
+
+        #endregion
+
+        #region Properties
 
         /// <summary>
         ///   Gets or sets the View.

@@ -25,7 +25,9 @@ namespace TVSorter
         /// <param name="shows">
         /// The shows to save.
         /// </param>
-        /// <param name="provider">The provider to save the shows with. </param>
+        /// <param name="provider">
+        /// The provider to save the shows with. 
+        /// </param>
         internal static void Save(this IEnumerable<TvShow> shows, IStorageProvider provider)
         {
             provider.SaveShows(shows);
