@@ -81,7 +81,7 @@ namespace TVSorter.Files
         /// <param name="files">
         /// The files to copy. 
         /// </param>
-        public void CopyFile(List<FileResult> files)
+        public void CopyFile(IEnumerable<FileResult> files)
         {
             this.ProcessFiles(files, SortType.Copy);
         }
@@ -92,7 +92,7 @@ namespace TVSorter.Files
         /// <param name="files">
         /// The files to move. 
         /// </param>
-        public void MoveFile(List<FileResult> files)
+        public void MoveFile(IEnumerable<FileResult> files)
         {
             this.ProcessFiles(files, SortType.Move);
         }

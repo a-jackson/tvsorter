@@ -8,16 +8,17 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter.Test
 {
-    using System.Collections.Generic;
-    using System.IO;
+    using NSubstitute;
 
     using NUnit.Framework;
+
+    using TVSorter.Wrappers;
 
     /// <summary>
     /// Tests for the TVShow class.
     /// </summary>
     [TestFixture]
-    public class TvShowTests
+    public class TvShowTests : ManagerTestBase
     {
         #region Public Methods and Operators
 
@@ -27,32 +28,31 @@ namespace TVSorter.Test
         [Test]
         public void CreateNfoFile()
         {
-            var show = new TvShow { FolderName = "Show", TvdbId = "1234" };
-            var settings = new Settings
-                {
-                    DestinationDirectories =
-                        new List<string>
-                            {
-                                "TestWorking" + Path.DirectorySeparatorChar + "TV1", 
-                                "TestWorking" + Path.DirectorySeparatorChar + "TV2"
-                            }
-                };
+            // Create the test directory.
+            var directory = Substitute.For<IDirectoryInfo>();
 
-            Directory.CreateDirectory(
-                "TestWorking" + Path.DirectorySeparatorChar + "TV1" + Path.DirectorySeparatorChar + "Show");
-            Directory.CreateDirectory("TestWorking" + Path.DirectorySeparatorChar + "TV2");
+            // Set its name and full path.
+            directory.Name.Returns("Alpha Folder");
 
-            show.CreateNfoFile(settings);
+            // Set the root directory to return alpha folder.
+            this.Root.GetDirectories().Returns(new[] { directory });
 
-            string path = string.Format("TestWorking{0}TV1{0}Show{0}tvshow.nfo", Path.DirectorySeparatorChar);
-            string path2 = string.Format("TestWorking{0}TV2{0}Show{0}tvshow.nfo", Path.DirectorySeparatorChar);
-            Assert.That(File.Exists(path), "tvshow.nfo doesn't exist.");
-            Assert.That(!File.Exists(path2), "tvshow.nfo does exist.");
+            // Create the tvshow.nfo
+            IFileInfo tvshowFile = this.CreateTestFile(directory, "tvshow.nfo")[0];
 
-            string contents = File.ReadAllText(path);
-            Assert.AreEqual(contents, "http://thetvdb.com/?tab=series&id=1234&lid=7");
+            // When WriteAllText is called. Assert that it is the correct text.
+            tvshowFile.When(x => x.WriteAllText(Arg.Any<string>())).Do(
+                x => Assert.AreEqual("http://thetvdb.com/?tab=series&id=1&lid=7", x.Arg<string>()));
 
-            Directory.Delete("TestWorking", true);
+            // When CreateFile is called, return the tvshowFile.
+            directory.CreateFile("tvshow.nfo").Returns(x => tvshowFile);
+
+            // Create Nfo files.
+            TvShow.CreateNfoFiles(new[] { this.Root }, this.StorageProvider);
+
+            // Assert that no other files were created or written to.
+            directory.Received(1).CreateFile(Arg.Any<string>());
+            tvshowFile.Received(1).WriteAllText(Arg.Any<string>());
         }
 
         #endregion

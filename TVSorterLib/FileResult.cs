@@ -17,6 +17,8 @@ namespace TVSorter
     using System.Linq;
     using System.Text.RegularExpressions;
 
+    using TVSorter.Wrappers;
+
     #endregion
 
     /// <summary>
@@ -61,7 +63,7 @@ namespace TVSorter
         /// <summary>
         ///   Gets the file.
         /// </summary>
-        public FileInfo InputFile { get; internal set; }
+        public IFileInfo InputFile { get; internal set; }
 
         /// <summary>
         ///   Gets the OutputPath.
@@ -222,6 +224,7 @@ namespace TVSorter
                 return string.Empty;
             }
 
+            // TODO
             Settings settings = Settings.LoadSettings();
 
             string formatString = this.Show.UseCustomFormat ? this.Show.CustomFormat : settings.DefaultOutputFormat;

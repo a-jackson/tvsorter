@@ -12,12 +12,12 @@ namespace TVSorter.Files
 
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using System.Linq;
     using System.Text.RegularExpressions;
 
     using TVSorter.Data;
     using TVSorter.Storage;
+    using TVSorter.Wrappers;
 
     #endregion
 
@@ -80,12 +80,12 @@ namespace TVSorter.Files
         /// The sub directory to refresh. 
         /// </param>
         /// <returns>
-        /// The list of files indentified during the refresh operation. 
+        /// The list of files identified during the refresh operation. 
         /// </returns>
         public List<FileResult> Refresh(string subDirectory)
         {
-            var root = new DirectoryInfo(string.Concat(this.settings.SourceDirectory, subDirectory));
-            return this.ProcessDirectory(root).ToList();
+            var root = new DirectoryInfoWrap(string.Concat(this.settings.SourceDirectory, subDirectory));
+            return this.Refresh(root);
         }
 
         /// <summary>
@@ -93,33 +93,7 @@ namespace TVSorter.Files
         /// </summary>
         public void RefreshFileCounts()
         {
-            List<string> directories = this.settings.DestinationDirectories;
-            var results = new List<FileResult>();
-
-            // Search all the destination directories.
-            foreach (string directory in directories)
-            {
-                List<FileResult> files = this.ProcessDirectory(new DirectoryInfo(directory), true).ToList();
-                results.AddRange(files);
-            }
-
-            // Group the results by episode.
-            IEnumerable<IGrouping<Episode, FileResult>> episodeGroups = results.GroupBy(x => x.Episode);
-            foreach (var group in episodeGroups)
-            {
-                if (group.Key != null)
-                {
-                    // Set the file count to the size of the group.
-                    int count = group.Count();
-                    foreach (FileResult ep in group)
-                    {
-                        ep.Episode.FileCount = count;
-                    }
-                }
-            }
-
-            results.GroupBy(result => result.Show).Where(showGroup => showGroup.Key != null).Select(
-                showGroup => showGroup.Key).Save(this.provider);
+            this.RefreshFileCounts(this.settings.DestinationDirectories.Select(x => new DirectoryInfoWrap(x)));
         }
 
         /// <summary>
@@ -156,16 +130,19 @@ namespace TVSorter.Files
         /// <param name="dataProvider">
         /// The data provider. 
         /// </param>
+        /// <param name="directories">
+        /// The directories to search.
+        /// </param>
         /// <returns>
         /// The ambiguous results of the search for user selection.
         /// </returns>
         internal static Dictionary<string, List<TvShow>> SearchNewShows(
-            IStorageProvider storageProvider, IDataProvider dataProvider)
+            IStorageProvider storageProvider, IDataProvider dataProvider, IEnumerable<IDirectoryInfo> directories)
         {
             Settings settings = Settings.LoadSettings(storageProvider);
             var showDirs = new List<string>();
             List<string> existingShows = TvShow.GetTvShows(storageProvider).Select(x => x.FolderName).ToList();
-            foreach (DirectoryInfo dirInfo in settings.GetDestinationDirectories())
+            foreach (IDirectoryInfo dirInfo in directories)
             {
                 // Add all of dirInfo's subdirectories where they don't already exist and 
                 // there isn't already a tv show with it as a folder name.
@@ -203,6 +180,56 @@ namespace TVSorter.Files
         }
 
         /// <summary>
+        /// Refresh the specified directory.
+        /// </summary>
+        /// <param name="directoryInfo">
+        /// The directory to refresh.
+        /// </param>
+        /// <returns>
+        /// The list of files identified during the refresh operation.
+        /// </returns>
+        internal List<FileResult> Refresh(IDirectoryInfo directoryInfo)
+        {
+            return this.ProcessDirectory(directoryInfo).ToList();
+        }
+
+        /// <summary>
+        /// Searches for files in specified directories to set the file counts.
+        /// </summary>
+        /// <param name="directories">
+        /// The directories to search.
+        /// </param>
+        internal void RefreshFileCounts(IEnumerable<IDirectoryInfo> directories)
+        {
+            var results = new List<FileResult>();
+
+            // Search all the destination directories.
+            foreach (IDirectoryInfo directory in directories)
+            {
+                List<FileResult> files = this.ProcessDirectory(directory, true).ToList();
+                results.AddRange(files);
+            }
+
+            // Group the results by episode.
+            IEnumerable<IGrouping<Episode, FileResult>> episodeGroups = results.GroupBy(x => x.Episode);
+            foreach (var group in episodeGroups)
+            {
+                if (group.Key != null)
+                {
+                    // Set the file count to the size of the group.
+                    int count = group.Count();
+                    foreach (FileResult ep in group)
+                    {
+                        ep.Episode.FileCount = count;
+                    }
+                }
+            }
+
+            results.GroupBy(result => result.Show).Where(showGroup => showGroup.Key != null).Select(
+                showGroup => showGroup.Key).Save(this.provider);
+        }
+
+        /// <summary>
         /// Gets the first match for the specified file.
         /// </summary>
         /// <param name="file">
@@ -211,7 +238,7 @@ namespace TVSorter.Files
         /// <returns>
         /// The first succcessful match. Null if none.
         /// </returns>
-        private Match GetFirstMatch(FileInfo file)
+        private Match GetFirstMatch(IFileInfo file)
         {
             return (from regex in this.settings.RegularExpressions
                     let match = Regex.Match(file.Name, regex, RegexOptions.IgnoreCase)
@@ -259,10 +286,10 @@ namespace TVSorter.Files
         /// <returns>
         /// The list of identified files. 
         /// </returns>
-        private IEnumerable<FileResult> ProcessDirectory(DirectoryInfo directory, bool overrideRecurse = false)
+        private IEnumerable<FileResult> ProcessDirectory(IDirectoryInfo directory, bool overrideRecurse = false)
         {
             // Get the files where the extension is in the list of extensions.
-            List<FileInfo> files =
+            List<IFileInfo> files =
                 directory.GetFiles().Where(file => this.settings.FileExtensions.Contains(file.Extension)).ToList();
 
             foreach (FileResult result in files.Select(this.ProcessFile))
@@ -280,7 +307,7 @@ namespace TVSorter.Files
                 yield break;
             }
 
-            DirectoryInfo[] dirs = directory.GetDirectories();
+            IDirectoryInfo[] dirs = directory.GetDirectories();
             foreach (FileResult result in dirs.SelectMany(dir => this.ProcessDirectory(dir, overrideRecurse)))
             {
                 yield return result;
@@ -343,7 +370,7 @@ namespace TVSorter.Files
         /// <returns>
         /// The results of the file process. 
         /// </returns>
-        private FileResult ProcessFile(FileInfo file)
+        private FileResult ProcessFile(IFileInfo file)
         {
             // Attempt to match to a regular express
             Match firstMatch = this.GetFirstMatch(file);

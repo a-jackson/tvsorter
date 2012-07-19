@@ -74,6 +74,10 @@
     <Compile Include="FileSearch.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="TvShow.cs" />
+    <Compile Include="Wrappers\DirectoryInfoWrap.cs" />
+    <Compile Include="Wrappers\FileInfoWrap.cs" />
+    <Compile Include="Wrappers\IDirectoryInfo.cs" />
+    <Compile Include="Wrappers\IFileInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="TVSorter-1.0.xsd">

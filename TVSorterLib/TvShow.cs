@@ -18,6 +18,7 @@ namespace TVSorter
     using TVSorter.Data;
     using TVSorter.Files;
     using TVSorter.Storage;
+    using TVSorter.Wrappers;
 
     #endregion
 
@@ -103,7 +104,10 @@ namespace TVSorter
         /// </summary>
         public static void CreateNfoFiles()
         {
-            CreateNfoFiles(Settings.LoadSettings());
+            Settings settings = Settings.LoadSettings();
+            IEnumerable<DirectoryInfoWrap> directories =
+                settings.DestinationDirectories.Select(x => new DirectoryInfoWrap(x));
+            CreateNfoFiles(directories.Cast<IDirectoryInfo>().ToList(), Factory.StorageProvider);
         }
 
         /// <summary>
@@ -142,7 +146,12 @@ namespace TVSorter
         /// </returns>
         public static Dictionary<string, List<TvShow>> SearchNewShows()
         {
-            return ScanManager.SearchNewShows(Factory.StorageProvider, Factory.DataProvider);
+            IStorageProvider storageProvider = Factory.StorageProvider;
+            Settings settings = Settings.LoadSettings(storageProvider);
+            IEnumerable<DirectoryInfoWrap> directories =
+                settings.DestinationDirectories.Select(x => new DirectoryInfoWrap(x));
+
+            return ScanManager.SearchNewShows(storageProvider, Factory.DataProvider, directories);
         }
 
         /// <summary>
@@ -256,14 +265,17 @@ namespace TVSorter
         /// <summary>
         /// Creates NFO files for each of the shows.
         /// </summary>
-        /// <param name="settings">
-        /// The settings to use.
+        /// <param name="directories">
+        /// The destination directories.
         /// </param>
-        internal static void CreateNfoFiles(Settings settings)
+        /// <param name="storageProvider">
+        /// The storage provider to use. 
+        /// </param>
+        internal static void CreateNfoFiles(IList<IDirectoryInfo> directories, IStorageProvider storageProvider)
         {
-            foreach (TvShow show in GetTvShows())
+            foreach (TvShow show in GetTvShows(storageProvider))
             {
-                show.CreateNfoFile(settings);
+                show.CreateNfoFile(directories);
             }
         }
 
@@ -301,25 +313,21 @@ namespace TVSorter
         /// <summary>
         /// Create an NFO file for the show.
         /// </summary>
-        /// <param name="settings">
-        /// The settings to use.
+        /// <param name="directories">
+        /// The destination directories.
         /// </param>
-        internal void CreateNfoFile(Settings settings)
+        internal void CreateNfoFile(IEnumerable<IDirectoryInfo> directories)
         {
             string url = string.Format("http://thetvdb.com/?tab=series&id={0}&lid=7", this.TvdbId);
-            IEnumerable<string> files = from destination in settings.DestinationDirectories
-                                        where
-                                            Directory.Exists(
-                                                string.Concat(destination, Path.DirectorySeparatorChar, this.FolderName))
-                                        select
-                                            string.Format(
-                                                "{0}{2}{1}{2}tvshow.nfo", 
-                                                destination, 
-                                                this.FolderName, 
-                                                Path.DirectorySeparatorChar);
-            foreach (string file in files.Where(x => !File.Exists(x)))
+
+            IEnumerable<IFileInfo> files = from destination in directories
+                                           from folder in destination.GetDirectories()
+                                           where folder.Name.Equals(this.FolderName)
+                                           select folder.CreateFile("tvshow.nfo");
+
+            foreach (IFileInfo file in files.Where(x => x.Exists))
             {
-                File.WriteAllText(file, url);
+                file.WriteAllText(url);
                 Logger.OnLogMessage(this, "Created nfo file {0}", file);
             }
         }

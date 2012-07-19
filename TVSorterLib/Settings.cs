@@ -13,7 +13,6 @@ namespace TVSorter
     using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
-    using System.Linq;
 
     using TVSorter.Storage;
 
@@ -99,15 +98,6 @@ namespace TVSorter
         public static Settings LoadSettings()
         {
             return LoadSettings(Factory.StorageProvider);
-        }
-
-        /// <summary>
-        /// Gets the destination directories as DirectoryInfo objects checking that they exist.
-        /// </summary>
-        /// <returns>The collection destination directories.</returns>
-        public IEnumerable<DirectoryInfo> GetDestinationDirectories()
-        {
-            return from dir in this.DestinationDirectories where Directory.Exists(dir) select new DirectoryInfo(dir);
         }
 
         /// <summary>

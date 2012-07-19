@@ -46,6 +46,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FileManagerTests.cs" />
+    <Compile Include="ManagerTestBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScanManagerTests.cs" />
     <Compile Include="TvShowTests.cs" />
