@@ -160,6 +160,7 @@ namespace TVSorter.Test
                 }
 
                 directory.FullName.Returns(fullName);
+                directory.Exists.Returns(true);
                 directories[i] = directory;
             }
 
@@ -191,8 +192,11 @@ namespace TVSorter.Test
             {
                 var file = Substitute.For<IFileInfo>();
                 file.Name.Returns(names[i]);
+                string fullName = string.Concat(directory.FullName, Path.DirectorySeparatorChar, names[i]);
+                file.FullName.Returns(fullName);
                 file.Extension.Returns(names[i].Substring(names[i].LastIndexOf('.')));
                 file.Exists.Returns(true);
+                file.Directory.Returns(directory);
                 files[i] = file;
             }
 

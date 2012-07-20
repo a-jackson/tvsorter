@@ -35,6 +35,11 @@ namespace TVSorter.Wrappers
         #region Public Methods and Operators
 
         /// <summary>
+        /// Creates the directory.
+        /// </summary>
+        void Create();
+
+        /// <summary>
         /// Creates a file under this directory.
         /// </summary>
         /// <param name="name">
@@ -58,6 +63,17 @@ namespace TVSorter.Wrappers
         /// </summary>
         /// <returns>The collection of sub directories.</returns>
         IDirectoryInfo[] GetDirectories();
+
+        /// <summary>
+        /// Gets a sub file of the directory at the specified path.
+        /// </summary>
+        /// <param name="outputPath">
+        /// The path toget the file for.
+        /// </param>
+        /// <returns>
+        /// The IFileInfo for the file.
+        /// </returns>
+        IFileInfo GetFile(string outputPath);
 
         /// <summary>
         /// Gets the files of this directory.

@@ -15,6 +15,7 @@ namespace TVSorter.Files
     using System.Linq;
 
     using TVSorter.Storage;
+    using TVSorter.Wrappers;
 
     #endregion
 
@@ -58,7 +59,7 @@ namespace TVSorter.Files
         /// <summary>
         /// The types of sorting operations possible.
         /// </summary>
-        private enum SortType
+        internal enum SortType
         {
             /// <summary>
             ///   Indicates a move operation.
@@ -83,7 +84,8 @@ namespace TVSorter.Files
         /// </param>
         public void CopyFile(IEnumerable<FileResult> files)
         {
-            this.ProcessFiles(files, SortType.Copy);
+            string destination = this.settings.DestinationDirectory;
+            this.ProcessFiles(files, SortType.Copy, new DirectoryInfoWrap(destination));
         }
 
         /// <summary>
@@ -94,12 +96,33 @@ namespace TVSorter.Files
         /// </param>
         public void MoveFile(IEnumerable<FileResult> files)
         {
-            this.ProcessFiles(files, SortType.Move);
+            string destination = this.settings.DestinationDirectory;
+            this.ProcessFiles(files, SortType.Move, new DirectoryInfoWrap(destination));
         }
 
         #endregion
 
         #region Methods
+
+        /// <summary>
+        /// Processes the specified list of files.
+        /// </summary>
+        /// <param name="files">
+        /// The list of files to process. 
+        /// </param>
+        /// <param name="type">
+        /// The operation to perform on the files. 
+        /// </param>
+        /// <param name="destination">
+        /// The destination to process the files into.
+        /// </param>
+        internal void ProcessFiles(IEnumerable<FileResult> files, SortType type, IDirectoryInfo destination)
+        {
+            foreach (FileResult file in files)
+            {
+                this.ProcessFile(type, file, destination);
+            }
+        }
 
         /// <summary>
         /// Deletes the subdirectories of the file if they are empty.
@@ -133,7 +156,11 @@ namespace TVSorter.Files
         /// <param name="file">
         /// The file to process.
         /// </param>
-        private void ProcessFile(SortType type, FileResult file)
+        /// <param name="destination">
+        /// 
+        /// The destination to process the files to.
+        /// </param>
+        private void ProcessFile(SortType type, FileResult file, IDirectoryInfo destination)
         {
             if (file.Incomplete)
             {
@@ -141,23 +168,17 @@ namespace TVSorter.Files
                 return;
             }
 
-            var destinationInfo = new FileInfo(file.GetFullPath(this.settings.DestinationDirectory));
+            IFileInfo destinationInfo = file.GetFullPath(destination);
             if (destinationInfo.Directory != null && !destinationInfo.Directory.Exists)
             {
                 destinationInfo.Directory.Create();
             }
 
-            // If the file name contains any overwrite keywords.
-            if (file.ContainsKeyword(this.settings.OverwriteKeywords))
+            // If the file name contains any overwrite keywords and the destination already exists.
+            if (file.ContainsKeyword(this.settings.OverwriteKeywords) && destinationInfo.Exists)
             {
-                // Get the new path for all the destination directories.
-                IEnumerable<string> destinationFiles = this.settings.DestinationDirectories.Select(file.GetFullPath);
-
-                // If the file exists at any of the destinations. Then delete it.
-                foreach (string oldFile in destinationFiles.Where(File.Exists))
-                {
-                    File.Delete(oldFile);
-                }
+                destinationInfo.Delete();
+                file.Episode.FileCount--;
             }
 
             if (destinationInfo.Exists)
@@ -185,23 +206,6 @@ namespace TVSorter.Files
 
             file.Episode.FileCount++;
             file.Episode.Save(this.provider);
-        }
-
-        /// <summary>
-        /// Processes the specified list of files.
-        /// </summary>
-        /// <param name="files">
-        /// The list of files to process. 
-        /// </param>
-        /// <param name="type">
-        /// The operation to perform on the files. 
-        /// </param>
-        private void ProcessFiles(IEnumerable<FileResult> files, SortType type)
-        {
-            foreach (FileResult file in files)
-            {
-                this.ProcessFile(type, file);
-            }
         }
 
         #endregion

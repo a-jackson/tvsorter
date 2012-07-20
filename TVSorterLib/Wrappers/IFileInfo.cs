@@ -36,6 +36,11 @@ namespace TVSorter.Wrappers
         string Extension { get; }
 
         /// <summary>
+        /// Gets the full name of the file.
+        /// </summary>
+        string FullName { get; }
+
+        /// <summary>
         /// Gets the name of the file.
         /// </summary>
         string Name { get; }

@@ -113,15 +113,14 @@ namespace TVSorter
         /// <returns>
         /// The full path of the file.
         /// </returns>
-        internal string GetFullPath(string destination)
+        internal IFileInfo GetFullPath(IDirectoryInfo destination)
         {
             if (this.Incomplete)
             {
                 throw new InvalidOperationException("There is not enough data to get the file path.");
             }
 
-            destination = destination.TrimEnd(Path.DirectorySeparatorChar);
-            return string.Concat(destination, Path.DirectorySeparatorChar, this.OutputPath);
+            return destination.GetFile(this.OutputPath);
         }
 
         /// <summary>

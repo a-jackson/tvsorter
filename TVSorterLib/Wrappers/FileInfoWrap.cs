@@ -97,6 +97,17 @@ namespace TVSorter.Wrappers
         }
 
         /// <summary>
+        /// Gets the full name of the file.
+        /// </summary>
+        public string FullName
+        {
+            get
+            {
+                return this.fileInfo.FullName;
+            }
+        }
+
+        /// <summary>
         /// Gets the name of the file.
         /// </summary>
         public string Name

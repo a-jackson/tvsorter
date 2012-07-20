@@ -90,6 +90,14 @@ namespace TVSorter.Wrappers
         #region Public Methods and Operators
 
         /// <summary>
+        /// Creates the directory.
+        /// </summary>
+        public void Create()
+        {
+            this.directoryInfo.Create();
+        }
+
+        /// <summary>
         /// Creates a file under this directory.
         /// </summary>
         /// <param name="name">
@@ -121,6 +129,20 @@ namespace TVSorter.Wrappers
         public IDirectoryInfo[] GetDirectories()
         {
             return ConvertDirectoryInfoToIDirectoryInfo(this.directoryInfo.GetDirectories());
+        }
+
+        /// <summary>
+        /// Gets a sub file of the directory at the specified path.
+        /// </summary>
+        /// <param name="outputPath">
+        /// The path toget the file for.
+        /// </param>
+        /// <returns>
+        /// The IFileInfo for the file.
+        /// </returns>
+        public IFileInfo GetFile(string outputPath)
+        {
+            return new FileInfoWrap(string.Concat(this.FullName, Path.DirectorySeparatorChar, outputPath));
         }
 
         /// <summary>
