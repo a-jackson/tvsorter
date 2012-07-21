@@ -25,10 +25,6 @@ namespace TVSorter.View
     {
         #region Constants and Fields
 
-        /// <summary>
-        ///   Required designer variable.
-        /// </summary>
-        private readonly IContainer components = null;
 
         /// <summary>
         ///   The copy button.
@@ -81,11 +77,6 @@ namespace TVSorter.View
         private Button selectAllButton;
 
         /// <summary>
-        ///   The select buttons flow.
-        /// </summary>
-        private FlowLayoutPanel selectButtonsFlow;
-
-        /// <summary>
         ///   The set episode button.
         /// </summary>
         private Button setEpisodeButton;
@@ -104,11 +95,6 @@ namespace TVSorter.View
         ///   The sub directory filter.
         /// </summary>
         private ComboBox subDirectoryFilter;
-
-        /// <summary>
-        ///   The top buttons flow.
-        /// </summary>
-        private FlowLayoutPanel topButtonsFlow;
 
         /// <summary>
         ///   The tv show column.
@@ -141,7 +127,9 @@ namespace TVSorter.View
         /// </summary>
         private void InitializeComponent()
         {
-            this.topButtonsFlow = new System.Windows.Forms.FlowLayoutPanel();
+            this.components = new System.ComponentModel.Container();
+            System.Windows.Forms.FlowLayoutPanel topButtonsFlow;
+            System.Windows.Forms.FlowLayoutPanel selectButtonsFlow;
             this.subDirectoryFilter = new System.Windows.Forms.ComboBox();
             this.scanButton = new System.Windows.Forms.Button();
             this.copyButton = new System.Windows.Forms.Button();
@@ -153,26 +141,28 @@ namespace TVSorter.View
             this.episodeColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.episodeNameColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.destinationFile = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.selectButtonsFlow = new System.Windows.Forms.FlowLayoutPanel();
             this.selectAllButton = new System.Windows.Forms.Button();
             this.deselectAllButton = new System.Windows.Forms.Button();
             this.setShowButton = new System.Windows.Forms.Button();
             this.setEpisodeButton = new System.Windows.Forms.Button();
-            this.topButtonsFlow.SuspendLayout();
-            this.selectButtonsFlow.SuspendLayout();
+            this.toolTip = new System.Windows.Forms.ToolTip(this.components);
+            topButtonsFlow = new System.Windows.Forms.FlowLayoutPanel();
+            selectButtonsFlow = new System.Windows.Forms.FlowLayoutPanel();
+            topButtonsFlow.SuspendLayout();
+            selectButtonsFlow.SuspendLayout();
             this.SuspendLayout();
             // 
             // topButtonsFlow
             // 
-            this.topButtonsFlow.Controls.Add(this.subDirectoryFilter);
-            this.topButtonsFlow.Controls.Add(this.scanButton);
-            this.topButtonsFlow.Controls.Add(this.copyButton);
-            this.topButtonsFlow.Controls.Add(this.moveButton);
-            this.topButtonsFlow.Dock = System.Windows.Forms.DockStyle.Top;
-            this.topButtonsFlow.Location = new System.Drawing.Point(0, 0);
-            this.topButtonsFlow.Name = "topButtonsFlow";
-            this.topButtonsFlow.Size = new System.Drawing.Size(678, 31);
-            this.topButtonsFlow.TabIndex = 1;
+            topButtonsFlow.Controls.Add(this.subDirectoryFilter);
+            topButtonsFlow.Controls.Add(this.scanButton);
+            topButtonsFlow.Controls.Add(this.copyButton);
+            topButtonsFlow.Controls.Add(this.moveButton);
+            topButtonsFlow.Dock = System.Windows.Forms.DockStyle.Top;
+            topButtonsFlow.Location = new System.Drawing.Point(0, 0);
+            topButtonsFlow.Name = "topButtonsFlow";
+            topButtonsFlow.Size = new System.Drawing.Size(678, 31);
+            topButtonsFlow.TabIndex = 1;
             // 
             // subDirectoryFilter
             // 
@@ -181,6 +171,7 @@ namespace TVSorter.View
             this.subDirectoryFilter.Name = "subDirectoryFilter";
             this.subDirectoryFilter.Size = new System.Drawing.Size(121, 21);
             this.subDirectoryFilter.TabIndex = 0;
+            this.toolTip.SetToolTip(this.subDirectoryFilter, "The subdirectory of Source Directory to search from.");
             // 
             // scanButton
             // 
@@ -189,6 +180,7 @@ namespace TVSorter.View
             this.scanButton.Size = new System.Drawing.Size(93, 23);
             this.scanButton.TabIndex = 1;
             this.scanButton.Text = "Scan for Files";
+            this.toolTip.SetToolTip(this.scanButton, "Scans for files in the selected subdirectory of Source Directory.");
             this.scanButton.UseVisualStyleBackColor = true;
             this.scanButton.Click += new System.EventHandler(this.ScanButtonClick);
             // 
@@ -199,6 +191,7 @@ namespace TVSorter.View
             this.copyButton.Size = new System.Drawing.Size(95, 23);
             this.copyButton.TabIndex = 2;
             this.copyButton.Text = "Copy to Dest.";
+            this.toolTip.SetToolTip(this.copyButton, "Copies the selected episodes to the Destination Directory");
             this.copyButton.UseVisualStyleBackColor = true;
             this.copyButton.Click += new System.EventHandler(this.CopyButtonClick);
             // 
@@ -209,6 +202,7 @@ namespace TVSorter.View
             this.moveButton.Size = new System.Drawing.Size(102, 23);
             this.moveButton.TabIndex = 3;
             this.moveButton.Text = "Move to Dest.";
+            this.toolTip.SetToolTip(this.moveButton, "Moves the selected episodes to the destination directory.");
             this.moveButton.UseVisualStyleBackColor = true;
             this.moveButton.Click += new System.EventHandler(this.MoveButtonClick);
             // 
@@ -264,15 +258,15 @@ namespace TVSorter.View
             // 
             // selectButtonsFlow
             // 
-            this.selectButtonsFlow.Controls.Add(this.selectAllButton);
-            this.selectButtonsFlow.Controls.Add(this.deselectAllButton);
-            this.selectButtonsFlow.Controls.Add(this.setShowButton);
-            this.selectButtonsFlow.Controls.Add(this.setEpisodeButton);
-            this.selectButtonsFlow.Dock = System.Windows.Forms.DockStyle.Top;
-            this.selectButtonsFlow.Location = new System.Drawing.Point(0, 31);
-            this.selectButtonsFlow.Name = "selectButtonsFlow";
-            this.selectButtonsFlow.Size = new System.Drawing.Size(678, 35);
-            this.selectButtonsFlow.TabIndex = 3;
+            selectButtonsFlow.Controls.Add(this.selectAllButton);
+            selectButtonsFlow.Controls.Add(this.deselectAllButton);
+            selectButtonsFlow.Controls.Add(this.setShowButton);
+            selectButtonsFlow.Controls.Add(this.setEpisodeButton);
+            selectButtonsFlow.Dock = System.Windows.Forms.DockStyle.Top;
+            selectButtonsFlow.Location = new System.Drawing.Point(0, 31);
+            selectButtonsFlow.Name = "selectButtonsFlow";
+            selectButtonsFlow.Size = new System.Drawing.Size(678, 35);
+            selectButtonsFlow.TabIndex = 3;
             // 
             // selectAllButton
             // 
@@ -281,6 +275,7 @@ namespace TVSorter.View
             this.selectAllButton.Size = new System.Drawing.Size(75, 23);
             this.selectAllButton.TabIndex = 0;
             this.selectAllButton.Text = "Select All";
+            this.toolTip.SetToolTip(this.selectAllButton, "Selects all the epsodes.");
             this.selectAllButton.UseVisualStyleBackColor = true;
             this.selectAllButton.Click += new System.EventHandler(this.SelectAllButtonClick);
             // 
@@ -291,6 +286,7 @@ namespace TVSorter.View
             this.deselectAllButton.Size = new System.Drawing.Size(75, 23);
             this.deselectAllButton.TabIndex = 1;
             this.deselectAllButton.Text = "Deselect All";
+            this.toolTip.SetToolTip(this.deselectAllButton, "Deselects all the episodes.");
             this.deselectAllButton.UseVisualStyleBackColor = true;
             this.deselectAllButton.Click += new System.EventHandler(this.DeselectAllButtonClick);
             // 
@@ -301,6 +297,7 @@ namespace TVSorter.View
             this.setShowButton.Size = new System.Drawing.Size(79, 23);
             this.setShowButton.TabIndex = 2;
             this.setShowButton.Text = "Set Show";
+            this.toolTip.SetToolTip(this.setShowButton, "Overrides the show of the selected episodes.");
             this.setShowButton.UseVisualStyleBackColor = true;
             this.setShowButton.Click += new System.EventHandler(this.SetShowButtonClick);
             // 
@@ -311,6 +308,7 @@ namespace TVSorter.View
             this.setEpisodeButton.Size = new System.Drawing.Size(75, 23);
             this.setEpisodeButton.TabIndex = 4;
             this.setEpisodeButton.Text = "Set Episode";
+            this.toolTip.SetToolTip(this.setEpisodeButton, ".");
             this.setEpisodeButton.UseVisualStyleBackColor = true;
             this.setEpisodeButton.Click += new System.EventHandler(this.SetEpisodeButtonClick);
             // 
@@ -319,17 +317,20 @@ namespace TVSorter.View
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.resultsList);
-            this.Controls.Add(this.selectButtonsFlow);
-            this.Controls.Add(this.topButtonsFlow);
+            this.Controls.Add(selectButtonsFlow);
+            this.Controls.Add(topButtonsFlow);
             this.Name = "SortEpisodes";
             this.Size = new System.Drawing.Size(678, 414);
             this.Load += new System.EventHandler(this.SortEpisodesLoad);
-            this.topButtonsFlow.ResumeLayout(false);
-            this.selectButtonsFlow.ResumeLayout(false);
+            topButtonsFlow.ResumeLayout(false);
+            selectButtonsFlow.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
 
         #endregion
+
+        private IContainer components;
+        private ToolTip toolTip;
     }
 }

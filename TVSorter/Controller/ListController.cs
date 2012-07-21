@@ -12,6 +12,7 @@ namespace TVSorter.Controller
 
     using System.Collections.Generic;
     using System.ComponentModel;
+    using System.Linq;
 
     using TVSorter.View;
 
@@ -49,7 +50,9 @@ namespace TVSorter.Controller
         /// </param>
         public ListController(IList<string> list, string dialogTitle)
         {
-            this.List = new BindingList<string>(list);
+            // Clone the list. That way, if the close button is used
+            // the original list won't be affected.
+            this.List = new BindingList<string>(list.ToList());
             this.Title = dialogTitle;
         }
 

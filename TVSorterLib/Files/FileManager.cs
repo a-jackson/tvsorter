@@ -184,7 +184,7 @@ namespace TVSorter.Files
             {
                 // Get the files that are already in the destination directory.
                 List<FileResult> results =
-                    this.scanManager.Refresh(destinationInfo.Directory).Where(
+                    this.scanManager.SearchDestinationFolder(destinationInfo.Directory).Where(
                         x => !x.Episodes.Where((t, i) => !file.Episodes[i].Equals(t)).Any()).ToList();
 
                 // If the episode already exists.
@@ -205,7 +205,8 @@ namespace TVSorter.Files
                     else if (this.settings.RenameIfExists)
                     {
                         // Can't rename more than 1 file to the same thing.
-                        if (results.Count == 1)
+                        // Also don't rename if the file name is already the same.
+                        if (results.Count == 1 && !results[0].InputFile.Name.Equals(destinationInfo.Name))
                         {
                             results[0].InputFile.MoveTo(destinationInfo.FullName);
                             Logger.OnLogMessage(

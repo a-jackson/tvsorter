@@ -11,6 +11,7 @@ namespace TVSorter.View
     #region Using Directives
 
     using System;
+    using System.Collections.Generic;
     using System.ComponentModel;
     using System.Drawing;
     using System.IO;
@@ -29,6 +30,11 @@ namespace TVSorter.View
     public partial class TvShows : UserControl, IView
     {
         #region Fields
+
+        /// <summary>
+        /// The list of alternate names.
+        /// </summary>
+        private List<string> alternateNames;
 
         /// <summary>
         ///   The controller.
@@ -101,11 +107,11 @@ namespace TVSorter.View
         /// </param>
         private void AlternateNamesButtonClick(object sender, EventArgs e)
         {
-            var listController = new ListController(this.controller.SelectedShow.AlternateNames, "Alternate Names");
+            var listController = new ListController(this.alternateNames, "Alternate Names");
             var dialog = new ListDialog(listController);
             if (dialog.ShowDialog(this) == DialogResult.OK)
             {
-                this.controller.SelectedShow.AlternateNames = listController.List.ToList();
+                this.alternateNames = listController.List.ToList();
             }
         }
 
@@ -195,6 +201,7 @@ namespace TVSorter.View
                             this.selectedShowLockButton.Text = this.selectedShowLocked ? "Unlock Show" : "Lock Show";
                             this.selectedShowLockButton.BackColor = this.selectedShowLocked ? Color.Red : Color.Green;
                             this.selectedShowLockButton.Enabled = true;
+                            this.alternateNames = new List<string>(this.controller.SelectedShow.AlternateNames);
                         }
                         else
                         {
@@ -359,6 +366,27 @@ namespace TVSorter.View
         }
 
         /// <summary>
+        /// Handles the controller's ShowChanged event.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender of the evetn.
+        /// </param>
+        /// <param name="e">
+        /// The arguments of the event.
+        /// </param>
+        private void ShowChanged(object sender, TvShowEventArgs e)
+        {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action(() => this.ShowChanged(sender, e)));
+            }
+            else
+            {
+                this.tvShowsList.Refresh();
+            }
+        }
+
+        /// <summary>
         /// Handles drawing an item in the list.
         /// </summary>
         /// <param name="sender">
@@ -442,6 +470,7 @@ namespace TVSorter.View
             {
                 this.controller = new TvShowsController();
                 this.controller.PropertyChanged += this.PropertyChanged;
+                this.controller.ShowChanged += this.ShowChanged;
                 this.controller.SearchShowsComplete += this.SearchShowsComplete;
                 this.controller.Initialise(this);
             }

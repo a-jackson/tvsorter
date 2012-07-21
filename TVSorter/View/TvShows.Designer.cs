@@ -25,10 +25,6 @@ namespace TVSorter.View
     {
         #region Constants and Fields
 
-        /// <summary>
-        ///   Required designer variable.
-        /// </summary>
-        private readonly IContainer components = null;
 
         /// <summary>
         ///   The add show button.
@@ -156,6 +152,7 @@ namespace TVSorter.View
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.Windows.Forms.TableLayoutPanel selectedShowTable;
             System.Windows.Forms.GroupBox customFormatGroup;
             System.Windows.Forms.FlowLayoutPanel selectedShowButtons;
@@ -188,6 +185,7 @@ namespace TVSorter.View
             this.createNfoFilesButton = new System.Windows.Forms.Button();
             this.tvShowsList = new System.Windows.Forms.ListBox();
             this.topButtonsFlow = new System.Windows.Forms.FlowLayoutPanel();
+            this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             selectedShowTable = new System.Windows.Forms.TableLayoutPanel();
             customFormatGroup = new System.Windows.Forms.GroupBox();
             selectedShowButtons = new System.Windows.Forms.FlowLayoutPanel();
@@ -261,6 +259,7 @@ namespace TVSorter.View
             this.selectedShowLastUpdated.Size = new System.Drawing.Size(565, 25);
             this.selectedShowLastUpdated.TabIndex = 2;
             this.selectedShowLastUpdated.Text = "Last Updated:";
+            this.toolTip.SetToolTip(this.selectedShowLastUpdated, "The time that the show was last updated in TheTVDB.com\'s server time (UTC).");
             // 
             // selectedShowTvdb
             // 
@@ -270,7 +269,8 @@ namespace TVSorter.View
             this.selectedShowTvdb.Name = "selectedShowTvdb";
             this.selectedShowTvdb.Size = new System.Drawing.Size(565, 25);
             this.selectedShowTvdb.TabIndex = 3;
-            this.selectedShowTvdb.Text = "TVDB: ";
+            this.selectedShowTvdb.Text = "TVDB ID: ";
+            this.toolTip.SetToolTip(this.selectedShowTvdb, "The show\'s ID on TheTVDB.com");
             // 
             // customFormatGroup
             // 
@@ -314,6 +314,7 @@ namespace TVSorter.View
             this.selectedShowUseCustomFormat.Size = new System.Drawing.Size(118, 17);
             this.selectedShowUseCustomFormat.TabIndex = 0;
             this.selectedShowUseCustomFormat.Text = "Use Custom Format";
+            this.toolTip.SetToolTip(this.selectedShowUseCustomFormat, "Indicates whether to use a custom format with this show.");
             this.selectedShowUseCustomFormat.UseVisualStyleBackColor = true;
             this.selectedShowUseCustomFormat.CheckedChanged += new System.EventHandler(this.SelectedUseCustomFormatCheckedChanged);
             // 
@@ -325,6 +326,7 @@ namespace TVSorter.View
             this.selectedShowCustomFormatText.Name = "selectedShowCustomFormatText";
             this.selectedShowCustomFormatText.Size = new System.Drawing.Size(372, 20);
             this.selectedShowCustomFormatText.TabIndex = 2;
+            this.toolTip.SetToolTip(this.selectedShowCustomFormatText, "The custom format to use for this show.");
             // 
             // formatLabel
             // 
@@ -368,6 +370,7 @@ namespace TVSorter.View
             this.saveButton.Size = new System.Drawing.Size(75, 23);
             this.saveButton.TabIndex = 0;
             this.saveButton.Text = "Save";
+            this.toolTip.SetToolTip(this.saveButton, "Saves any changes to the show\'s configuration.");
             this.saveButton.UseVisualStyleBackColor = true;
             this.saveButton.Click += new System.EventHandler(this.SaveButtonClick);
             // 
@@ -378,6 +381,7 @@ namespace TVSorter.View
             this.revertButton.Size = new System.Drawing.Size(75, 23);
             this.revertButton.TabIndex = 1;
             this.revertButton.Text = "Revert";
+            this.toolTip.SetToolTip(this.revertButton, "Revert\'s any unsaved changes to the show\'s configuration.");
             this.revertButton.UseVisualStyleBackColor = true;
             this.revertButton.Click += new System.EventHandler(this.RevertButtonClick);
             // 
@@ -388,6 +392,7 @@ namespace TVSorter.View
             this.updateShowButton.Size = new System.Drawing.Size(93, 23);
             this.updateShowButton.TabIndex = 2;
             this.updateShowButton.Text = "Update Show";
+            this.toolTip.SetToolTip(this.updateShowButton, "Updates the show\'s episode data.");
             this.updateShowButton.UseVisualStyleBackColor = true;
             this.updateShowButton.Click += new System.EventHandler(this.UpdateShowButtonClick);
             // 
@@ -398,6 +403,7 @@ namespace TVSorter.View
             this.removeShowButton.Size = new System.Drawing.Size(75, 23);
             this.removeShowButton.TabIndex = 3;
             this.removeShowButton.Text = "Remove";
+            this.toolTip.SetToolTip(this.removeShowButton, "Removes the show from TVSorter.");
             this.removeShowButton.UseVisualStyleBackColor = true;
             this.removeShowButton.Click += new System.EventHandler(this.RemoveShowButtonClick);
             // 
@@ -408,6 +414,8 @@ namespace TVSorter.View
             this.resetLastUpdatedButton.Size = new System.Drawing.Size(115, 23);
             this.resetLastUpdatedButton.TabIndex = 4;
             this.resetLastUpdatedButton.Text = "Reset Last Updated";
+            this.toolTip.SetToolTip(this.resetLastUpdatedButton, "Resets the Last Updated timestamp of the show. \r\nThis allows new data to be downl" +
+        "oaded in the next\r\nupdate.");
             this.resetLastUpdatedButton.UseVisualStyleBackColor = true;
             this.resetLastUpdatedButton.Click += new System.EventHandler(this.ResetLastUpdatedButtonClick);
             // 
@@ -459,6 +467,7 @@ namespace TVSorter.View
             this.selectedShowFolderNameText.Name = "selectedShowFolderNameText";
             this.selectedShowFolderNameText.Size = new System.Drawing.Size(371, 20);
             this.selectedShowFolderNameText.TabIndex = 2;
+            this.toolTip.SetToolTip(this.selectedShowFolderNameText, "The folder name that the show is in.");
             // 
             // alternateNamesButton
             // 
@@ -467,6 +476,7 @@ namespace TVSorter.View
             this.alternateNamesButton.Size = new System.Drawing.Size(100, 23);
             this.alternateNamesButton.TabIndex = 3;
             this.alternateNamesButton.Text = "Alternate Names";
+            this.toolTip.SetToolTip(this.alternateNamesButton, "Edit the alternate names used by the show.");
             this.alternateNamesButton.UseVisualStyleBackColor = true;
             this.alternateNamesButton.Click += new System.EventHandler(this.AlternateNamesButtonClick);
             // 
@@ -500,6 +510,7 @@ namespace TVSorter.View
             this.selectedShowUseDvdOrder.Size = new System.Drawing.Size(100, 17);
             this.selectedShowUseDvdOrder.TabIndex = 0;
             this.selectedShowUseDvdOrder.Text = "Use DVD Order";
+            this.toolTip.SetToolTip(this.selectedShowUseDvdOrder, "Indicates whether the show should use the DVD order for episodes.");
             this.selectedShowUseDvdOrder.UseVisualStyleBackColor = true;
             // 
             // selectedShowLockButton
@@ -509,6 +520,7 @@ namespace TVSorter.View
             this.selectedShowLockButton.Size = new System.Drawing.Size(90, 23);
             this.selectedShowLockButton.TabIndex = 1;
             this.selectedShowLockButton.Text = "Unlock Show";
+            this.toolTip.SetToolTip(this.selectedShowLockButton, "Locks/Unlocks  the show.");
             this.selectedShowLockButton.UseVisualStyleBackColor = true;
             this.selectedShowLockButton.Click += new System.EventHandler(this.SelectedShowLockButtonClick);
             // 
@@ -519,6 +531,7 @@ namespace TVSorter.View
             this.updateAllButton.Size = new System.Drawing.Size(75, 23);
             this.updateAllButton.TabIndex = 0;
             this.updateAllButton.Text = "Update All";
+            this.toolTip.SetToolTip(this.updateAllButton, "Updates the episode data for all the unlocked shows.");
             this.updateAllButton.UseVisualStyleBackColor = true;
             this.updateAllButton.Click += new System.EventHandler(this.UpdateAllButtonClick);
             // 
@@ -529,6 +542,7 @@ namespace TVSorter.View
             this.addShowButton.Size = new System.Drawing.Size(75, 23);
             this.addShowButton.TabIndex = 1;
             this.addShowButton.Text = "Add Show";
+            this.toolTip.SetToolTip(this.addShowButton, "Adds a new show.");
             this.addShowButton.UseVisualStyleBackColor = true;
             this.addShowButton.Click += new System.EventHandler(this.AddShowButtonClick);
             // 
@@ -539,6 +553,8 @@ namespace TVSorter.View
             this.searchShowsButton.Size = new System.Drawing.Size(112, 23);
             this.searchShowsButton.TabIndex = 2;
             this.searchShowsButton.Text = "Search for Shows";
+            this.toolTip.SetToolTip(this.searchShowsButton, "Searches for new shows in the output directories.\r\nThis looks up shows by folder " +
+        "name.");
             this.searchShowsButton.UseVisualStyleBackColor = true;
             this.searchShowsButton.Click += new System.EventHandler(this.SearchShowsButtonClick);
             // 
@@ -549,6 +565,8 @@ namespace TVSorter.View
             this.createNfoFilesButton.Size = new System.Drawing.Size(105, 23);
             this.createNfoFilesButton.TabIndex = 3;
             this.createNfoFilesButton.Text = "Create Nfo Files";
+            this.toolTip.SetToolTip(this.createNfoFilesButton, "Creates a tvshow.nfo file in each show\'s directoy with\r\nthe URL to the show on Th" +
+        "e TVDB. This is read by \r\nXBMC when scanning.");
             this.createNfoFilesButton.UseVisualStyleBackColor = true;
             this.createNfoFilesButton.Click += new System.EventHandler(this.CreateNfoFilesButtonClick);
             // 
@@ -614,5 +632,7 @@ namespace TVSorter.View
         private TableLayoutPanel nameTable;
         private FlowLayoutPanel episodesFlow;
         private Button resetLastUpdatedButton;
+        private ToolTip toolTip;
+        private IContainer components;
     }
 }

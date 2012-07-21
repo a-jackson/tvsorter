@@ -51,6 +51,11 @@ namespace TVSorter.Controller
         /// </summary>
         public event EventHandler SearchShowsComplete;
 
+        /// <summary>
+        /// Occurs when a show changes.
+        /// </summary>
+        public event EventHandler<TvShowEventArgs> ShowChanged;
+
         #endregion
 
         #region Public Properties
@@ -296,6 +301,11 @@ namespace TVSorter.Controller
             else
             {
                 this.Shows.Add(e.TvShow);
+            }
+
+            if (this.ShowChanged != null)
+            {
+                this.ShowChanged(sender, e);
             }
         }
 

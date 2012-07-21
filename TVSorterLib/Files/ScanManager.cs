@@ -27,15 +27,6 @@ namespace TVSorter.Files
     /// </summary>
     internal class ScanManager
     {
-        #region Static Fields
-
-        /// <summary>
-        ///   An array of characters that can be used as spaces.
-        /// </summary>
-        private static readonly char[] SpacerChars = new[] { '.', '_', '-' };
-
-        #endregion
-
         #region Fields
 
         /// <summary>
@@ -223,6 +214,8 @@ namespace TVSorter.Files
             List<FileResult> matchedFiles =
                 directories.SelectMany(dir => this.ProcessDirectory(dir, true)).Where(x => !x.Incomplete).ToList();
 
+            Logger.OnLogMessage(this, "Updating file counts...");
+
             // Get all of the matched episodes.
             List<Episode> matchedEpsiodes = matchedFiles.SelectMany(x => x.Episodes).ToList();
 
@@ -236,8 +229,25 @@ namespace TVSorter.Files
                 episode.FileCount = matchedEpsiodes.Count(x => episode.Equals(x));
             }
 
+            Logger.OnLogMessage(this, "Saving file counts...");
+
             // Save all the shows.
             shows.Save(this.storageProvider);
+        }
+
+        /// <summary>
+        /// Searches a destination folder for files.
+        /// This is intended to be called by the file manager.
+        /// </summary>
+        /// <param name="destination">
+        /// The destination directory to search.
+        /// </param>
+        /// <returns>
+        /// The collection of matched files.
+        /// </returns>
+        internal IEnumerable<FileResult> SearchDestinationFolder(IDirectoryInfo destination)
+        {
+            return this.ProcessDirectory(destination, false, true);
         }
 
         /// <summary>
@@ -269,22 +279,25 @@ namespace TVSorter.Files
         /// <param name="showName">
         /// The name of the show as seen by the program. 
         /// </param>
+        /// <param name="ignoreShowUpdate">
+        /// A value indicating whether the settings to update and lock shows should be ignored.
+        /// </param>
         /// <returns>
         /// The TV show that was found. 
         /// </returns>
-        private TvShow MatchShow(string fileName, int matchIndex, out string showName)
+        private TvShow MatchShow(string fileName, int matchIndex, out string showName, bool ignoreShowUpdate)
         {
             showName = fileName.Substring(0, matchIndex - 1);
 
             // Replace any spacer characters with spaces
-            showName = SpacerChars.Aggregate(showName, (current, ch) => current.Replace(ch, ' '));
+            showName = TvShow.RemoveSpacerChars(showName);
 
             string name = showName;
             TvShow show =
                 this.tvShows.FirstOrDefault(
                     x => x.GetShowNames().Contains(name, StringComparer.InvariantCultureIgnoreCase));
 
-            if (this.settings.AddUnmatchedShows && show == null)
+            if (this.settings.AddUnmatchedShows && show == null && !ignoreShowUpdate)
             {
                 Logger.OnLogMessage(this, "Attempting to add show {0}", showName);
 
@@ -305,7 +318,8 @@ namespace TVSorter.Files
             }
 
             // If Unlock matched shows is on and the show is locked.
-            if (!this.refreshingFileCounts && this.settings.UnlockMatchedShows && show != null && show.Locked)
+            if (!this.refreshingFileCounts && this.settings.UnlockMatchedShows && show != null && show.Locked
+                && !ignoreShowUpdate)
             {
                 // Unlock and update the show.
                 show.Locked = false;
@@ -325,16 +339,20 @@ namespace TVSorter.Files
         /// <param name="overrideRecurse">
         /// A value indicating whether the setting for recurse subdirectories should be overriden. 
         /// </param>
+        /// <param name="ignoreShowUpdate">
+        /// A value indicating whether the settings for updating and locked shows should be ignored.
+        /// </param>
         /// <returns>
         /// The list of identified files. 
         /// </returns>
-        private IEnumerable<FileResult> ProcessDirectory(IDirectoryInfo directory, bool overrideRecurse = false)
+        private IEnumerable<FileResult> ProcessDirectory(
+            IDirectoryInfo directory, bool overrideRecurse = false, bool ignoreShowUpdate = false)
         {
             // Get the files where the extension is in the list of extensions.
             IEnumerable<IFileInfo> files =
                 directory.GetFiles().Where(file => this.settings.FileExtensions.Contains(file.Extension));
 
-            foreach (FileResult result in files.Select(this.ProcessFile))
+            foreach (FileResult result in files.Select(info => this.ProcessFile(info, ignoreShowUpdate)))
             {
                 if (result != null)
                 {
@@ -342,7 +360,12 @@ namespace TVSorter.Files
                 }
             }
 
-            Logger.OnLogMessage(this, "Scanned directory: {0}", directory.FullName);
+            // If ignore show update is on then this is being run from the FileManger as part
+            // of a move or copy operation. It should add to log that it is scanning the directory.
+            if (!ignoreShowUpdate)
+            {
+                Logger.OnLogMessage(this, "Scanned directory: {0}", directory.FullName);
+            }
 
             if (!this.settings.RecurseSubdirectories && !overrideRecurse)
             {
@@ -350,7 +373,9 @@ namespace TVSorter.Files
             }
 
             IDirectoryInfo[] dirs = directory.GetDirectories();
-            foreach (FileResult result in dirs.SelectMany(dir => this.ProcessDirectory(dir, overrideRecurse)))
+            foreach (
+                FileResult result in
+                    dirs.SelectMany(dir => this.ProcessDirectory(dir, overrideRecurse, ignoreShowUpdate)))
             {
                 yield return result;
             }
@@ -411,10 +436,13 @@ namespace TVSorter.Files
         /// <param name="file">
         /// The file to process. 
         /// </param>
+        /// <param name="ignoreShowUpdate">
+        /// A value indicating whether the settings to update and lock shows should be ignored.
+        /// </param>
         /// <returns>
         /// The results of the file process. 
         /// </returns>
-        private FileResult ProcessFile(IFileInfo file)
+        private FileResult ProcessFile(IFileInfo file, bool ignoreShowUpdate)
         {
             // Attempt to match to a regular express
             Match firstMatch = this.GetFirstMatch(file);
@@ -426,7 +454,7 @@ namespace TVSorter.Files
 
             string showname;
 
-            TvShow show = this.MatchShow(file.Name, firstMatch.Index, out showname);
+            TvShow show = this.MatchShow(file.Name, firstMatch.Index, out showname, ignoreShowUpdate);
 
             Episode episode = null;
             IList<Episode> episodes = null;

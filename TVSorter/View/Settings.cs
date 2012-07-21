@@ -43,6 +43,11 @@ namespace TVSorter.View
         private List<string> fileExtensions;
 
         /// <summary>
+        /// The list of overwrite keywords.
+        /// </summary>
+        private List<string> overwriteKeywords;
+
+        /// <summary>
         ///   The list of regular expressions.
         /// </summary>
         private List<string> regularExpressions;
@@ -99,6 +104,25 @@ namespace TVSorter.View
         }
 
         /// <summary>
+        /// Handles the click event of the Edit Overwrite Keywords button.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender of the event.
+        /// </param>
+        /// <param name="e">
+        /// The arguments of the event.
+        /// </param>
+        private void EditOverwriteKeywordsButtonClick(object sender, EventArgs e)
+        {
+            var listController = new ListController(this.overwriteKeywords, "Overwrite keywords");
+            var dialog = new ListDialog(listController);
+            if (dialog.ShowDialog(this) == DialogResult.OK)
+            {
+                this.overwriteKeywords = listController.List.ToList();
+            }
+        }
+
+        /// <summary>
         /// Handles the File Extensions button being clicked.
         /// </summary>
         /// <param name="sender">
@@ -150,6 +174,7 @@ namespace TVSorter.View
                         new BindingList<string>(this.controller.Settings.DestinationDirectories);
                     this.regularExpressions = new List<string>(this.controller.Settings.RegularExpressions);
                     this.fileExtensions = new List<string>(this.controller.Settings.FileExtensions);
+                    this.overwriteKeywords = new List<string>(this.controller.Settings.OverwriteKeywords);
 
                     // Update directories
                     this.sourceText.Text = this.controller.Settings.SourceDirectory;
@@ -234,6 +259,7 @@ namespace TVSorter.View
             this.controller.Settings.RegularExpressions = this.regularExpressions.ToList();
             this.controller.Settings.FileExtensions = this.fileExtensions.ToList();
             this.controller.Settings.DestinationDirectories = this.destinationDirectories.ToList();
+            this.controller.Settings.OverwriteKeywords = this.overwriteKeywords.ToList();
 
             this.controller.Settings.SourceDirectory = this.sourceText.Text;
             this.controller.Settings.DestinationDirectory = (string)this.destinationList.SelectedItem;

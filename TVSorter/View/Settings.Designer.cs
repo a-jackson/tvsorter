@@ -148,6 +148,7 @@ namespace TVSorter.View
             System.Windows.Forms.TableLayoutPanel formatTable;
             System.Windows.Forms.Label formatLabel;
             System.Windows.Forms.FlowLayoutPanel flowBottomButtons;
+            System.Windows.Forms.Button editOverwriteKeywordsButton;
             this.groupDirectories = new System.Windows.Forms.GroupBox();
             this.sourceText = new System.Windows.Forms.TextBox();
             this.sourceBrowse = new System.Windows.Forms.Button();
@@ -159,6 +160,7 @@ namespace TVSorter.View
             this.renameIfExistsCheck = new System.Windows.Forms.CheckBox();
             this.addUnmatchedShowsCheck = new System.Windows.Forms.CheckBox();
             this.unlockAndUpdateCheck = new System.Windows.Forms.CheckBox();
+            this.lockShowWithNoNewEpisodesCheck = new System.Windows.Forms.CheckBox();
             this.regExButton = new System.Windows.Forms.Button();
             this.fileExtensionsButton = new System.Windows.Forms.Button();
             this.formatText = new System.Windows.Forms.TextBox();
@@ -167,7 +169,6 @@ namespace TVSorter.View
             this.saveButton = new System.Windows.Forms.Button();
             this.folderDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.lockShowWithNoNewEpisodesCheck = new System.Windows.Forms.CheckBox();
             mainTable = new System.Windows.Forms.TableLayoutPanel();
             tableDirectories = new System.Windows.Forms.TableLayoutPanel();
             sourceLabel = new System.Windows.Forms.Label();
@@ -182,6 +183,7 @@ namespace TVSorter.View
             formatTable = new System.Windows.Forms.TableLayoutPanel();
             formatLabel = new System.Windows.Forms.Label();
             flowBottomButtons = new System.Windows.Forms.FlowLayoutPanel();
+            editOverwriteKeywordsButton = new System.Windows.Forms.Button();
             mainTable.SuspendLayout();
             this.groupDirectories.SuspendLayout();
             tableDirectories.SuspendLayout();
@@ -268,6 +270,7 @@ namespace TVSorter.View
             this.sourceText.ReadOnly = true;
             this.sourceText.Size = new System.Drawing.Size(388, 20);
             this.sourceText.TabIndex = 1;
+            this.toolTip.SetToolTip(this.sourceText, "The source directory to search for TV Show files.");
             // 
             // sourceBrowse
             // 
@@ -298,6 +301,8 @@ namespace TVSorter.View
             this.destinationList.Name = "destinationList";
             this.destinationList.Size = new System.Drawing.Size(388, 114);
             this.destinationList.TabIndex = 6;
+            this.toolTip.SetToolTip(this.destinationList, "All the directories where TV Shows are stored. Only the selected one will have TV" +
+        " moved to it but all will be used in Missing and Duplicate episode searches.");
             // 
             // destinationButtonsFlow
             // 
@@ -427,6 +432,18 @@ namespace TVSorter.View
         "if a match is found.");
             this.unlockAndUpdateCheck.UseVisualStyleBackColor = true;
             // 
+            // lockShowWithNoNewEpisodesCheck
+            // 
+            this.lockShowWithNoNewEpisodesCheck.AutoSize = true;
+            this.lockShowWithNoNewEpisodesCheck.Location = new System.Drawing.Point(222, 49);
+            this.lockShowWithNoNewEpisodesCheck.Name = "lockShowWithNoNewEpisodesCheck";
+            this.lockShowWithNoNewEpisodesCheck.Size = new System.Drawing.Size(264, 17);
+            this.lockShowWithNoNewEpisodesCheck.TabIndex = 5;
+            this.lockShowWithNoNewEpisodesCheck.Text = "Lock Show After 3 Weeks With No New Episodes\r\n";
+            this.toolTip.SetToolTip(this.lockShowWithNoNewEpisodesCheck, "When selected, during an update, if the show hasn\'t \r\nhad any new episodes for 3 " +
+        "weeks, the show will be\r\nlocked and skipped in future updates.");
+            this.lockShowWithNoNewEpisodesCheck.UseVisualStyleBackColor = true;
+            // 
             // searchOptionsGroup
             // 
             searchOptionsGroup.Controls.Add(searchOptionsFlow);
@@ -442,6 +459,7 @@ namespace TVSorter.View
             // 
             searchOptionsFlow.Controls.Add(this.regExButton);
             searchOptionsFlow.Controls.Add(this.fileExtensionsButton);
+            searchOptionsFlow.Controls.Add(editOverwriteKeywordsButton);
             searchOptionsFlow.Dock = System.Windows.Forms.DockStyle.Fill;
             searchOptionsFlow.Location = new System.Drawing.Point(3, 16);
             searchOptionsFlow.Name = "searchOptionsFlow";
@@ -455,6 +473,8 @@ namespace TVSorter.View
             this.regExButton.Size = new System.Drawing.Size(136, 23);
             this.regExButton.TabIndex = 0;
             this.regExButton.Text = "Edit Regular Expressions";
+            this.toolTip.SetToolTip(this.regExButton, "Edit the regular expressions used for searching.\r\nSee http://code.google.com/p/tv" +
+        "sorter for more\r\ninformation.");
             this.regExButton.UseVisualStyleBackColor = true;
             this.regExButton.Click += new System.EventHandler(this.RegExButtonClick);
             // 
@@ -465,6 +485,7 @@ namespace TVSorter.View
             this.fileExtensionsButton.Size = new System.Drawing.Size(136, 23);
             this.fileExtensionsButton.TabIndex = 1;
             this.fileExtensionsButton.Text = "Edit File Extensions";
+            this.toolTip.SetToolTip(this.fileExtensionsButton, "Edit the file extensions that are searched.");
             this.fileExtensionsButton.UseVisualStyleBackColor = true;
             this.fileExtensionsButton.Click += new System.EventHandler(this.FileExtensionsButtonClick);
             // 
@@ -500,11 +521,11 @@ namespace TVSorter.View
             // 
             formatLabel.Anchor = System.Windows.Forms.AnchorStyles.Right;
             formatLabel.AutoSize = true;
-            formatLabel.Location = new System.Drawing.Point(52, 8);
+            formatLabel.Location = new System.Drawing.Point(46, 8);
             formatLabel.Name = "formatLabel";
-            formatLabel.Size = new System.Drawing.Size(71, 13);
+            formatLabel.Size = new System.Drawing.Size(77, 13);
             formatLabel.TabIndex = 0;
-            formatLabel.Text = "Format Label:";
+            formatLabel.Text = "Output Format:";
             // 
             // formatText
             // 
@@ -513,6 +534,8 @@ namespace TVSorter.View
             this.formatText.Name = "formatText";
             this.formatText.Size = new System.Drawing.Size(388, 20);
             this.formatText.TabIndex = 1;
+            this.toolTip.SetToolTip(this.formatText, "The formatting string used to set the output path for an episode. This setting ca" +
+        "n be overriden on a per show basis.");
             // 
             // formatBuilderButton
             // 
@@ -556,15 +579,16 @@ namespace TVSorter.View
             this.saveButton.UseVisualStyleBackColor = true;
             this.saveButton.Click += new System.EventHandler(this.SaveButtonClick);
             // 
-            // lockShowWithNoNewEpisodesCheck
+            // editOverwriteKeywordsButton
             // 
-            this.lockShowWithNoNewEpisodesCheck.AutoSize = true;
-            this.lockShowWithNoNewEpisodesCheck.Location = new System.Drawing.Point(222, 49);
-            this.lockShowWithNoNewEpisodesCheck.Name = "lockShowWithNoNewEpisodesCheck";
-            this.lockShowWithNoNewEpisodesCheck.Size = new System.Drawing.Size(264, 17);
-            this.lockShowWithNoNewEpisodesCheck.TabIndex = 5;
-            this.lockShowWithNoNewEpisodesCheck.Text = "Lock Show After 3 Weeks With No New Episodes\r\n";
-            this.lockShowWithNoNewEpisodesCheck.UseVisualStyleBackColor = true;
+            editOverwriteKeywordsButton.Location = new System.Drawing.Point(287, 3);
+            editOverwriteKeywordsButton.Name = "editOverwriteKeywordsButton";
+            editOverwriteKeywordsButton.Size = new System.Drawing.Size(146, 23);
+            editOverwriteKeywordsButton.TabIndex = 2;
+            editOverwriteKeywordsButton.Text = "Edit Overwrite Keywords";
+            this.toolTip.SetToolTip(editOverwriteKeywordsButton, resources.GetString("editOverwriteKeywordsButton.ToolTip"));
+            editOverwriteKeywordsButton.UseVisualStyleBackColor = true;
+            editOverwriteKeywordsButton.Click += new System.EventHandler(this.EditOverwriteKeywordsButtonClick);
             // 
             // Settings
             // 

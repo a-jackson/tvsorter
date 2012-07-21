@@ -27,6 +27,15 @@ namespace TVSorter.Model
     /// </summary>
     public class TvShow : IEquatable<TvShow>
     {
+        #region Static Fields
+
+        /// <summary>
+        ///   An array of characters that can be used as spaces.
+        /// </summary>
+        private static readonly char[] SpacerChars = new[] { '.', '_', '-' };
+
+        #endregion
+
         #region Constructors and Destructors
 
         /// <summary>
@@ -324,6 +333,20 @@ namespace TVSorter.Model
         }
 
         /// <summary>
+        /// Removes the spacer chars from the specfied string.
+        /// </summary>
+        /// <param name="str">
+        /// The string to process.
+        /// </param>
+        /// <returns>
+        /// The processed string.
+        /// </returns>
+        internal static string RemoveSpacerChars(string str)
+        {
+            return SpacerChars.Aggregate(str, (current, ch) => current.Replace(ch, ' '));
+        }
+
+        /// <summary>
         /// Searches for new shows.
         /// </summary>
         /// <param name="name">
@@ -379,26 +402,7 @@ namespace TVSorter.Model
         /// <returns>The possible names of the show.</returns>
         internal IEnumerable<string> GetShowNames()
         {
-            if (this.Name != null)
-            {
-                yield return this.Name;
-                yield return GetFileSafeName(this.Name);
-            }
-
-            if (this.FolderName != null)
-            {
-                yield return GetFileSafeName(this.FolderName);
-                yield return this.FolderName;
-            }
-
-            if (this.AlternateNames != null)
-            {
-                foreach (string alternateName in this.AlternateNames)
-                {
-                    yield return alternateName;
-                    yield return GetFileSafeName(alternateName);
-                }
-            }
+            return GetNames(new[] { this.Name, this.FolderName }.Concat(this.AlternateNames)).Distinct();
         }
 
         /// <summary>
@@ -462,6 +466,25 @@ namespace TVSorter.Model
             }
 
             return new string(str.Where(x => !Path.GetInvalidFileNameChars().Contains(x)).ToArray());
+        }
+
+        /// <summary>
+        /// Gets the names from the specified collection of names.
+        /// </summary>
+        /// <param name="names">
+        /// The names to convert.
+        /// </param>
+        /// <returns>
+        /// The complete list of names including string processing.
+        /// </returns>
+        private static IEnumerable<string> GetNames(IEnumerable<string> names)
+        {
+            foreach (string name in names.Where(name => name != null))
+            {
+                yield return name;
+                yield return GetFileSafeName(name);
+                yield return RemoveSpacerChars(name);
+            }
         }
 
         /// <summary>

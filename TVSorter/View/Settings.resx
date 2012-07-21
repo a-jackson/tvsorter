@@ -126,6 +126,9 @@
   <metadata name="sourceLabel.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
   </metadata>
+  <metadata name="toolTip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>136, 17</value>
+  </metadata>
   <metadata name="destinationListLabel.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
   </metadata>
@@ -141,14 +144,11 @@
   <metadata name="sortOptionsFlow.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
   </metadata>
-  <metadata name="toolTip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>136, 17</value>
-  </metadata>
   <data name="addUnmatchedShowsCheck.ToolTip" xml:space="preserve">
-    <value>If a file is found by the scanner that cannot be matched to 
-a show already in the database. This will automatically
-search The TVDB for the show and attempt to add it.
-It will add an alternate name to the show if the search
+    <value>When selected, if a file is found by the scanner that cannot be
+matched to a show already in the database. This will
+automatically search The TVDB for the show and attempt to 
+add it. It will add an alternate name to the show if the search
 returns an existing show. </value>
   </data>
   <metadata name="searchOptionsGroup.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
@@ -157,6 +157,16 @@ returns an existing show. </value>
   <metadata name="searchOptionsFlow.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
   </metadata>
+  <metadata name="editOverwriteKeywordsButton.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="editOverwriteKeywordsButton.ToolTip" xml:space="preserve">
+    <value>Edit the keywords, that when found in a
+filename will trigger the system to overwrite any
+file that might already exist for the episode.
+This is for cases where a repack of an episode is
+made that should be used instead of the first release.</value>
+  </data>
   <metadata name="formatOptionsGroup.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
   </metadata>

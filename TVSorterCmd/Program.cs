@@ -34,6 +34,7 @@ namespace TVSorter
         public static void Main(string[] args)
         {
             Logger.LogMessage += (sender, e) => Console.WriteLine(e.LogMessage);
+            Console.WriteLine("TVSorter Version {0}", Version.CurrentVersion);
 
             foreach (string arg in args)
             {
