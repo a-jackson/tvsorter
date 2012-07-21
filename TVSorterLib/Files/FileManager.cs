@@ -157,7 +157,6 @@ namespace TVSorter.Files
         /// The file to process.
         /// </param>
         /// <param name="destination">
-        /// 
         /// The destination to process the files to.
         /// </param>
         private void ProcessFile(SortType type, FileResult file, IDirectoryInfo destination)
@@ -180,8 +179,7 @@ namespace TVSorter.Files
                 destinationInfo.Delete();
                 file.Episode.FileCount--;
             }
-
-            if (destinationInfo.Exists)
+            else if (destinationInfo.Exists)
             {
                 Logger.OnLogMessage(this, "Skipping {0}. Already exists.", destinationInfo.Name);
                 return;

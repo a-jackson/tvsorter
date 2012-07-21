@@ -51,7 +51,7 @@ namespace TVSorter.Test
                 yield return
                     new TvShow
                         {
-                            Name = "Alpha", 
+                            Name = "Alpha Show", 
                             FolderName = "Alpha Folder", 
                             TvdbId = "1", 
                             Episodes =
@@ -62,7 +62,7 @@ namespace TVSorter.Test
                                                 EpisodeNumber = 1, 
                                                 SeasonNumber = 1, 
                                                 FirstAir = new DateTime(2012, 1, 1), 
-                                                Name = "Episode One", 
+                                                Name = "Episode One (1)", 
                                                 TvdbId = "111"
                                             }, 
                                         new Episode
@@ -70,16 +70,16 @@ namespace TVSorter.Test
                                                 EpisodeNumber = 2, 
                                                 SeasonNumber = 1, 
                                                 FirstAir = new DateTime(2012, 1, 2), 
-                                                Name = "Episode Two", 
+                                                Name = "Episode One (2)", 
                                                 TvdbId = "112"
                                             }
                                     }, 
-                            AlternateNames = new List<string> { "alt name" }
+                            AlternateNames = new List<string> { "alt name", "alpha" }
                         };
                 yield return
                     new TvShow
                         {
-                            Name = "Beta", 
+                            Name = "Beta Show", 
                             FolderName = "Beta Folder", 
                             TvdbId = "2", 
                             Episodes =
@@ -93,7 +93,8 @@ namespace TVSorter.Test
                                                 Name = "Episode One", 
                                                 TvdbId = "211", 
                                             }
-                                    }
+                                    }, 
+                            AlternateNames = new List<string> { "beta" }, 
                         };
             }
         }

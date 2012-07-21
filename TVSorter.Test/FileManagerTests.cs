@@ -8,7 +8,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter.Test
 {
-    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
@@ -46,6 +45,7 @@ namespace TVSorter.Test
             IFileInfo file = this.CreateTestFile(this.Root, "alpha.s01e01.avi")[0];
             var result = new FileResult { Checked = true, Show = this.TestShows.First(), InputFile = file, };
             result.Episode = result.Show.Episodes.First();
+            result.Episodes = new List<Episode> { result.Episode };
 
             IDirectoryInfo seasonOne = null;
 
@@ -55,19 +55,22 @@ namespace TVSorter.Test
                         var path = x.Arg<string>();
 
                         // Check that the path is as expected
-                        string expectedPath = string.Format(
-                            "Alpha Folder{0}Season 1{0}Alpha.S01E01.Episode.One.avi", Path.DirectorySeparatorChar);
+                        string expectedPath =
+                            string.Format(
+                                "Alpha Folder{0}Season 1{0}Alpha.Show.S01E01.Episode.One.(1).avi", 
+                                Path.DirectorySeparatorChar);
                         Assert.AreEqual(expectedPath, path, "The path is incorrect.");
 
                         // Return the correct file.
                         IDirectoryInfo alphaFolder = this.CreateTestDirectory(this.Root, "Alpha Folder")[0];
                         seasonOne = this.CreateTestDirectory(alphaFolder, "Season 1")[0];
                         seasonOne.Exists.Returns(false);
-                        IFileInfo episodeFile = this.CreateTestFile(seasonOne, "Alpha.S01E01.Episode.One.avi")[0];
+                        IFileInfo episodeFile =
+                            this.CreateTestFile(seasonOne, "Alpha.Show.S01E01.Episode.One.(1).avi")[0];
                         episodeFile.Exists.Returns(false);
                         return episodeFile;
                     });
-            
+
             this.fileManager.ProcessFiles(new List<FileResult> { result }, FileManager.SortType.Copy, this.Root);
 
             // Check that seasonOne has been created.
@@ -79,7 +82,7 @@ namespace TVSorter.Test
             // Copy the files.
             file.Received(1).CopyTo(
                 string.Format(
-                    "TV{0}Alpha Folder{0}Season 1{0}Alpha.S01E01.Episode.One.avi", Path.DirectorySeparatorChar));
+                    "TV{0}Alpha Folder{0}Season 1{0}Alpha.Show.S01E01.Episode.One.(1).avi", Path.DirectorySeparatorChar));
 
             // Check that the episode was saved.
             this.StorageProvider.Received(1).SaveEpisode(result.Episode);
@@ -94,7 +97,7 @@ namespace TVSorter.Test
             // Should be one call to MoveTo with the new directory path.
             file.Received(1).MoveTo(
                 string.Format(
-                    "TV{0}Alpha Folder{0}Season 1{0}Alpha.S01E01.Episode.One.avi", Path.DirectorySeparatorChar));
+                    "TV{0}Alpha Folder{0}Season 1{0}Alpha.Show.S01E01.Episode.One.(1).avi", Path.DirectorySeparatorChar));
 
             // Check that the episode was saved.
             this.StorageProvider.Received(1).SaveEpisode(result.Episode);

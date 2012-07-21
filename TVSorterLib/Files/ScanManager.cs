@@ -114,7 +114,8 @@ namespace TVSorter.Files
                 result.Episode = null;
             }
 
-            result.Episode = this.ProcessEpisode(match, show);
+            result.Episodes = this.ProcessEpisode(match, show).ToList();
+            result.Episode = result.Episodes.FirstOrDefault();
         }
 
         #endregion
@@ -201,32 +202,28 @@ namespace TVSorter.Files
         /// </param>
         internal void RefreshFileCounts(IEnumerable<IDirectoryInfo> directories)
         {
-            var results = new List<FileResult>();
+            // Search all the destination directories for positive matches.
+            // Incomplete matches are filtered out.
+            var matchedFiles =
+                directories.SelectMany(directory => this.ProcessDirectory(directory, true)).Where(x => !x.Incomplete).
+                    ToList();
 
-            // Search all the destination directories.
-            foreach (IDirectoryInfo directory in directories)
+            // Get all of the matched episodes.
+            var matchedEpsiodes = matchedFiles.SelectMany(x => x.Episodes).ToList();
+
+
+            // Get all of the shows and episodes.
+            var shows = TvShow.GetTvShows(this.provider).ToList();
+            var allEpisodes = shows.SelectMany(x => x.Episodes);
+
+            // Update the file count of the episodes.
+            foreach (var episode in allEpisodes)
             {
-                List<FileResult> files = this.ProcessDirectory(directory, true).ToList();
-                results.AddRange(files);
+                episode.FileCount = matchedEpsiodes.Count(x => episode.Equals(x));
             }
 
-            // Group the results by episode.
-            IEnumerable<IGrouping<Episode, FileResult>> episodeGroups = results.GroupBy(x => x.Episode);
-            foreach (var group in episodeGroups)
-            {
-                if (group.Key != null)
-                {
-                    // Set the file count to the size of the group.
-                    int count = group.Count();
-                    foreach (FileResult ep in group)
-                    {
-                        ep.Episode.FileCount = count;
-                    }
-                }
-            }
-
-            results.GroupBy(result => result.Show).Where(showGroup => showGroup.Key != null).Select(
-                showGroup => showGroup.Key).Save(this.provider);
+            // Save all the shows.
+            shows.Save(this.provider);
         }
 
         /// <summary>
@@ -289,8 +286,7 @@ namespace TVSorter.Files
         private IEnumerable<FileResult> ProcessDirectory(IDirectoryInfo directory, bool overrideRecurse = false)
         {
             // Get the files where the extension is in the list of extensions.
-            List<IFileInfo> files =
-                directory.GetFiles().Where(file => this.settings.FileExtensions.Contains(file.Extension)).ToList();
+            var files = directory.GetFiles().Where(file => this.settings.FileExtensions.Contains(file.Extension));
 
             foreach (FileResult result in files.Select(this.ProcessFile))
             {
@@ -324,9 +320,9 @@ namespace TVSorter.Files
         /// The show. 
         /// </param>
         /// <returns>
-        /// The episode object 
+        /// The episode objects that have been matched.
         /// </returns>
-        private Episode ProcessEpisode(Match match, TvShow show)
+        private IEnumerable<Episode> ProcessEpisode(Match match, TvShow show)
         {
             Group season = match.Groups["S"];
             Group episode = match.Groups["E"];
@@ -336,29 +332,31 @@ namespace TVSorter.Files
 
             if (show == null)
             {
-                return null;
+                yield break;
             }
-
-            Episode ep;
 
             // Determine if the match was a season/episode or a date.
             if (season.Success && episode.Success)
             {
                 int seasonNum = int.Parse(season.ToString());
-                int episodeNum = int.Parse(episode.ToString());
-                ep = show.Episodes.FirstOrDefault(x => x.EpisodeNumber == episodeNum && x.SeasonNumber == seasonNum);
+
+                // There is the possibility of multiple episodes being matches
+                foreach (Capture episodeGroup in match.Groups["E"].Captures)
+                {
+                    int episodeNum = int.Parse(episodeGroup.ToString());
+                    yield return
+                        show.Episodes.FirstOrDefault(x => x.EpisodeNumber == episodeNum && x.SeasonNumber == seasonNum);
+                }
             }
             else if (year.Success && month.Success && day.Success)
             {
                 DateTime date = DateTime.Parse(string.Concat(year, "-", month, "-", day));
-                ep = show.Episodes.FirstOrDefault(x => x.FirstAir.Equals(date));
+                yield return show.Episodes.FirstOrDefault(x => x.FirstAir.Equals(date));
             }
             else
             {
                 throw new Exception("Invalid regular expression.");
             }
-
-            return ep;
         }
 
         /// <summary>
@@ -385,13 +383,21 @@ namespace TVSorter.Files
             TvShow show = this.MatchShow(file.Name, firstMatch.Index, out showname);
 
             Episode episode = null;
+            IList<Episode> episodes = null;
 
             if (show != null)
             {
-                episode = this.ProcessEpisode(firstMatch, show);
+                episodes = this.ProcessEpisode(firstMatch, show).ToList();
+                if (episodes.Count > 0)
+                {
+                    episode = episodes.First();
+                }
             }
 
-            return new FileResult { Episode = episode, InputFile = file, Show = show, ShowName = showname };
+            return new FileResult
+                {
+                   Episode = episode, Episodes = episodes, InputFile = file, Show = show, ShowName = showname 
+                };
         }
 
         #endregion

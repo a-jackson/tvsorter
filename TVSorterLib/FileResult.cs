@@ -45,9 +45,14 @@ namespace TVSorter
         public bool Checked { get; set; }
 
         /// <summary>
-        ///   Gets the file's episode.
+        ///   Gets the file's episode match or first episode if there is more than one.
         /// </summary>
         public Episode Episode { get; internal set; }
+
+        /// <summary>
+        /// Gets the files's episodes matches.
+        /// </summary>
+        public IList<Episode> Episodes { get; internal set; }
 
         /// <summary>
         /// Gets a value indicating whether the result is incomplete.
@@ -72,7 +77,10 @@ namespace TVSorter
         {
             get
             {
-                return this.FormatOutputPath();
+                string formatString = this.Show.UseCustomFormat
+                                          ? this.Show.CustomFormat
+                                          : Settings.LoadSettings().DefaultOutputFormat;
+                return this.FormatOutputPath(formatString);
             }
         }
 
@@ -102,6 +110,44 @@ namespace TVSorter
         internal bool ContainsKeyword(IEnumerable<string> keywords)
         {
             return keywords.Any(keyword => this.InputFile.Name.ToLower().Contains(keyword.ToLower()));
+        }
+
+        /// <summary>
+        /// Formats the output path of the episode.
+        /// </summary>
+        /// <param name="formatString">
+        /// The format string to use.
+        /// </param>
+        /// <returns>
+        /// The formatted output path. 
+        /// </returns>
+        internal string FormatOutputPath(string formatString)
+        {
+            if (this.Show == null || this.Episode == null || this.InputFile == null)
+            {
+                return string.Empty;
+            }
+
+            // Replace the extension and folder name. (Format codes with no parameters)
+            formatString = formatString.Replace("{Ext}", this.InputFile.Extension);
+            formatString = formatString.Replace("{FName}", this.Show.FolderName);
+
+            // Identify the other format codes and their parameters.
+            var regExp = new Regex(@"{([a-zA-Z]+)\(([^\)}]+)\)}");
+
+            // Replace the matches with the appropriate strings.
+            formatString = regExp.Replace(formatString, this.ProcessMatch);
+
+            // Replace : with .
+            formatString = formatString.Replace(':', '.');
+
+            // Get the invalid characters for a file name, not including the DirectorySeparatorChar.
+            IEnumerable<char> invalidChars =
+                Path.GetInvalidFileNameChars().Where(x => !x.Equals(Path.DirectorySeparatorChar));
+
+            // Remove any characters that can't be in a filename from the formatString.
+            return invalidChars.Aggregate(
+                formatString, (current, ch) => current.Replace(ch.ToString(CultureInfo.InvariantCulture), string.Empty));
         }
 
         /// <summary>
@@ -143,39 +189,35 @@ namespace TVSorter
             // Characters that can be used as separators, if there is one of these at the start
             // or end of a part then it won't put the arg character next to it. This is to avoid
             // outputs like Day.1.12.00.-.1.00 for a 24 episode since .-. looks silly.
-            // Or names with titles in like Dr. Smith would be Mr..Smith - equally silly.
-            var separatorChars = new[] { "-", ":", "_", ".", "," };
+            // Or names with titles in like Mr. Smith would be Mr..Smith - equally silly.
+            var separatorChars = new[] { '-', ':', '_', '.', ',' };
 
             // The new name to be returned
-            string[] newName = { parts[0] };
+            string newName = parts[0];
 
             // Loop through each part appending it with the appropriate separator
             for (int i = 1; i < parts.Length; i++)
             {
-                bool prefix = separatorChars.All(sep => !parts[i].StartsWith(sep) && !parts[i - 1].EndsWith(sep));
+                // Check for the separator chars at the start of this part of the end of the next.
+                bool prefix =
+                    separatorChars.Select(x => x.ToString(CultureInfo.InvariantCulture)).All(
+                        sep => !parts[i].StartsWith(sep) && !parts[i - 1].EndsWith(sep));
 
-                // Check for the separator chars at the start of this part of the end of the next,
-                // no extra one should be added
+                // If there is already a prefix then don't add another
                 // Add the arg character
                 if (prefix)
                 {
-                    newName[0] += arg;
+                    newName += arg;
                 }
 
                 // Add the part
-                newName[0] += parts[i];
+                newName += parts[i];
             }
 
             // If the string ends with a separator character then remove it
-            foreach (string sep in separatorChars)
-            {
-                if (newName[0].EndsWith(sep))
-                {
-                    newName[0] = newName[0].Substring(0, newName[0].Length - 1);
-                }
-            }
+            newName = newName.TrimEnd(separatorChars);
 
-            return newName[0];
+            return newName;
         }
 
         /// <summary>
@@ -185,14 +227,21 @@ namespace TVSorter
         /// The variable's argument, the length of the output num 
         /// </param>
         /// <param name="num">
-        /// The number to format 
+        /// The numbers to format 
         /// </param>
         /// <returns>
         /// The formatted string 
         /// </returns>
-        private string FormatNum(string arg, long num)
+        private string FormatNum(string arg, params int[] num)
         {
+            if (num.Length == 0)
+            {
+                throw new ArgumentException("You must specify at least one number to format.");
+            }
+
             int length = int.Parse(arg);
+
+            // Build the format string for the specfied number of digits.
             string zeros = "{0:";
             if (length == 0)
             {
@@ -207,86 +256,106 @@ namespace TVSorter
             }
 
             zeros += "}";
-            return string.Format(zeros, num);
+
+            return num.Distinct().Select(x => string.Format(zeros, x)).Aggregate((x, y) => x + "-" + y);
         }
 
         /// <summary>
-        /// Formats the output path of the episode.
+        /// Gets the name of the episode. Used if there is more than one episode.
         /// </summary>
-        /// <returns>
-        /// The formatted output path. 
-        /// </returns>
-        private string FormatOutputPath()
+        /// <returns>The name of the episode.</returns>
+        private string GetEpisodeName()
         {
-            if (this.Show == null || this.Episode == null || this.InputFile == null)
+            // If there is only one episode on the match then return it.
+            if (this.Episodes.Count == 1)
             {
-                return string.Empty;
+                return this.Episode.Name;
             }
 
-            // TODO
-            Settings settings = Settings.LoadSettings();
+            // If the episode names are the same except for a part number at the end then
+            // use the same name and just list the part numbers at the end.
+            var regex = new Regex(@"\(([0-9]+)\)");
+            var episodeNames = (from episode in this.Episodes
+                                let match = regex.Match(episode.Name)
+                                where match.Success
+                                select
+                                    new
+                                        {
+                                            Name = episode.Name.Substring(0, match.Index).Trim(), 
+                                            Part = match.Groups[1], 
+                                        }).ToList();
 
-            string formatString = this.Show.UseCustomFormat ? this.Show.CustomFormat : settings.DefaultOutputFormat;
+            // If all the episode had a number in brackets at the end of them.
+            if (episodeNames.Count == this.Episodes.Count)
+            {
+                // Ensure that the all the episode names before the number were the same.
+                string firstName = episodeNames.First().Name;
+                if (episodeNames.All(x => x.Name == firstName))
+                {
+                    // Return the episode name with the number list in brackets.
+                    // e.g Episode Name (1-2)
+                    return firstName + " ("
+                           + episodeNames.Select(x => x.Part.ToString()).Aggregate((x, y) => x + "-" + y) + ")";
+                }
+            }
 
-            formatString = formatString.Replace("{Ext}", this.InputFile.Extension);
-            formatString = formatString.Replace("{FName}", this.Show.FolderName);
+            // The names didn't have numbers or didn't match. 
+            // Just concatenate all the names together separated with -.
+            return this.Episodes.Select(x => x.Name).Aggregate((x, y) => x + "-" + y);
+        }
 
-            var regExp = new Regex(@"{([a-zA-Z]+)\(([^\)}]+)\)}");
-
-            formatString = regExp.Replace(
-                formatString, 
-                match =>
+        /// <summary>
+        /// Processes a single match of a format code.
+        /// </summary>
+        /// <param name="match">
+        /// The matched format code.
+        /// </param>
+        /// <returns>
+        /// The string to replace the format code with.
+        /// </returns>
+        private string ProcessMatch(Match match)
+        {
+            string type = match.Groups[1].Value;
+            string arg = match.Groups[2].Value;
+            switch (type)
+            {
+                case "SName":
+                    return this.FormatName(this.Show.Name, arg);
+                case "EName":
+                    string name = this.GetEpisodeName();
+                    return this.FormatName(name, arg);
+                case "ENum":
+                    try
                     {
-                        string type = match.Groups[1].Value;
-                        string arg = match.Groups[2].Value;
-                        switch (type)
-                        {
-                            case "SName":
-                                return this.FormatName(this.Show.Name, arg);
-                            case "EName":
-                                return this.FormatName(this.Episode.Name, arg);
-                            case "ENum":
-                                try
-                                {
-                                    return this.FormatNum(arg, this.Episode.EpisodeNumber);
-                                }
-                                catch
-                                {
-                                    return match.Value;
-                                }
-
-                            case "SNum":
-                                try
-                                {
-                                    return this.FormatNum(arg, this.Episode.SeasonNumber);
-                                }
-                                catch
-                                {
-                                    return match.Value;
-                                }
-
-                            case "Date":
-                                try
-                                {
-                                    return this.Episode.FirstAir.ToString(arg);
-                                }
-                                catch
-                                {
-                                    return match.Value;
-                                }
-                        }
-
+                        return this.FormatNum(arg, this.Episodes.Select(x => x.EpisodeNumber).ToArray());
+                    }
+                    catch
+                    {
                         return match.Value;
-                    });
+                    }
 
-            // Replace : with .
-            formatString = formatString.Replace(':', '.');
+                case "SNum":
+                    try
+                    {
+                        return this.FormatNum(arg, this.Episodes.Select(x => x.SeasonNumber).ToArray());
+                    }
+                    catch
+                    {
+                        return match.Value;
+                    }
 
-            // Remove any characters that can't be in a filename
-            return
-                Path.GetInvalidFileNameChars().Where(ch => !ch.Equals(Path.DirectorySeparatorChar)).Aggregate(
-                    formatString, 
-                    (current, ch) => current.Replace(ch.ToString(CultureInfo.InvariantCulture), string.Empty));
+                case "Date":
+                    try
+                    {
+                        return this.Episode.FirstAir.ToString(arg);
+                    }
+                    catch
+                    {
+                        return match.Value;
+                    }
+            }
+
+            return match.Value;
         }
 
         #endregion

@@ -42,6 +42,46 @@ namespace TVSorter.Test
         #region Public Methods and Operators
 
         /// <summary>
+        /// Tests the output format the dual episodes.
+        /// </summary>
+        [Test]
+        public void DualEpisodeFormatting()
+        {
+            // Creat the result.
+            var result = new FileResult
+                {
+                   Checked = true, Show = this.TestShows.First(), InputFile = Substitute.For<IFileInfo>() 
+                };
+            result.Episode = result.Show.Episodes.First();
+            result.Episodes = new List<Episode> { result.Episode, result.Show.Episodes[1] };
+            result.InputFile.Extension.Returns(".avi");
+
+            // Format the string.
+            string output = result.FormatOutputPath("{SName(.)}.S{SNum(2)}E{ENum(2)}.{EName(.)}");
+            Assert.AreEqual(
+                "Alpha.Show.S01E01-02.Episode.One.(1-2)", output, "The output format does not match what it should be.");
+        }
+
+        /// <summary>
+        /// Tests the scanner ability to detect dual episodes.
+        /// </summary>
+        [Test]
+        public void DualEpisodeScanning()
+        {
+            this.CreateTestFile(this.Root, "Alpha.S01E01-02.avi");
+
+            List<FileResult> results = this.scanManager.Refresh(this.Root);
+
+            Assert.AreEqual(1, results.Count, "There should be 1 result");
+            this.MatchesShow1(results[0]);
+            Assert.AreEqual(2, results[0].Episodes.Count, "There should be 2 episode in the result.");
+            Assert.AreEqual(
+                this.TestShows.First().Episodes[1], 
+                results[0].Episodes[1], 
+                "The second episode should be show's second epsiode.");
+        }
+
+        /// <summary>
         /// Tests the precendece of the the regular expressions to ensure that the higher listed match is used in the case of multiple matches.
         /// </summary>
         /// <param name="seasonEpisodeNumber">
@@ -69,7 +109,7 @@ namespace TVSorter.Test
         [Test]
         public void MatchesShow(
             [Values("Alpha", "Alpha.Folder", "ALPHA_FOLDER", "ALPHA-FOLDER", "Alt Name", "AlT.Name", "Alt_Name", 
-                "alt-name")] string showName)
+                "alt-name", "Alpha Show", "Alpha.Show", "Alpha_Show", "Alpha-Show")] string showName)
         {
             this.CreateTestFile(this.Root, showName + ".S01E01.avi");
 
@@ -129,8 +169,8 @@ namespace TVSorter.Test
         {
             // Create the folder and files to test.
             IDirectoryInfo[] folders = this.CreateTestDirectory(this.Root, "Alpha Folder", "Beta Folder");
-            this.CreateTestFile(folders[0], "Alpha.S01E01.avi", "Alpha.S01E01.Name.avi");
-            this.CreateTestFile(folders[1], "Beta.S01E01.avi");
+            this.CreateTestFile(folders[0], "Alpha.S01E01.avi", "Alpha.S01E01.Name.avi", "Alpha.S01E01-02.avi");
+            TestShows.First(x => x.Name == "Beta Show").Episodes[0].FileCount = 1;
 
             // When save shows is called. Assert that each episode has the correct file count.
             this.StorageProvider.SaveShows(
@@ -139,9 +179,9 @@ namespace TVSorter.Test
                         x =>
                             {
                                 List<TvShow> shows = x.ToList();
-                                Assert.AreEqual(2, shows[0].Episodes[0].FileCount);
-                                Assert.AreEqual(0, shows[0].Episodes[1].FileCount);
-                                Assert.AreEqual(1, shows[1].Episodes[0].FileCount);
+                                Assert.AreEqual(3, shows[0].Episodes[0].FileCount);
+                                Assert.AreEqual(1, shows[0].Episodes[1].FileCount);
+                                Assert.AreEqual(0, shows[1].Episodes[0].FileCount);
                             })));
 
             // Refresh the file counts.
@@ -183,8 +223,8 @@ namespace TVSorter.Test
             Assert.AreEqual(1, results.Count, "There should be 1 result.");
             this.MatchesShow1(results[0]);
 
-            this.scanManager.ResetShow(results[0], this.TestShows.First(x => x.Name == "Beta"));
-            Assert.AreEqual("Beta", results[0].Show.Name, "The show hasn't changed.");
+            this.scanManager.ResetShow(results[0], this.TestShows.First(x => x.Name == "Beta Show"));
+            Assert.AreEqual("Beta Show", results[0].Show.Name, "The show hasn't changed.");
             Assert.AreEqual("211", results[0].Episode.TvdbId, "The episode hasn't changed.");
         }
 
@@ -199,8 +239,8 @@ namespace TVSorter.Test
             List<FileResult> results = this.scanManager.Refresh(this.Root);
 
             Assert.AreEqual(1, results.Count, "There should be 1 result.");
-            this.scanManager.ResetShow(results[0], this.TestShows.First(x => x.Name == "Beta"));
-            Assert.AreEqual("Beta", results[0].Show.Name, "The show hasn't changed.");
+            this.scanManager.ResetShow(results[0], this.TestShows.First(x => x.Name == "Beta Show"));
+            Assert.AreEqual("Beta Show", results[0].Show.Name, "The show hasn't changed.");
             Assert.AreEqual(null, results[0].Episode, "The episode shouldn't have been matched.");
         }
 
@@ -271,6 +311,42 @@ namespace TVSorter.Test
             base.Setup();
 
             this.scanManager = new ScanManager(this.StorageProvider);
+        }
+
+        /// <summary>
+        /// This test will test several different output formats to ensure 
+        /// that the destination paths are correct.
+        /// </summary>
+        /// <param name="format">
+        /// The format being tested.
+        /// </param>
+        /// <returns>
+        /// The output path for the file.
+        /// </returns>
+        [TestCase(@"{FName}\Season {SNum(1)}\{SName(.)}.S{SNum(2)}E{ENum(2)}.{EName(.)}{Ext}", 
+            Result = @"Alpha Folder\Season 1\Alpha.Show.S01E01.Episode.One.(1).avi")]
+        [TestCase(
+            @"{FName}\{Date(yyyy)}\{Date(MMM)}\{SName(.)}.S{SNum(2)}E{ENum(2)}.{Date(dd-MMM-yyyy)}.{EName(.)}{Ext}", 
+            Result = @"Alpha Folder\2012\Jan\Alpha.Show.S01E01.01-Jan-2012.Episode.One.(1).avi")]
+        [TestCase(@"{FName}", Result = "Alpha Folder")]
+        [TestCase(@"{SName( )} {SName(.)} {SName(_)}", Result = "Alpha Show Alpha.Show Alpha_Show")]
+        [TestCase(@"{EName( )} {EName(.)} {EName(_)}", Result = "Episode One (1) Episode.One.(1) Episode_One_(1)")]
+        [TestCase(@"{SNum(1)} {SNum(2)} {SNum(3)}", Result = "1 01 001")]
+        [TestCase(@"{ENum(1)} {ENum(2)} {ENum(3)}", Result = "1 01 001")]
+        [TestCase(@"{Date(yyyy)} {Date(MM)} {Date(MMM)} {Date(dd)}", Result = "2012 01 Jan 01")]
+        public string TestOutputFormat(string format)
+        {
+            // Creat the result.
+            var result = new FileResult
+                {
+                   Checked = true, Show = this.TestShows.First(), InputFile = Substitute.For<IFileInfo>() 
+                };
+            result.Episode = result.Show.Episodes.First();
+            result.Episodes = new List<Episode> { result.Episode };
+            result.InputFile.Extension.Returns(".avi");
+
+            // Format the string.
+            return result.FormatOutputPath(format);
         }
 
         #endregion
