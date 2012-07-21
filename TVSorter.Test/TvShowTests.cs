@@ -12,6 +12,7 @@ namespace TVSorter.Test
 
     using NUnit.Framework;
 
+    using TVSorter.Model;
     using TVSorter.Wrappers;
 
     /// <summary>

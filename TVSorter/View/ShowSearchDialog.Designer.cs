@@ -28,7 +28,7 @@ namespace TVSorter.View
         /// <summary>
         ///   Required designer variable.
         /// </summary>
-        private readonly IContainer components;
+        private readonly IContainer components = null;
 
         /// <summary>
         ///   The close button.

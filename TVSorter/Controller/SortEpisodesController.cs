@@ -16,9 +16,10 @@ namespace TVSorter.Controller
     using System.IO;
     using System.Linq;
 
+    using TVSorter.Model;
     using TVSorter.View;
 
-    using Settings = TVSorter.Settings;
+    using Settings = TVSorter.Model.Settings;
 
     #endregion
 
@@ -38,6 +39,11 @@ namespace TVSorter.Controller
         ///   The last subdirectory scanned.
         /// </summary>
         private string lastSubdirectoryScanned;
+
+        /// <summary>
+        /// The system settings.
+        /// </summary>
+        private Settings settings;
 
         /// <summary>
         ///   The sort view.
@@ -185,6 +191,8 @@ namespace TVSorter.Controller
         /// </summary>
         private void LoadSettings()
         {
+            this.settings = Settings.LoadSettings();
+            this.settings.SettingsChanged += (sender, e) => { this.SubDirectories = this.LoadSubDirectories(); };
             this.SubDirectories = this.LoadSubDirectories();
         }
 
@@ -200,7 +208,7 @@ namespace TVSorter.Controller
 
             try
             {
-                var source = new DirectoryInfo(Settings.LoadSettings().SourceDirectory);
+                var source = new DirectoryInfo(this.settings.SourceDirectory);
                 if (source.Exists)
                 {
                     dirs.Add(Path.DirectorySeparatorChar.ToString(CultureInfo.InvariantCulture));

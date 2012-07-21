@@ -15,6 +15,7 @@ namespace TVSorter.View
     using System.Windows.Forms;
 
     using TVSorter.Controller;
+    using TVSorter.Model;
 
     #endregion
 

@@ -28,7 +28,7 @@ namespace TVSorter.View
         /// <summary>
         ///   Required designer variable.
         /// </summary>
-        private readonly IContainer components;
+        private readonly IContainer components = null;
 
         /// <summary>
         ///   The log.
@@ -243,6 +243,7 @@ namespace TVSorter.View
             this.Controls.Add(this.mainTabs);
             this.Name = "MainForm";
             this.Text = "TV Sorter";
+            this.Load += new System.EventHandler(this.MainFormLoad);
             this.mainTabs.ResumeLayout(false);
             this.sortEpisodesPage.ResumeLayout(false);
             this.tvShowsPage.ResumeLayout(false);

@@ -18,6 +18,7 @@ namespace TVSorter.View
     using System.Windows.Forms;
 
     using TVSorter.Controller;
+    using TVSorter.Model;
     using TVSorter.Properties;
 
     #endregion
@@ -32,7 +33,7 @@ namespace TVSorter.View
         /// <summary>
         ///   The controller.
         /// </summary>
-        private readonly TvShowsController controller;
+        private TvShowsController controller;
 
         /// <summary>
         ///   A value indicating whether the select show is locked.
@@ -49,9 +50,6 @@ namespace TVSorter.View
         public TvShows()
         {
             this.InitializeComponent();
-            this.controller = new TvShowsController();
-            this.controller.PropertyChanged += this.PropertyChanged;
-            this.controller.SearchShowsComplete += this.SearchShowsComplete;
         }
 
         #endregion
@@ -90,7 +88,6 @@ namespace TVSorter.View
         {
             var dialog = new ShowSearchDialog(new AddShowController());
             dialog.ShowDialog(this);
-            this.controller.RefreshShows();
         }
 
         /// <summary>
@@ -441,7 +438,13 @@ namespace TVSorter.View
         /// </param>
         private void TvShowsLoad(object sender, EventArgs e)
         {
-            this.controller.Initialise(this);
+            if (!this.DesignMode)
+            {
+                this.controller = new TvShowsController();
+                this.controller.PropertyChanged += this.PropertyChanged;
+                this.controller.SearchShowsComplete += this.SearchShowsComplete;
+                this.controller.Initialise(this);
+            }
         }
 
         /// <summary>

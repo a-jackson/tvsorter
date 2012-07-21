@@ -12,7 +12,7 @@ namespace TVSorter.Controller
 
     using TVSorter.View;
 
-    using Settings = TVSorter.Settings;
+    using Settings = TVSorter.Model.Settings;
 
     #endregion
 

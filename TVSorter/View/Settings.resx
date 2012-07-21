@@ -141,6 +141,16 @@
   <metadata name="sortOptionsFlow.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
   </metadata>
+  <metadata name="toolTip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>136, 17</value>
+  </metadata>
+  <data name="addUnmatchedShowsCheck.ToolTip" xml:space="preserve">
+    <value>If a file is found by the scanner that cannot be matched to 
+a show already in the database. This will automatically
+search The TVDB for the show and attempt to add it.
+It will add an alternate name to the show if the search
+returns an existing show. </value>
+  </data>
   <metadata name="searchOptionsGroup.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
   </metadata>

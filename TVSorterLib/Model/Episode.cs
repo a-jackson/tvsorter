@@ -6,7 +6,7 @@
 //   The episode.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-namespace TVSorter
+namespace TVSorter.Model
 {
     #region Using Directives
 

@@ -14,6 +14,8 @@ namespace TVSorter.Files
     using System.IO;
     using System.Linq;
 
+    using TVSorter.Data;
+    using TVSorter.Model;
     using TVSorter.Storage;
     using TVSorter.Wrappers;
 
@@ -27,14 +29,19 @@ namespace TVSorter.Files
         #region Fields
 
         /// <summary>
-        /// The storage provider.
+        /// A instance of scan manager.
         /// </summary>
-        private readonly IStorageProvider provider;
+        private readonly ScanManager scanManager;
 
         /// <summary>
         ///   The settings.
         /// </summary>
         private readonly Settings settings;
+
+        /// <summary>
+        /// The storage provider.
+        /// </summary>
+        private readonly IStorageProvider storageProvider;
 
         #endregion
 
@@ -43,13 +50,17 @@ namespace TVSorter.Files
         /// <summary>
         /// Initializes a new instance of the <see cref="FileManager"/> class. Initialises a new instance of the <see cref="FileManager"/> class.
         /// </summary>
-        /// <param name="provider">
-        /// The provider.
+        /// <param name="storageProvider">
+        /// The storage provider.
         /// </param>
-        internal FileManager(IStorageProvider provider)
+        /// <param name="dataProvider">
+        /// The data provider.
+        /// </param>
+        internal FileManager(IStorageProvider storageProvider, IDataProvider dataProvider)
         {
-            this.provider = provider;
-            this.settings = Settings.LoadSettings(provider);
+            this.storageProvider = storageProvider;
+            this.settings = Settings.LoadSettings(storageProvider);
+            this.scanManager = new ScanManager(this.storageProvider, dataProvider);
         }
 
         #endregion
@@ -148,6 +159,71 @@ namespace TVSorter.Files
         }
 
         /// <summary>
+        /// Handles the rename and overwrite of the file.
+        /// </summary>
+        /// <param name="file">
+        /// The file being processed.
+        /// </param>
+        /// <param name="destination">
+        /// The destination directory.
+        /// </param>
+        /// <param name="destinationInfo">
+        /// The destination file.
+        /// </param>
+        /// <returns>
+        /// A value indicating whether the ProcessFile operation should continue or not.
+        /// </returns>
+        private bool HandleRenameAndOverwrite(
+            FileResult file, IDirectoryInfo destination, ref IFileInfo destinationInfo)
+        {
+            // If the directory didn't exist then check it for the episode.
+            bool containsOverwriteKeyword = file.ContainsKeyword(this.settings.OverwriteKeywords);
+
+            // Rename the file that is already in the destination if it exists under a different name.
+            if (this.settings.RenameIfExists || containsOverwriteKeyword)
+            {
+                // Get the files that are already in the destination directory.
+                List<FileResult> results =
+                    this.scanManager.Refresh(destinationInfo.Directory).Where(
+                        x => !x.Episodes.Where((t, i) => !file.Episodes[i].Equals(t)).Any()).ToList();
+
+                // If the episode already exists.
+                if (results.Count > 0)
+                {
+                    if (containsOverwriteKeyword)
+                    {
+                        foreach (FileResult result in results)
+                        {
+                            result.InputFile.Delete();
+                            foreach (Episode episode in result.Episodes)
+                            {
+                                episode.FileCount--;
+                                episode.Save(this.storageProvider);
+                            }
+                        }
+                    }
+                    else if (this.settings.RenameIfExists)
+                    {
+                        // Can't rename more than 1 file to the same thing.
+                        if (results.Count == 1)
+                        {
+                            results[0].InputFile.MoveTo(destinationInfo.FullName);
+                            Logger.OnLogMessage(
+                                this, "Renamed {0} to {1}", results[0].InputFile.Name, destinationInfo.Name);
+
+                            return false;
+                        }
+                    }
+                }
+
+                // Refresh the destination info as it may have changed.
+                destinationInfo = file.GetFullPath(destination, this.storageProvider);
+            }
+
+            return true;
+        }
+
+        /// <summary>
         /// Processes a single file.
         /// </summary>
         /// <param name="type">
@@ -167,19 +243,20 @@ namespace TVSorter.Files
                 return;
             }
 
-            IFileInfo destinationInfo = file.GetFullPath(destination);
+            IFileInfo destinationInfo = file.GetFullPath(destination, this.storageProvider);
             if (destinationInfo.Directory != null && !destinationInfo.Directory.Exists)
             {
                 destinationInfo.Directory.Create();
             }
-
-            // If the file name contains any overwrite keywords and the destination already exists.
-            if (file.ContainsKeyword(this.settings.OverwriteKeywords) && destinationInfo.Exists)
+            else
             {
-                destinationInfo.Delete();
-                file.Episode.FileCount--;
+                if (!this.HandleRenameAndOverwrite(file, destination, ref destinationInfo))
+                {
+                    return;
+                }
             }
-            else if (destinationInfo.Exists)
+
+            if (destinationInfo.Exists)
             {
                 Logger.OnLogMessage(this, "Skipping {0}. Already exists.", destinationInfo.Name);
                 return;
@@ -203,7 +280,7 @@ namespace TVSorter.Files
             }
 
             file.Episode.FileCount++;
-            file.Episode.Save(this.provider);
+            file.Episode.Save(this.storageProvider);
         }
 
         #endregion

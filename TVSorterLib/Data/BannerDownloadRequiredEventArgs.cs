@@ -12,6 +12,8 @@ namespace TVSorter.Data
 
     using System;
 
+    using TVSorter.Model;
+
     #endregion
 
     /// <summary>

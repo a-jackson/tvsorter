@@ -12,6 +12,7 @@ namespace TVSorter.Controller
 
     using System.ComponentModel;
 
+    using TVSorter.Model;
     using TVSorter.View;
 
     #endregion

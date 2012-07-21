@@ -6,10 +6,11 @@
 //   The settings.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-namespace TVSorter
+namespace TVSorter.Model
 {
     #region Using Directives
 
+    using System;
     using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
@@ -35,7 +36,21 @@ namespace TVSorter
 
         #endregion
 
+        #region Public Events
+
+        /// <summary>
+        /// Occurs when the settings of the object are changed.
+        /// </summary>
+        public event EventHandler SettingsChanged;
+
+        #endregion
+
         #region Public Properties
+
+        /// <summary>
+        /// Gets or sets a value indicating whether unmatched shows should be added.
+        /// </summary>
+        public bool AddUnmatchedShows { get; set; }
 
         /// <summary>
         ///   Gets or sets DefaultOutputFormat.
@@ -63,6 +78,11 @@ namespace TVSorter
         public List<string> FileExtensions { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether to lock shows that have had no episodes in the past 3 weeks.
+        /// </summary>
+        public bool LockShowsWithNoEpisodes { get; set; }
+
+        /// <summary>
         ///   Gets or sets OverwriteKeywords.
         /// </summary>
         public List<string> OverwriteKeywords { get; set; }
@@ -86,6 +106,11 @@ namespace TVSorter
         ///   Gets or sets the source directory to scan.
         /// </summary>
         public string SourceDirectory { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether matched shows should be unlocked.
+        /// </summary>
+        public bool UnlockMatchedShows { get; set; }
 
         #endregion
 
@@ -127,6 +152,11 @@ namespace TVSorter
             try
             {
                 provider.LoadSettings(settings);
+
+                // Remove the event handler before adding it incase the 
+                // handler has been added before.
+                provider.SettingsSaved -= settings.OnSettingsSaved;
+                provider.SettingsSaved += settings.OnSettingsSaved;
             }
             catch (IOException)
             {
@@ -146,6 +176,26 @@ namespace TVSorter
         internal void Save(IStorageProvider provider)
         {
             provider.SaveSettings(this);
+        }
+
+        /// <summary>
+        /// Handles the StorageProvider's SettingsSaved event by firing the SettingsChanged event.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender of the event.
+        /// </param>
+        /// <param name="e">
+        /// The arguments of the event.
+        /// </param>
+        private void OnSettingsSaved(object sender, EventArgs e)
+        {
+            // Reload the settings.
+            ((IStorageProvider)sender).LoadSettings(this);
+
+            if (this.SettingsChanged != null)
+            {
+                this.SettingsChanged(sender, e);
+            }
         }
 
         /// <summary>
@@ -177,6 +227,9 @@ namespace TVSorter
             this.OverwriteKeywords = new List<string> { "repack", "proper" };
             this.RecurseSubdirectories = false;
             this.RenameIfExists = false;
+            this.UnlockMatchedShows = false;
+            this.AddUnmatchedShows = false;
+            this.LockShowsWithNoEpisodes = false;
         }
 
         #endregion

@@ -16,6 +16,7 @@ namespace TVSorter.Files
     using System.Text.RegularExpressions;
 
     using TVSorter.Data;
+    using TVSorter.Model;
     using TVSorter.Storage;
     using TVSorter.Wrappers;
 
@@ -38,9 +39,9 @@ namespace TVSorter.Files
         #region Fields
 
         /// <summary>
-        /// The storage provider to use.
+        /// The data provider to use.
         /// </summary>
-        private readonly IStorageProvider provider;
+        private readonly IDataProvider dataProvider;
 
         /// <summary>
         ///   The current settings of the system.
@@ -48,9 +49,19 @@ namespace TVSorter.Files
         private readonly Settings settings;
 
         /// <summary>
+        /// The storage provider to use.
+        /// </summary>
+        private readonly IStorageProvider storageProvider;
+
+        /// <summary>
         /// The list of the tvshows.
         /// </summary>
         private readonly List<TvShow> tvShows;
+
+        /// <summary>
+        /// Indicating whether the file counts are being refreshed or not.
+        /// </summary>
+        private bool refreshingFileCounts;
 
         #endregion
 
@@ -59,14 +70,18 @@ namespace TVSorter.Files
         /// <summary>
         /// Initializes a new instance of the <see cref="ScanManager"/> class.
         /// </summary>
-        /// <param name="provider">
-        /// The provider.
+        /// <param name="storageProvider">
+        /// The storage provider to use.
         /// </param>
-        internal ScanManager(IStorageProvider provider)
+        /// <param name="dataProvider">
+        /// The data provider to use. 
+        /// </param>
+        internal ScanManager(IStorageProvider storageProvider, IDataProvider dataProvider)
         {
-            this.provider = provider;
-            this.settings = Settings.LoadSettings(provider);
-            this.tvShows = TvShow.GetTvShows(provider).ToList();
+            this.storageProvider = storageProvider;
+            this.dataProvider = dataProvider;
+            this.settings = Settings.LoadSettings(storageProvider);
+            this.tvShows = TvShow.GetTvShows(storageProvider).ToList();
         }
 
         #endregion
@@ -140,7 +155,6 @@ namespace TVSorter.Files
         internal static Dictionary<string, List<TvShow>> SearchNewShows(
             IStorageProvider storageProvider, IDataProvider dataProvider, IEnumerable<IDirectoryInfo> directories)
         {
-            Settings settings = Settings.LoadSettings(storageProvider);
             var showDirs = new List<string>();
             List<string> existingShows = TvShow.GetTvShows(storageProvider).Select(x => x.FolderName).ToList();
             foreach (IDirectoryInfo dirInfo in directories)
@@ -202,28 +216,28 @@ namespace TVSorter.Files
         /// </param>
         internal void RefreshFileCounts(IEnumerable<IDirectoryInfo> directories)
         {
+            this.refreshingFileCounts = true;
+
             // Search all the destination directories for positive matches.
             // Incomplete matches are filtered out.
-            var matchedFiles =
-                directories.SelectMany(directory => this.ProcessDirectory(directory, true)).Where(x => !x.Incomplete).
-                    ToList();
+            List<FileResult> matchedFiles =
+                directories.SelectMany(dir => this.ProcessDirectory(dir, true)).Where(x => !x.Incomplete).ToList();
 
             // Get all of the matched episodes.
-            var matchedEpsiodes = matchedFiles.SelectMany(x => x.Episodes).ToList();
-
+            List<Episode> matchedEpsiodes = matchedFiles.SelectMany(x => x.Episodes).ToList();
 
             // Get all of the shows and episodes.
-            var shows = TvShow.GetTvShows(this.provider).ToList();
-            var allEpisodes = shows.SelectMany(x => x.Episodes);
+            List<TvShow> shows = TvShow.GetTvShows(this.storageProvider).ToList();
+            IEnumerable<Episode> allEpisodes = shows.SelectMany(x => x.Episodes);
 
             // Update the file count of the episodes.
-            foreach (var episode in allEpisodes)
+            foreach (Episode episode in allEpisodes)
             {
                 episode.FileCount = matchedEpsiodes.Count(x => episode.Equals(x));
             }
 
             // Save all the shows.
-            shows.Save(this.provider);
+            shows.Save(this.storageProvider);
         }
 
         /// <summary>
@@ -266,9 +280,40 @@ namespace TVSorter.Files
             showName = SpacerChars.Aggregate(showName, (current, ch) => current.Replace(ch, ' '));
 
             string name = showName;
-            return
+            TvShow show =
                 this.tvShows.FirstOrDefault(
                     x => x.GetShowNames().Contains(name, StringComparer.InvariantCultureIgnoreCase));
+
+            if (this.settings.AddUnmatchedShows && show == null)
+            {
+                Logger.OnLogMessage(this, "Attempting to add show {0}", showName);
+
+                // Attempt to add the show.
+                List<TvShow> results = TvShow.SearchShow(showName, this.dataProvider);
+                if (results.Count == 0)
+                {
+                    Logger.OnLogMessage(this, "Show not found.");
+                    return null;
+                }
+
+                // If there is only 1 result, of the name of the first result is a perfect match
+                // then use it as the show.
+                if (results.Count == 1 || results[0].Name.Equals(showName, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    show = this.ProcessResult(showName, results[0]);
+                }
+            }
+
+            // If Unlock matched shows is on and the show is locked.
+            if (!this.refreshingFileCounts && this.settings.UnlockMatchedShows && show != null && show.Locked)
+            {
+                // Unlock and update the show.
+                show.Locked = false;
+                show.Save(this.storageProvider);
+                show.Update(this.dataProvider, this.storageProvider);
+            }
+
+            return show;
         }
 
         /// <summary>
@@ -286,7 +331,8 @@ namespace TVSorter.Files
         private IEnumerable<FileResult> ProcessDirectory(IDirectoryInfo directory, bool overrideRecurse = false)
         {
             // Get the files where the extension is in the list of extensions.
-            var files = directory.GetFiles().Where(file => this.settings.FileExtensions.Contains(file.Extension));
+            IEnumerable<IFileInfo> files =
+                directory.GetFiles().Where(file => this.settings.FileExtensions.Contains(file.Extension));
 
             foreach (FileResult result in files.Select(this.ProcessFile))
             {
@@ -398,6 +444,39 @@ namespace TVSorter.Files
                 {
                    Episode = episode, Episodes = episodes, InputFile = file, Show = show, ShowName = showname 
                 };
+        }
+
+        /// <summary>
+        /// Processes a TVShow result
+        /// </summary>
+        /// <param name="showName">
+        /// The name of the show.
+        /// </param>
+        /// <param name="result">
+        /// The matched result.
+        /// </param>
+        /// <returns>
+        /// The matched TV Show.
+        /// </returns>
+        private TvShow ProcessResult(string showName, TvShow result)
+        {
+            // See if we already have the show under the same TVDB.
+            TvShow show = this.tvShows.FirstOrDefault(x => x.Equals(result));
+            if (show != null)
+            {
+                Logger.OnLogMessage(this, "{0} matched as {1}. Adding alternate name.", showName, show.Name);
+                show.AlternateNames.Add(showName);
+                show.Save(this.storageProvider);
+                return show;
+            }
+
+            Logger.OnLogMessage(this, "Matched {0} as a new show. Adding and updating...", showName);
+
+            // Doesn't exist with the same TVDB. Add a new show and update.
+            show = TvShow.FromSearchResult(result);
+            show.Save(this.storageProvider);
+            show.Update(this.dataProvider, this.storageProvider);
+            return show;
         }
 
         #endregion

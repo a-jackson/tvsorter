@@ -16,6 +16,7 @@ namespace TVSorter.Test
 
     using NUnit.Framework;
 
+    using TVSorter.Model;
     using TVSorter.Storage;
     using TVSorter.Wrappers;
 
@@ -27,17 +28,17 @@ namespace TVSorter.Test
         #region Properties
 
         /// <summary>
-        /// The root directory;
+        /// Gets the root directory;
         /// </summary>
         protected IDirectoryInfo Root { get; private set; }
 
         /// <summary>
-        /// The scan manager's settings.
+        /// Gets the scan manager's settings.
         /// </summary>
         protected Settings Settings { get; private set; }
 
         /// <summary>
-        /// The mocked storage provider.
+        /// Gets the mocked storage provider.
         /// </summary>
         protected IStorageProvider StorageProvider { get; private set; }
 

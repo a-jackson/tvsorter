@@ -6,7 +6,7 @@
 //   The settings for a missing episode search.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-namespace TVSorter
+namespace TVSorter.Model
 {
     using TVSorter.Storage;
 

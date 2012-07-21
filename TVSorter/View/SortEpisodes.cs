@@ -29,7 +29,7 @@ namespace TVSorter.View
         /// <summary>
         ///   The controller.
         /// </summary>
-        private readonly SortEpisodesController controller;
+        private SortEpisodesController controller;
 
         #endregion
 
@@ -41,9 +41,6 @@ namespace TVSorter.View
         public SortEpisodes()
         {
             this.InitializeComponent();
-
-            this.controller = new SortEpisodesController();
-            this.controller.PropertyChanged += this.ControllerOnPropertyChanged;
         }
 
         #endregion
@@ -259,7 +256,12 @@ namespace TVSorter.View
         /// </param>
         private void SortEpisodesLoad(object sender, EventArgs e)
         {
-            this.controller.Initialise(this);
+            if (!this.DesignMode)
+            {
+                this.controller = new SortEpisodesController();
+                this.controller.PropertyChanged += this.ControllerOnPropertyChanged;
+                this.controller.Initialise(this);
+            }
         }
 
         #endregion

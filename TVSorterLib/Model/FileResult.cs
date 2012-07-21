@@ -6,7 +6,7 @@
 //   The file result.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-namespace TVSorter
+namespace TVSorter.Model
 {
     #region Using Directives
 
@@ -17,6 +17,7 @@ namespace TVSorter
     using System.Linq;
     using System.Text.RegularExpressions;
 
+    using TVSorter.Storage;
     using TVSorter.Wrappers;
 
     #endregion
@@ -77,9 +78,7 @@ namespace TVSorter
         {
             get
             {
-                string formatString = this.Show.UseCustomFormat
-                                          ? this.Show.CustomFormat
-                                          : Settings.LoadSettings().DefaultOutputFormat;
+                string formatString = this.GetOuptutFormat(Factory.StorageProvider);
                 return this.FormatOutputPath(formatString);
             }
         }
@@ -156,17 +155,20 @@ namespace TVSorter
         /// <param name="destination">
         /// The destination directory.
         /// </param>
+        /// <param name="provider">
+        /// The storage provider. 
+        /// </param>
         /// <returns>
         /// The full path of the file.
         /// </returns>
-        internal IFileInfo GetFullPath(IDirectoryInfo destination)
+        internal IFileInfo GetFullPath(IDirectoryInfo destination, IStorageProvider provider)
         {
             if (this.Incomplete)
             {
                 throw new InvalidOperationException("There is not enough data to get the file path.");
             }
 
-            return destination.GetFile(this.OutputPath);
+            return destination.GetFile(this.FormatOutputPath(this.GetOuptutFormat(provider)));
         }
 
         /// <summary>
@@ -302,6 +304,22 @@ namespace TVSorter
             // The names didn't have numbers or didn't match. 
             // Just concatenate all the names together separated with -.
             return this.Episodes.Select(x => x.Name).Aggregate((x, y) => x + "-" + y);
+        }
+
+        /// <summary>
+        /// Gets the output format the result should use.
+        /// </summary>
+        /// <param name="provider">
+        /// The storage provider.
+        /// </param>
+        /// <returns>
+        /// The output format that should be used.
+        /// </returns>
+        private string GetOuptutFormat(IStorageProvider provider)
+        {
+            return this.Show.UseCustomFormat
+                       ? this.Show.CustomFormat
+                       : Settings.LoadSettings(provider).DefaultOutputFormat;
         }
 
         /// <summary>

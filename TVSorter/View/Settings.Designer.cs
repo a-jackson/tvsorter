@@ -25,10 +25,6 @@ namespace TVSorter.View
     {
         #region Constants and Fields
 
-        /// <summary>
-        ///   Required designer variable.
-        /// </summary>
-        private readonly IContainer components;
 
         /// <summary>
         ///   The add destination button.
@@ -136,6 +132,7 @@ namespace TVSorter.View
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.Windows.Forms.TableLayoutPanel mainTable;
             System.Windows.Forms.TableLayoutPanel tableDirectories;
             System.Windows.Forms.Label sourceLabel;
@@ -144,6 +141,7 @@ namespace TVSorter.View
             System.Windows.Forms.Label destinationDescLabel;
             System.Windows.Forms.GroupBox sortOptionsGroup;
             System.Windows.Forms.FlowLayoutPanel sortOptionsFlow;
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Settings));
             System.Windows.Forms.GroupBox searchOptionsGroup;
             System.Windows.Forms.FlowLayoutPanel searchOptionsFlow;
             System.Windows.Forms.GroupBox formatOptionsGroup;
@@ -159,6 +157,8 @@ namespace TVSorter.View
             this.recurseSubdirectoriesCheck = new System.Windows.Forms.CheckBox();
             this.deleteEmptyCheck = new System.Windows.Forms.CheckBox();
             this.renameIfExistsCheck = new System.Windows.Forms.CheckBox();
+            this.addUnmatchedShowsCheck = new System.Windows.Forms.CheckBox();
+            this.unlockAndUpdateCheck = new System.Windows.Forms.CheckBox();
             this.regExButton = new System.Windows.Forms.Button();
             this.fileExtensionsButton = new System.Windows.Forms.Button();
             this.formatText = new System.Windows.Forms.TextBox();
@@ -166,6 +166,8 @@ namespace TVSorter.View
             this.revertButton = new System.Windows.Forms.Button();
             this.saveButton = new System.Windows.Forms.Button();
             this.folderDialog = new System.Windows.Forms.FolderBrowserDialog();
+            this.toolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.lockShowWithNoNewEpisodesCheck = new System.Windows.Forms.CheckBox();
             mainTable = new System.Windows.Forms.TableLayoutPanel();
             tableDirectories = new System.Windows.Forms.TableLayoutPanel();
             sourceLabel = new System.Windows.Forms.Label();
@@ -356,6 +358,9 @@ namespace TVSorter.View
             sortOptionsFlow.Controls.Add(this.recurseSubdirectoriesCheck);
             sortOptionsFlow.Controls.Add(this.deleteEmptyCheck);
             sortOptionsFlow.Controls.Add(this.renameIfExistsCheck);
+            sortOptionsFlow.Controls.Add(this.addUnmatchedShowsCheck);
+            sortOptionsFlow.Controls.Add(this.unlockAndUpdateCheck);
+            sortOptionsFlow.Controls.Add(this.lockShowWithNoNewEpisodesCheck);
             sortOptionsFlow.Dock = System.Windows.Forms.DockStyle.Fill;
             sortOptionsFlow.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             sortOptionsFlow.Location = new System.Drawing.Point(3, 16);
@@ -371,6 +376,8 @@ namespace TVSorter.View
             this.recurseSubdirectoriesCheck.Size = new System.Drawing.Size(136, 17);
             this.recurseSubdirectoriesCheck.TabIndex = 0;
             this.recurseSubdirectoriesCheck.Text = "Recurse Subdirectories";
+            this.toolTip.SetToolTip(this.recurseSubdirectoriesCheck, "When selected, this option will search the subdirectories of the source directory" +
+        " as well.");
             this.recurseSubdirectoriesCheck.UseVisualStyleBackColor = true;
             // 
             // deleteEmptyCheck
@@ -381,6 +388,8 @@ namespace TVSorter.View
             this.deleteEmptyCheck.Size = new System.Drawing.Size(159, 17);
             this.deleteEmptyCheck.TabIndex = 1;
             this.deleteEmptyCheck.Text = "Delete Empty Subdirectories";
+            this.toolTip.SetToolTip(this.deleteEmptyCheck, "When selected, this option will delete subdirectories of Source Directory after f" +
+        "iles have been moved out of them if this leaves the directory empty.");
             this.deleteEmptyCheck.UseVisualStyleBackColor = true;
             // 
             // renameIfExistsCheck
@@ -391,7 +400,32 @@ namespace TVSorter.View
             this.renameIfExistsCheck.Size = new System.Drawing.Size(213, 17);
             this.renameIfExistsCheck.TabIndex = 2;
             this.renameIfExistsCheck.Text = "Rename if Episode Exists at Destination";
+            this.toolTip.SetToolTip(this.renameIfExistsCheck, "When selected, this option will search the destination directoy for the episode b" +
+        "eing processed and renamed the copy there if it exists with a different name.");
             this.renameIfExistsCheck.UseVisualStyleBackColor = true;
+            // 
+            // addUnmatchedShowsCheck
+            // 
+            this.addUnmatchedShowsCheck.AutoSize = true;
+            this.addUnmatchedShowsCheck.Location = new System.Drawing.Point(222, 3);
+            this.addUnmatchedShowsCheck.Name = "addUnmatchedShowsCheck";
+            this.addUnmatchedShowsCheck.Size = new System.Drawing.Size(203, 17);
+            this.addUnmatchedShowsCheck.TabIndex = 3;
+            this.addUnmatchedShowsCheck.Text = "Add Unmatched Shows Automatically";
+            this.toolTip.SetToolTip(this.addUnmatchedShowsCheck, resources.GetString("addUnmatchedShowsCheck.ToolTip"));
+            this.addUnmatchedShowsCheck.UseVisualStyleBackColor = true;
+            // 
+            // unlockAndUpdateCheck
+            // 
+            this.unlockAndUpdateCheck.AutoSize = true;
+            this.unlockAndUpdateCheck.Location = new System.Drawing.Point(222, 26);
+            this.unlockAndUpdateCheck.Name = "unlockAndUpdateCheck";
+            this.unlockAndUpdateCheck.Size = new System.Drawing.Size(202, 17);
+            this.unlockAndUpdateCheck.TabIndex = 4;
+            this.unlockAndUpdateCheck.Text = "Unlock and Update Locked Matches";
+            this.toolTip.SetToolTip(this.unlockAndUpdateCheck, "When selected, this option will unlock any shows that are locked and update them " +
+        "if a match is found.");
+            this.unlockAndUpdateCheck.UseVisualStyleBackColor = true;
             // 
             // searchOptionsGroup
             // 
@@ -522,6 +556,16 @@ namespace TVSorter.View
             this.saveButton.UseVisualStyleBackColor = true;
             this.saveButton.Click += new System.EventHandler(this.SaveButtonClick);
             // 
+            // lockShowWithNoNewEpisodesCheck
+            // 
+            this.lockShowWithNoNewEpisodesCheck.AutoSize = true;
+            this.lockShowWithNoNewEpisodesCheck.Location = new System.Drawing.Point(222, 49);
+            this.lockShowWithNoNewEpisodesCheck.Name = "lockShowWithNoNewEpisodesCheck";
+            this.lockShowWithNoNewEpisodesCheck.Size = new System.Drawing.Size(264, 17);
+            this.lockShowWithNoNewEpisodesCheck.TabIndex = 5;
+            this.lockShowWithNoNewEpisodesCheck.Text = "Lock Show After 3 Weeks With No New Episodes\r\n";
+            this.lockShowWithNoNewEpisodesCheck.UseVisualStyleBackColor = true;
+            // 
             // Settings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -549,5 +593,11 @@ namespace TVSorter.View
         }
 
         #endregion
+
+        private ToolTip toolTip;
+        private CheckBox addUnmatchedShowsCheck;
+        private CheckBox unlockAndUpdateCheck;
+        private IContainer components = null;
+        private CheckBox lockShowWithNoNewEpisodesCheck;
     }
 }

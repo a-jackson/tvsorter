@@ -17,6 +17,8 @@ namespace TVSorter.Data.Tvdb
     using System.Threading.Tasks;
     using System.Xml.Linq;
 
+    using TVSorter.Model;
+
     #endregion
 
     /// <summary>

@@ -10,7 +10,10 @@ namespace TVSorter.View
 {
     #region Using Directives
 
+    using System;
     using System.Windows.Forms;
+
+    using Version = TVSorter.Version;
 
     #endregion
 
@@ -27,6 +30,24 @@ namespace TVSorter.View
         public MainForm()
         {
             this.InitializeComponent();
+        }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Handles the load event for the form.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender of the event.
+        /// </param>
+        /// <param name="e">
+        /// The arguments of the event.
+        /// </param>
+        private void MainFormLoad(object sender, EventArgs e)
+        {
+            this.Text = "TV Sorter " + Version.CurrentVersion;
         }
 
         #endregion

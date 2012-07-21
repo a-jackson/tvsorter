@@ -13,6 +13,8 @@ namespace TVSorter.Storage
     using System.Linq;
     using System.Xml.Linq;
 
+    using TVSorter.Model;
+
     /// <summary>
     /// Contains extension methods to model object for storage in XML.
     /// </summary>
@@ -39,6 +41,9 @@ namespace TVSorter.Storage
             settings.RenameIfExists = bool.Parse(settingsNode.GetAttribute("renameifexists", "false"));
             settings.DestinationDirectories = new List<string>();
             settings.DestinationDirectory = string.Empty;
+            settings.UnlockMatchedShows = bool.Parse(settingsNode.GetAttribute("unlockmatchedshows", "false"));
+            settings.AddUnmatchedShows = bool.Parse(settingsNode.GetAttribute("addunmatchedshows", "false"));
+            settings.LockShowsWithNoEpisodes = bool.Parse(settingsNode.GetAttribute("lockshowsnonewepisodes", "false"));
 
             XElement destinationDirectories = settingsNode.Element(Xml.GetName("DestinationDirectories"));
 
@@ -170,6 +175,9 @@ namespace TVSorter.Storage
                 new XAttribute("recursesubdirectories", settings.RecurseSubdirectories), 
                 new XAttribute("deleteemptysubdirectories", settings.DeleteEmptySubdirectories), 
                 new XAttribute("renameifexists", settings.RenameIfExists), 
+                new XAttribute("addunmatchedshows", settings.AddUnmatchedShows), 
+                new XAttribute("unlockmatchedshows", settings.UnlockMatchedShows), 
+                new XAttribute("lockshowsnonewepisodes", settings.LockShowsWithNoEpisodes), 
                 destinationDirectories, 
                 fileExtensions, 
                 regularExpressions, 

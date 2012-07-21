@@ -12,6 +12,8 @@ namespace TVSorter
     using System.Globalization;
     using System.Windows.Forms;
 
+    using TVSorter.Model;
+
     /// <summary>
     /// Extension methods for the FileResult class.
     /// </summary>

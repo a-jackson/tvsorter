@@ -30,7 +30,7 @@ namespace TVSorter.View
         /// <summary>
         ///   The controller.
         /// </summary>
-        private readonly SettingsController controller;
+        private SettingsController controller;
 
         /// <summary>
         ///   The list of destination directories.
@@ -57,8 +57,6 @@ namespace TVSorter.View
         public Settings()
         {
             this.InitializeComponent();
-            this.controller = new SettingsController();
-            this.controller.PropertyChanged += this.PropertyChanged;
         }
 
         #endregion
@@ -162,6 +160,9 @@ namespace TVSorter.View
                     this.recurseSubdirectoriesCheck.Checked = this.controller.Settings.RecurseSubdirectories;
                     this.deleteEmptyCheck.Checked = this.controller.Settings.DeleteEmptySubdirectories;
                     this.renameIfExistsCheck.Checked = this.controller.Settings.RenameIfExists;
+                    this.unlockAndUpdateCheck.Checked = this.controller.Settings.UnlockMatchedShows;
+                    this.addUnmatchedShowsCheck.Checked = this.controller.Settings.AddUnmatchedShows;
+                    this.lockShowWithNoNewEpisodesCheck.Checked = this.controller.Settings.LockShowsWithNoEpisodes;
 
                     // Format text
                     this.formatText.Text = this.controller.Settings.DefaultOutputFormat;
@@ -240,6 +241,9 @@ namespace TVSorter.View
             this.controller.Settings.RecurseSubdirectories = this.recurseSubdirectoriesCheck.Checked;
             this.controller.Settings.DeleteEmptySubdirectories = this.deleteEmptyCheck.Checked;
             this.controller.Settings.RenameIfExists = this.renameIfExistsCheck.Checked;
+            this.controller.Settings.AddUnmatchedShows = this.addUnmatchedShowsCheck.Checked;
+            this.controller.Settings.UnlockMatchedShows = this.unlockAndUpdateCheck.Checked;
+            this.controller.Settings.LockShowsWithNoEpisodes = this.lockShowWithNoNewEpisodesCheck.Checked;
 
             this.controller.Settings.DefaultOutputFormat = this.formatText.Text;
 
@@ -257,7 +261,12 @@ namespace TVSorter.View
         /// </param>
         private void SettingsLoad(object sender, EventArgs e)
         {
-            this.controller.Initialise(this);
+            if (!this.DesignMode)
+            {
+                this.controller = new SettingsController();
+                this.controller.PropertyChanged += this.PropertyChanged;
+                this.controller.Initialise(this);
+            }
         }
 
         /// <summary>

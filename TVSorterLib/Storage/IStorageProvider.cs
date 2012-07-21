@@ -8,13 +8,40 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter.Storage
 {
+    using System;
     using System.Collections.Generic;
+
+    using TVSorter.Model;
 
     /// <summary>
     /// Repsents an object that can provide storage for the program.
     /// </summary>
     public interface IStorageProvider
     {
+        #region Public Events
+
+        /// <summary>
+        /// Occurs when the settings are saved.
+        /// </summary>
+        event EventHandler SettingsSaved;
+
+        /// <summary>
+        /// Occurs when a TV Show is added.
+        /// </summary>
+        event EventHandler<TvShowEventArgs> TvShowAdded;
+
+        /// <summary>
+        /// Occurs when a TV Show changes.
+        /// </summary>
+        event EventHandler<TvShowEventArgs> TvShowChanged;
+
+        /// <summary>
+        /// Occurs when a TV Show is removed.
+        /// </summary>
+        event EventHandler<TvShowEventArgs> TvShowRemoved;
+
+        #endregion
+
         #region Public Methods and Operators
 
         /// <summary>

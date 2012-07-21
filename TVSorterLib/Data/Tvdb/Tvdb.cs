@@ -14,6 +14,8 @@ namespace TVSorter.Data.Tvdb
     using System.Collections.Generic;
     using System.IO;
 
+    using TVSorter.Model;
+
     #endregion
 
     /// <summary>
@@ -84,7 +86,14 @@ namespace TVSorter.Data.Tvdb
         {
             DateTime serverTime = TvdbDownload.GetServerTime();
             string xmlFile = TvdbDownload.DownloadShowEpisodes(show);
-            this.tvdbProcess.ProcessShow(show, xmlFile, serverTime);
+            try
+            {
+                this.tvdbProcess.ProcessShow(show, xmlFile, serverTime);
+            }
+            catch (Exception e)
+            {
+                Logger.OnLogMessage(this, "Error parsing XML for {0}. {1}", show.Name, e.Message);
+            }
         }
 
         #endregion

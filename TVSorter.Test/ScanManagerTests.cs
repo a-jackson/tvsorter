@@ -20,6 +20,7 @@ namespace TVSorter.Test
 
     using TVSorter.Data;
     using TVSorter.Files;
+    using TVSorter.Model;
     using TVSorter.Wrappers;
 
     #endregion
@@ -170,7 +171,7 @@ namespace TVSorter.Test
             // Create the folder and files to test.
             IDirectoryInfo[] folders = this.CreateTestDirectory(this.Root, "Alpha Folder", "Beta Folder");
             this.CreateTestFile(folders[0], "Alpha.S01E01.avi", "Alpha.S01E01.Name.avi", "Alpha.S01E01-02.avi");
-            TestShows.First(x => x.Name == "Beta Show").Episodes[0].FileCount = 1;
+            this.TestShows.First(x => x.Name == "Beta Show").Episodes[0].FileCount = 1;
 
             // When save shows is called. Assert that each episode has the correct file count.
             this.StorageProvider.SaveShows(
@@ -310,7 +311,8 @@ namespace TVSorter.Test
         {
             base.Setup();
 
-            this.scanManager = new ScanManager(this.StorageProvider);
+            var dataProvider = Substitute.For<IDataProvider>();
+            this.scanManager = new ScanManager(this.StorageProvider, dataProvider);
         }
 
         /// <summary>

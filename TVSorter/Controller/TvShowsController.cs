@@ -15,6 +15,7 @@ namespace TVSorter.Controller
     using System.ComponentModel;
     using System.Linq;
 
+    using TVSorter.Model;
     using TVSorter.View;
 
     #endregion
@@ -117,15 +118,11 @@ namespace TVSorter.Controller
         {
             this.tvView = view;
             this.Shows = new BindingList<TvShow>(TvShow.GetTvShows().ToList());
+            this.Shows.ListChanged += (sender, e) => this.OnPropertyChanged("Shows");
             this.TvShowSelected(0);
-        }
-
-        /// <summary>
-        /// Refreshes the list of TVShows.
-        /// </summary>
-        public void RefreshShows()
-        {
-            this.Shows = new BindingList<TvShow>(TvShow.GetTvShows().ToList());
+            TvShow.TvShowAdded += this.OnTvShowAdded;
+            TvShow.TvShowChanged += this.OnTvShowChanged;
+            TvShow.TvShowRemoved += this.OnTvShowRemoved;
         }
 
         /// <summary>
@@ -140,6 +137,7 @@ namespace TVSorter.Controller
 
             this.SelectedShow.Delete();
             this.Shows.Remove(this.SelectedShow);
+            this.SelectedShow = null;
         }
 
         /// <summary>
@@ -180,7 +178,6 @@ namespace TVSorter.Controller
                     {
                         this.SearchResults = TvShow.SearchNewShows();
                         this.OnSearchShowsComplete();
-                        this.RefreshShows();
                     });
             task.Start();
 
@@ -260,6 +257,60 @@ namespace TVSorter.Controller
             {
                 this.SearchShowsComplete(this, EventArgs.Empty);
             }
+        }
+
+        /// <summary>
+        /// Handles the TVShow's OnTvShowAdded event.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender of the event.
+        /// </param>
+        /// <param name="e">
+        /// The arguments of the event.
+        /// </param>
+        private void OnTvShowAdded(object sender, TvShowEventArgs e)
+        {
+            this.Shows.Add(e.TvShow);
+        }
+
+        /// <summary>
+        /// Handles the TVShow's OnTvShowChanged event.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender of the event.
+        /// </param>
+        /// <param name="e">
+        /// The arguments of the event.
+        /// </param>
+        private void OnTvShowChanged(object sender, TvShowEventArgs e)
+        {
+            int index = this.Shows.IndexOf(e.TvShow);
+            if (index != -1)
+            {
+                this.Shows[index] = e.TvShow;
+                if (e.TvShow.Equals(this.SelectedShow))
+                {
+                    this.SelectedShow = e.TvShow;
+                }
+            }
+            else
+            {
+                this.Shows.Add(e.TvShow);
+            }
+        }
+
+        /// <summary>
+        /// Handles the TVShow's OnTvShowRemoved event.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender of the event.
+        /// </param>
+        /// <param name="e">
+        /// The arguments of the event.
+        /// </param>
+        private void OnTvShowRemoved(object sender, TvShowEventArgs e)
+        {
+            this.Shows.Remove(e.TvShow);
         }
 
         #endregion

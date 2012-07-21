@@ -13,6 +13,7 @@ namespace TVSorter.Controller
     using System.Collections.Generic;
     using System.ComponentModel;
 
+    using TVSorter.Model;
     using TVSorter.View;
 
     #endregion

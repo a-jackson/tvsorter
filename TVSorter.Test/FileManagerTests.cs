@@ -16,7 +16,9 @@ namespace TVSorter.Test
 
     using NUnit.Framework;
 
+    using TVSorter.Data;
     using TVSorter.Files;
+    using TVSorter.Model;
     using TVSorter.Wrappers;
 
     /// <summary>
@@ -109,8 +111,8 @@ namespace TVSorter.Test
         public override void Setup()
         {
             base.Setup();
-
-            this.fileManager = new FileManager(this.StorageProvider);
+            var dataProvider = Substitute.For<IDataProvider>();
+            this.fileManager = new FileManager(this.StorageProvider, dataProvider);
         }
 
         #endregion

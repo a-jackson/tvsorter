@@ -6,7 +6,7 @@
 //   The tv show.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-namespace TVSorter
+namespace TVSorter.Model
 {
     #region Using Directives
 
@@ -35,6 +35,25 @@ namespace TVSorter
         internal TvShow()
         {
         }
+
+        #endregion
+
+        #region Public Events
+
+        /// <summary>
+        /// Occurs when a TV Show is added.
+        /// </summary>
+        public static event EventHandler<TvShowEventArgs> TvShowAdded;
+
+        /// <summary>
+        /// Occurs when a TV Show changes.
+        /// </summary>
+        public static event EventHandler<TvShowEventArgs> TvShowChanged;
+
+        /// <summary>
+        /// Occurs when a TV Show is removed.
+        /// </summary>
+        public static event EventHandler<TvShowEventArgs> TvShowRemoved;
 
         #endregion
 
@@ -290,6 +309,17 @@ namespace TVSorter
         /// </returns>
         internal static IEnumerable<TvShow> GetTvShows(IStorageProvider provider)
         {
+            // Remove the event handlers incase they have been added 
+            // before to this storage provider.
+            provider.TvShowAdded -= OnTvShowAdded;
+            provider.TvShowChanged -= OnTvShowChanged;
+            provider.TvShowRemoved -= OnTvShowRemoved;
+
+            // Add event handlers to the storage provider.
+            provider.TvShowAdded += OnTvShowAdded;
+            provider.TvShowChanged += OnTvShowChanged;
+            provider.TvShowRemoved += OnTvShowRemoved;
+
             return provider.LoadTvShows();
         }
 
@@ -394,6 +424,24 @@ namespace TVSorter
         internal void Update(IDataProvider dataProvider, IStorageProvider storageProvider)
         {
             dataProvider.UpdateShow(this);
+
+            if (Settings.LoadSettings(storageProvider).LockShowsWithNoEpisodes)
+            {
+                DateTime mostRecentAirDate = (from episode in this.Episodes
+                                              where episode.FirstAir < DateTime.Today
+                                              orderby episode.FirstAir descending
+                                              select episode.FirstAir).FirstOrDefault();
+
+                DateTime threeWeeksAgo = DateTime.Today.Subtract(TimeSpan.FromDays(21));
+
+                if (threeWeeksAgo > mostRecentAirDate)
+                {
+                    this.Locked = true;
+                    Logger.OnLogMessage(
+                        this, "Locking {0}. No new episodes since {1:dd-MMM-yyyy}", this.Name, mostRecentAirDate);
+                }
+            }
+
             this.Save(storageProvider);
         }
 
@@ -414,6 +462,57 @@ namespace TVSorter
             }
 
             return new string(str.Where(x => !Path.GetInvalidFileNameChars().Contains(x)).ToArray());
+        }
+
+        /// <summary>
+        /// Handles the IStorageProvider's OnTvShowAdded event.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender of the event.
+        /// </param>
+        /// <param name="e">
+        /// The arguments of the event.
+        /// </param>
+        private static void OnTvShowAdded(object sender, TvShowEventArgs e)
+        {
+            if (TvShowAdded != null)
+            {
+                TvShowAdded(sender, e);
+            }
+        }
+
+        /// <summary>
+        /// Handles the IStorageProvider's OnTvShowChanged event.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender of the event.
+        /// </param>
+        /// <param name="e">
+        /// The arguments of the event.
+        /// </param>
+        private static void OnTvShowChanged(object sender, TvShowEventArgs e)
+        {
+            if (TvShowChanged != null)
+            {
+                TvShowChanged(sender, e);
+            }
+        }
+
+        /// <summary>
+        /// Handles the IStorageProvider's OnTvShowRemoved event.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender of the event.
+        /// </param>
+        /// <param name="e">
+        /// The arguments of the event.
+        /// </param>
+        private static void OnTvShowRemoved(object sender, TvShowEventArgs e)
+        {
+            if (TvShowRemoved != null)
+            {
+                TvShowRemoved(sender, e);
+            }
         }
 
         /// <summary>

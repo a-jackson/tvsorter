@@ -17,6 +17,20 @@ namespace TVSorter
     /// </summary>
     internal static class Factory
     {
+        #region Static Fields
+
+        /// <summary>
+        /// The data provider for the system.
+        /// </summary>
+        private static IDataProvider dataProvider;
+
+        /// <summary>
+        /// The storage provider for the system.
+        /// </summary>
+        private static IStorageProvider storageProvider;
+
+        #endregion
+
         #region Properties
 
         /// <summary>
@@ -26,7 +40,7 @@ namespace TVSorter
         {
             get
             {
-                return new Tvdb();
+                return dataProvider ?? (dataProvider = new Tvdb());
             }
         }
 
@@ -37,7 +51,7 @@ namespace TVSorter
         {
             get
             {
-                return new Xml();
+                return storageProvider ?? (storageProvider = new Xml());
             }
         }
 

@@ -10,6 +10,7 @@ namespace TVSorter
 {
     using System.Collections.Generic;
 
+    using TVSorter.Model;
     using TVSorter.Storage;
 
     /// <summary>

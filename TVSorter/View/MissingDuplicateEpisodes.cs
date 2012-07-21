@@ -30,7 +30,7 @@ namespace TVSorter.View
         /// <summary>
         ///   The controller.
         /// </summary>
-        private readonly MissingDuplicateController controller;
+        private MissingDuplicateController controller;
 
         #endregion
 
@@ -42,8 +42,6 @@ namespace TVSorter.View
         public MissingDuplicateEpisodes()
         {
             this.InitializeComponent();
-            this.controller = new MissingDuplicateController();
-            this.controller.PropertyChanged += this.OnPropertyChanged;
         }
 
         #endregion
@@ -114,12 +112,17 @@ namespace TVSorter.View
         /// </param>
         private void MissingDuplicateEpisodesLoad(object sender, EventArgs e)
         {
-            this.controller.Initialise(this);
-            this.hideLocked.Checked = this.controller.Settings.HideLocked;
-            this.hidePart2.Checked = this.controller.Settings.HidePart2;
-            this.hideSeason0.Checked = this.controller.Settings.HideSeason0;
-            this.hideUnaired.Checked = this.controller.Settings.HideNotYetAired;
-            this.hideWholeSeasons.Checked = this.controller.Settings.HideMissingSeasons;
+            if (!this.DesignMode)
+            {
+                this.controller = new MissingDuplicateController();
+                this.controller.PropertyChanged += this.OnPropertyChanged;
+                this.controller.Initialise(this);
+                this.hideLocked.Checked = this.controller.Settings.HideLocked;
+                this.hidePart2.Checked = this.controller.Settings.HidePart2;
+                this.hideSeason0.Checked = this.controller.Settings.HideSeason0;
+                this.hideUnaired.Checked = this.controller.Settings.HideNotYetAired;
+                this.hideWholeSeasons.Checked = this.controller.Settings.HideMissingSeasons;
+            }
         }
 
         /// <summary>

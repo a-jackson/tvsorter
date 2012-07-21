@@ -10,6 +10,8 @@ namespace TVSorter.Data
 {
     using System.Collections.Generic;
 
+    using TVSorter.Model;
+
     /// <summary>
     /// Interface for getting show data.
     /// </summary>

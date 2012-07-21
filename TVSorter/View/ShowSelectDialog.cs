@@ -14,6 +14,8 @@ namespace TVSorter.View
     using System.Collections.Generic;
     using System.Windows.Forms;
 
+    using TVSorter.Model;
+
     #endregion
 
     /// <summary>
