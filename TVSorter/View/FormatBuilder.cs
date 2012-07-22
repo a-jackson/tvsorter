@@ -6,7 +6,6 @@
 //   The class for the FormatBuilder form.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace TVSorter.View
 {
     using System;

@@ -293,6 +293,7 @@ namespace TVSorter.View
             this.controller.SelectedShow.UseCustomFormat = this.selectedShowUseCustomFormat.Checked;
             this.controller.SelectedShow.UseDvdOrder = this.selectedShowUseDvdOrder.Checked;
             this.controller.SelectedShow.Locked = this.selectedShowLocked;
+            this.controller.SelectedShow.AlternateNames = this.alternateNames;
             this.controller.SaveSelectedShow();
 
             this.tvShowsList.Refresh();

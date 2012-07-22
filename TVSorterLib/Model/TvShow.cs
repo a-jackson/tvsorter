@@ -12,7 +12,6 @@ namespace TVSorter.Model
 
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using System.Linq;
 
     using TVSorter.Data;
@@ -27,15 +26,6 @@ namespace TVSorter.Model
     /// </summary>
     public class TvShow : IEquatable<TvShow>
     {
-        #region Static Fields
-
-        /// <summary>
-        ///   An array of characters that can be used as spaces.
-        /// </summary>
-        private static readonly char[] SpacerChars = new[] { '.', '_', '-' };
-
-        #endregion
-
         #region Constructors and Destructors
 
         /// <summary>
@@ -344,20 +334,6 @@ namespace TVSorter.Model
         }
 
         /// <summary>
-        /// Removes the spacer chars from the specfied string.
-        /// </summary>
-        /// <param name="str">
-        /// The string to process.
-        /// </param>
-        /// <returns>
-        /// The processed string.
-        /// </returns>
-        internal static string RemoveSpacerChars(string str)
-        {
-            return SpacerChars.Aggregate(str, (current, ch) => current.Replace(ch, ' '));
-        }
-
-        /// <summary>
         /// Searches for new shows.
         /// </summary>
         /// <param name="name">
@@ -413,6 +389,32 @@ namespace TVSorter.Model
         }
 
         /// <summary>
+        /// Locks the show if it has no episodes.
+        /// </summary>
+        /// <param name="storageProvider">
+        /// The storage provider to use.
+        /// </param>
+        internal void LockIfNoEpisodes(IStorageProvider storageProvider)
+        {
+            if (Settings.LoadSettings(storageProvider).LockShowsWithNoEpisodes)
+            {
+                DateTime mostRecentAirDate = (from episode in this.Episodes
+                                              where episode.FirstAir < DateTime.Today
+                                              orderby episode.FirstAir descending
+                                              select episode.FirstAir).FirstOrDefault();
+
+                DateTime threeWeeksAgo = DateTime.Today.Subtract(TimeSpan.FromDays(21));
+
+                if (threeWeeksAgo > mostRecentAirDate)
+                {
+                    this.Locked = true;
+                    Logger.OnLogMessage(
+                        this, "Locking {0}. No new episodes since {1:dd-MMM-yyyy}", this.Name, mostRecentAirDate);
+                }
+            }
+        }
+
+        /// <summary>
         /// Saves the show.
         /// </summary>
         /// <param name="provider">
@@ -436,43 +438,9 @@ namespace TVSorter.Model
         {
             dataProvider.UpdateShow(this);
 
-            if (Settings.LoadSettings(storageProvider).LockShowsWithNoEpisodes)
-            {
-                DateTime mostRecentAirDate = (from episode in this.Episodes
-                                              where episode.FirstAir < DateTime.Today
-                                              orderby episode.FirstAir descending
-                                              select episode.FirstAir).FirstOrDefault();
-
-                DateTime threeWeeksAgo = DateTime.Today.Subtract(TimeSpan.FromDays(21));
-
-                if (threeWeeksAgo > mostRecentAirDate)
-                {
-                    this.Locked = true;
-                    Logger.OnLogMessage(
-                        this, "Locking {0}. No new episodes since {1:dd-MMM-yyyy}", this.Name, mostRecentAirDate);
-                }
-            }
+            this.LockIfNoEpisodes(storageProvider);
 
             this.Save(storageProvider);
-        }
-
-        /// <summary>
-        /// Strips any characters that can't be in a file name from the specified string.
-        /// </summary>
-        /// <param name="str">
-        /// The string to edit.
-        /// </param>
-        /// <returns>
-        /// The file name safe string.
-        /// </returns>
-        private static string GetFileSafeName(string str)
-        {
-            if (str == null)
-            {
-                throw new ArgumentNullException("str", "The string cannot be null.");
-            }
-
-            return new string(str.Where(x => !Path.GetInvalidFileNameChars().Contains(x)).ToArray());
         }
 
         /// <summary>
@@ -489,8 +457,9 @@ namespace TVSorter.Model
             foreach (string name in names.Where(name => name != null))
             {
                 yield return name;
-                yield return GetFileSafeName(name);
-                yield return RemoveSpacerChars(name);
+                yield return name.GetFileSafeName();
+                yield return name.RemoveSpacerChars();
+                yield return name.RemoveSpecialChars();
             }
         }
 

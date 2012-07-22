@@ -50,7 +50,7 @@ namespace TVSorter
         internal static void Update(
             this IList<TvShow> shows, IStorageProvider storageProvider, IDataProvider dataProvider)
         {
-            dataProvider.UpdateShows(shows);
+            dataProvider.UpdateShows(shows, storageProvider);
             shows.Save(storageProvider);
         }
 

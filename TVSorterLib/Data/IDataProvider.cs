@@ -11,6 +11,7 @@ namespace TVSorter.Data
     using System.Collections.Generic;
 
     using TVSorter.Model;
+    using TVSorter.Storage;
 
     /// <summary>
     /// Interface for getting show data.
@@ -44,7 +45,10 @@ namespace TVSorter.Data
         /// <param name="shows">
         /// The shows to update.
         /// </param>
-        void UpdateShows(IList<TvShow> shows);
+        /// <param name="storageProvider">
+        /// The storage provider to use.
+        /// </param>
+        void UpdateShows(IList<TvShow> shows, IStorageProvider storageProvider);
 
         #endregion
     }

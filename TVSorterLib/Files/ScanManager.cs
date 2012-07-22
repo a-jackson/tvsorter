@@ -177,8 +177,10 @@ namespace TVSorter.Files
                 // Search for each of the shows using the directory name as the show name.
                 List<TvShow> results = TvShow.SearchShow(showName, dataProvider);
 
-                // Any with only one result should be saved.
-                if (results.Count == 1)
+                // Any with only one result should be saved or where the first result is an exact match.
+                if (results.Count == 1
+                    ||
+                    (results.Count > 1 && results[0].Name.Equals(showName, StringComparison.InvariantCultureIgnoreCase)))
                 {
                     TvShow show = TvShow.FromSearchResult(results[0]);
                     show.Save(storageProvider);
@@ -306,7 +308,7 @@ namespace TVSorter.Files
             showName = fileName.Substring(0, matchIndex - 1);
 
             // Replace any spacer characters with spaces
-            showName = TvShow.RemoveSpacerChars(showName);
+            showName = showName.RemoveSpacerChars();
 
             string name = showName;
             TvShow show =

@@ -16,6 +16,7 @@ namespace TVSorter.Data.Tvdb
     using System.Linq;
 
     using TVSorter.Model;
+    using TVSorter.Storage;
 
     #endregion
 
@@ -103,11 +104,25 @@ namespace TVSorter.Data.Tvdb
         /// <param name="shows">
         /// The shows to update.
         /// </param>
-        public void UpdateShows(IList<TvShow> shows)
+        /// <param name="storageProvider">
+        /// The storage provider to use.
+        /// </param>
+        public void UpdateShows(IList<TvShow> shows, IStorageProvider storageProvider)
         {
             DateTime firstUpdate = shows.Min(x => x.LastUpdated);
-            StringReader updates = TvdbDownload.DownloadUpdates(firstUpdate);
-            List<string> updateIds = this.tvdbProcess.ProcessUpdates(updates).ToList();
+            List<string> updateIds;
+
+            // Only get the updates if the date is less than a month ago.
+            if (firstUpdate > DateTime.Today.Subtract(TimeSpan.FromDays(30)))
+            {
+                StringReader updates = TvdbDownload.DownloadUpdates(firstUpdate);
+                updateIds = this.tvdbProcess.ProcessUpdates(updates).ToList();
+            }
+            else
+            {
+                updateIds = new List<string>();
+            }
+
             DateTime serverTime = TvdbDownload.GetServerTime();
             foreach (TvShow show in shows)
             {
@@ -119,6 +134,7 @@ namespace TVSorter.Data.Tvdb
                 else
                 {
                     this.tvdbProcess.ProcessShow(show, TvdbDownload.DownloadShowEpisodes(show), serverTime);
+                    show.LockIfNoEpisodes(storageProvider);
                 }
             }
         }

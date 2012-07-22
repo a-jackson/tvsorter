@@ -110,6 +110,13 @@ namespace TVSorter.Controller
 
             List<Episode> missingEpisodes = Episode.GetMissingEpisodes().ToList();
 
+            if (this.Settings.HideMissingSeasons)
+            {
+                List<Episode> episodesWithEntireSeasonMissing =
+                    this.GetEpisodesWithEntireSeasonMissing(missingEpisodes).ToList();
+                missingEpisodes = missingEpisodes.Except(episodesWithEntireSeasonMissing).ToList();
+            }
+
             if (this.Settings.HideNotYetAired)
             {
                 missingEpisodes =
@@ -130,13 +137,6 @@ namespace TVSorter.Controller
             if (this.Settings.HideLocked)
             {
                 missingEpisodes = missingEpisodes.Where(ep => !ep.Show.Locked).ToList();
-            }
-
-            if (this.Settings.HideMissingSeasons)
-            {
-                List<Episode> episodesWithEntireSeasonMissing =
-                    this.GetEpisodesWithEntireSeasonMissing(missingEpisodes).ToList();
-                missingEpisodes = missingEpisodes.Except(episodesWithEntireSeasonMissing).ToList();
             }
 
             this.Episodes = missingEpisodes.OrderBy(x => x.Show.Name).ToList();

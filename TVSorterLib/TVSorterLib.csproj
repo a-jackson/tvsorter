@@ -74,6 +74,7 @@
     <Compile Include="Model\FileSearch.cs" />
     <Compile Include="Model\Settings.cs" />
     <Compile Include="Model\TvShow.cs" />
+    <Compile Include="StringExtensions.cs" />
     <Compile Include="TvShowEventArgs.cs" />
     <Compile Include="Version.cs" />
     <Compile Include="Wrappers\DirectoryInfoWrap.cs" />
