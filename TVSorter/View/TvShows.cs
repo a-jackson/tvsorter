@@ -140,6 +140,11 @@ namespace TVSorter.View
         /// </param>
         private void FormatBuilderClick(object sender, EventArgs e)
         {
+            var formatBuilderDialog = new FormatBuilder(this.selectedShowCustomFormatText.Text);
+            if (formatBuilderDialog.ShowDialog(this) == DialogResult.OK)
+            {
+                this.selectedShowCustomFormatText.Text = formatBuilderDialog.FormatString;
+            }
         }
 
         /// <summary>

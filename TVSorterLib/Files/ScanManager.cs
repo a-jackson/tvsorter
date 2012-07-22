@@ -54,6 +54,16 @@ namespace TVSorter.Files
         /// </summary>
         private bool refreshingFileCounts;
 
+        /// <summary>
+        /// The list of unsuccessful matches.
+        /// </summary>
+        private List<string> unsuccessfulMatches;
+
+        /// <summary>
+        /// The list of shows that have been updated as part of the search.
+        /// </summary>
+        private List<TvShow> updatedShows;
+
         #endregion
 
         #region Constructors and Destructors
@@ -196,6 +206,8 @@ namespace TVSorter.Files
         /// </returns>
         internal List<FileResult> Refresh(IDirectoryInfo directoryInfo)
         {
+            this.unsuccessfulMatches = new List<string>();
+            this.updatedShows = new List<TvShow>();
             return this.ProcessDirectory(directoryInfo).ToList();
         }
 
@@ -207,6 +219,8 @@ namespace TVSorter.Files
         /// </param>
         internal void RefreshFileCounts(IEnumerable<IDirectoryInfo> directories)
         {
+            this.unsuccessfulMatches = new List<string>();
+            this.updatedShows = new List<TvShow>();
             this.refreshingFileCounts = true;
 
             // Search all the destination directories for positive matches.
@@ -247,6 +261,8 @@ namespace TVSorter.Files
         /// </returns>
         internal IEnumerable<FileResult> SearchDestinationFolder(IDirectoryInfo destination)
         {
+            this.unsuccessfulMatches = new List<string>();
+            this.updatedShows = new List<TvShow>();
             return this.ProcessDirectory(destination, false, true);
         }
 
@@ -297,7 +313,8 @@ namespace TVSorter.Files
                 this.tvShows.FirstOrDefault(
                     x => x.GetShowNames().Contains(name, StringComparer.InvariantCultureIgnoreCase));
 
-            if (this.settings.AddUnmatchedShows && show == null && !ignoreShowUpdate)
+            if (this.settings.AddUnmatchedShows && show == null && !ignoreShowUpdate
+                && !this.unsuccessfulMatches.Contains(showName))
             {
                 Logger.OnLogMessage(this, "Attempting to add show {0}", showName);
 
@@ -306,6 +323,7 @@ namespace TVSorter.Files
                 if (results.Count == 0)
                 {
                     Logger.OnLogMessage(this, "Show not found.");
+                    this.unsuccessfulMatches.Add(showName);
                     return null;
                 }
 
@@ -319,12 +337,13 @@ namespace TVSorter.Files
 
             // If Unlock matched shows is on and the show is locked.
             if (!this.refreshingFileCounts && this.settings.UnlockMatchedShows && show != null && show.Locked
-                && !ignoreShowUpdate)
+                && !ignoreShowUpdate && !this.updatedShows.Contains(show))
             {
                 // Unlock and update the show.
                 show.Locked = false;
                 show.Save(this.storageProvider);
                 show.Update(this.dataProvider, this.storageProvider);
+                this.updatedShows.Add(show);
             }
 
             return show;
@@ -373,9 +392,8 @@ namespace TVSorter.Files
             }
 
             IDirectoryInfo[] dirs = directory.GetDirectories();
-            foreach (
-                FileResult result in
-                    dirs.SelectMany(dir => this.ProcessDirectory(dir, overrideRecurse, ignoreShowUpdate)))
+            foreach (FileResult result in
+                dirs.SelectMany(dir => this.ProcessDirectory(dir, overrideRecurse, ignoreShowUpdate)))
             {
                 yield return result;
             }

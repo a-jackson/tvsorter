@@ -197,6 +197,17 @@ namespace TVSorter.Model
         }
 
         /// <summary>
+        /// Updates the specified collection of shows.
+        /// </summary>
+        /// <param name="shows">
+        /// The shows to update.
+        /// </param>
+        public static void UpdateShows(IList<TvShow> shows)
+        {
+            UpdateShows(shows, Factory.DataProvider, Factory.StorageProvider);
+        }
+
+        /// <summary>
         /// Deletes the show.
         /// </summary>
         public void Delete()
@@ -364,25 +375,21 @@ namespace TVSorter.Model
         }
 
         /// <summary>
-        /// Create an NFO file for the show.
+        /// Updates the specified collection of shows.
         /// </summary>
-        /// <param name="directories">
-        /// The destination directories.
+        /// <param name="shows">
+        /// The shows to update.
         /// </param>
-        internal void CreateNfoFile(IEnumerable<IDirectoryInfo> directories)
+        /// <param name="dataProvider">
+        /// The data provider to use.
+        /// </param>
+        /// <param name="storageProvider">
+        /// The storage provider to use.
+        /// </param>
+        internal static void UpdateShows(
+            IList<TvShow> shows, IDataProvider dataProvider, IStorageProvider storageProvider)
         {
-            string url = string.Format("http://thetvdb.com/?tab=series&id={0}&lid=7", this.TvdbId);
-
-            IEnumerable<IFileInfo> files = from destination in directories
-                                           from folder in destination.GetDirectories()
-                                           where folder.Name.Equals(this.FolderName)
-                                           select folder.CreateFile("tvshow.nfo");
-
-            foreach (IFileInfo file in files.Where(x => x.Exists))
-            {
-                file.WriteAllText(url);
-                Logger.OnLogMessage(this, "Created nfo file {0}", file);
-            }
+            shows.Update(storageProvider, dataProvider);
         }
 
         /// <summary>
@@ -535,6 +542,28 @@ namespace TVSorter.Model
             if (TvShowRemoved != null)
             {
                 TvShowRemoved(sender, e);
+            }
+        }
+
+        /// <summary>
+        /// Create an NFO file for the show.
+        /// </summary>
+        /// <param name="directories">
+        /// The destination directories.
+        /// </param>
+        private void CreateNfoFile(IEnumerable<IDirectoryInfo> directories)
+        {
+            string url = string.Format("http://thetvdb.com/?tab=series&id={0}&lid=7", this.TvdbId);
+
+            IEnumerable<IFileInfo> files = from destination in directories
+                                           from folder in destination.GetDirectories()
+                                           where folder.Name.Equals(this.FolderName)
+                                           select folder.CreateFile("tvshow.nfo");
+
+            foreach (IFileInfo file in files.Where(x => x.Exists))
+            {
+                file.WriteAllText(url);
+                Logger.OnLogMessage(this, "Created nfo file {0}", file);
             }
         }
 

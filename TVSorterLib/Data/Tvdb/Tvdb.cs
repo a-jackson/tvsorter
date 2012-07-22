@@ -13,6 +13,7 @@ namespace TVSorter.Data.Tvdb
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
 
     using TVSorter.Model;
 
@@ -93,6 +94,32 @@ namespace TVSorter.Data.Tvdb
             catch (Exception e)
             {
                 Logger.OnLogMessage(this, "Error parsing XML for {0}. {1}", show.Name, e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Updates the collection of shows.
+        /// </summary>
+        /// <param name="shows">
+        /// The shows to update.
+        /// </param>
+        public void UpdateShows(IList<TvShow> shows)
+        {
+            DateTime firstUpdate = shows.Min(x => x.LastUpdated);
+            StringReader updates = TvdbDownload.DownloadUpdates(firstUpdate);
+            List<string> updateIds = this.tvdbProcess.ProcessUpdates(updates).ToList();
+            DateTime serverTime = TvdbDownload.GetServerTime();
+            foreach (TvShow show in shows)
+            {
+                if (updateIds.Contains(show.TvdbId))
+                {
+                    Logger.OnLogMessage(this, "No updates for {0}", show.Name);
+                    show.LastUpdated = serverTime;
+                }
+                else
+                {
+                    this.tvdbProcess.ProcessShow(show, TvdbDownload.DownloadShowEpisodes(show), serverTime);
+                }
             }
         }
 

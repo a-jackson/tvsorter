@@ -21,7 +21,7 @@ namespace TVSorter
     /// <summary>
     /// TVSorterCmd's program.
     /// </summary>
-    internal class Program
+    internal static class Program
     {
         #region Public Methods and Operators
 
@@ -41,12 +41,8 @@ namespace TVSorter
                 switch (arg.ToLower())
                 {
                     case "-update_all":
-                        IEnumerable<TvShow> shows = TvShow.GetTvShows();
-                        foreach (TvShow show in shows.Where(x => !x.Locked))
-                        {
-                            show.Update();
-                        }
-
+                        List<TvShow> shows = TvShow.GetTvShows().Where(x => !x.Locked).ToList();
+                        TvShow.UpdateShows(shows);
                         break;
                     case "-copy":
                     case "-move":

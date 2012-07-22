@@ -217,11 +217,7 @@ namespace TVSorter.Controller
                     {
                         // Only update the unlocked shows.
                         List<TvShow> unlockedShows = this.Shows.Where(x => !x.Locked).ToList();
-                        foreach (TvShow show in unlockedShows)
-                        {
-                            show.Update();
-                        }
-
+                        TvShow.UpdateShows(unlockedShows);
                         this.OnPropertyChanged("SelectedShow");
                     });
             task.Start();

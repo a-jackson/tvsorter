@@ -14,22 +14,22 @@
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\bin\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\bin\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -56,6 +56,12 @@
     <Compile Include="Controller\SortEpisodesController.cs" />
     <Compile Include="Controller\TvShowsController.cs" />
     <Compile Include="FileResultExtensions.cs" />
+    <Compile Include="View\FormatBuilder.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="View\FormatBuilder.Designer.cs">
+      <DependentUpon>FormatBuilder.cs</DependentUpon>
+    </Compile>
     <Compile Include="View\IView.cs" />
     <Compile Include="View\ListDialog.cs">
       <SubType>Form</SubType>
@@ -125,6 +131,9 @@
     <Compile Include="View\TvShows.Designer.cs">
       <DependentUpon>TvShows.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="View\FormatBuilder.resx">
+      <DependentUpon>FormatBuilder.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="View\ListDialog.resx">
       <DependentUpon>ListDialog.cs</DependentUpon>
     </EmbeddedResource>

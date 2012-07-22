@@ -125,6 +125,7 @@ namespace TVSorter.Test
                         x.Arg<Settings>().FileExtensions = new List<string> { ".avi" };
                         x.Arg<Settings>().DestinationDirectories = new List<string> { "TV" };
                         x.Arg<Settings>().DestinationDirectory = "TV";
+                        x.Arg<Settings>().AddUnmatchedShows = true;
                         this.Settings = x.Arg<Settings>();
                     });
 

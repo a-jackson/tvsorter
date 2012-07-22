@@ -34,6 +34,11 @@ namespace TVSorter.Test
         #region Fields
 
         /// <summary>
+        /// Gets or sets the data provider.
+        /// </summary>
+        private IDataProvider dataProvider;
+
+        /// <summary>
         ///   The scan manager that the tests will be performed on.
         /// </summary>
         private ScanManager scanManager;
@@ -41,6 +46,67 @@ namespace TVSorter.Test
         #endregion
 
         #region Public Methods and Operators
+
+        /// <summary>
+        /// Tests that an alternate name is added to an existing show.
+        /// </summary>
+        [Test]
+        public void AddAlternateName()
+        {
+            TvShow alpha = this.TestShows.First();
+
+            // When the data provider is searched for ShowName, return Alpha.
+            this.dataProvider.SearchShow("ShowName").Returns(new List<TvShow> { alpha });
+
+            // Create the file to be searched.
+            this.CreateTestFile(this.Root, "ShowName.S01E01.avi");
+
+            // When the show is saved, alpha should contain ShowName as an alternate name.
+            this.StorageProvider.When(x => x.SaveShow(alpha)).Do(
+                x => Assert.Contains("ShowName", x.Arg<TvShow>().AlternateNames));
+
+            List<FileResult> results = this.scanManager.Refresh(this.Root);
+
+            // There should be one result matching Delta Episode 1.
+            Assert.AreEqual(1, results.Count, "There should be one result.");
+            Assert.AreEqual(results[0].Show, alpha, "The show shuld be Alpha");
+
+            // Check that the results were called.
+            this.StorageProvider.Received(1).SaveShow(alpha);
+        }
+
+        /// <summary>
+        /// Tests the functionality to add unmatched shows.
+        /// </summary>
+        [Test]
+        public void AddUnmatchedShow()
+        {
+            // Create new show and episodes
+            var delta = new TvShow { Name = "Delta", FolderName = "Delta", TvdbId = "4" };
+            var episode1 = new Episode { EpisodeNumber = 1, SeasonNumber = 1, Name = "Episode 1", TvdbId = "41" };
+
+            // Create a file for the search to return.
+            this.CreateTestFile(this.Root, "Delta.S01E01.avi");
+
+            // When the data provider searches for Delta return the delta show.
+            this.dataProvider.SearchShow("Delta").Returns(new List<TvShow> { delta });
+
+            // When the show is saved, get the new show. A new one will be created by
+            // TvShow.FromSearchResult
+            this.StorageProvider.When(x => x.SaveShow(Arg.Any<TvShow>())).Do(x => { delta = x.Arg<TvShow>(); });
+
+            // Delta should be updated.When it is, add the episode.
+            this.dataProvider.When(x => x.UpdateShow(delta)).Do(
+                x => { delta.Episodes = new List<Episode> { episode1 }; });
+
+            // Search the folder.
+            List<FileResult> results = this.scanManager.Refresh(this.Root);
+
+            // There should be one result matching Delta Episode 1.
+            Assert.AreEqual(1, results.Count, "There should be one result.");
+            Assert.AreEqual(results[0].Show, delta, "The show shuld be Delta");
+            Assert.AreEqual(results[0].Episode, episode1, "The episode should be Episode 1");
+        }
 
         /// <summary>
         /// Tests the output format the dual episodes.
@@ -270,26 +336,26 @@ namespace TVSorter.Test
             var gamma = new TvShow { Name = "Gamma", TvdbId = "3", FolderName = "Gamma Folder" };
             var delta = new TvShow { Name = "Delta", TvdbId = "4", FolderName = "Delta Folder" };
             var delta2 = new TvShow { Name = "Delta2", TvdbId = "5", FolderName = "Delta2 Folder" };
-            var dataProvider = Substitute.For<IDataProvider>();
-            dataProvider.SearchShow("Gamma Folder").Returns(new List<TvShow> { gamma });
-            dataProvider.SearchShow("Delta Folder").Returns(new List<TvShow> { delta, delta2 });
+
+            this.dataProvider.SearchShow("Gamma Folder").Returns(new List<TvShow> { gamma });
+            this.dataProvider.SearchShow("Delta Folder").Returns(new List<TvShow> { delta, delta2 });
 
             // Create the directories that will be searched.
             this.CreateTestDirectory(this.Root, "Alpha Folder", "Beta Folder", "Gamma Folder", "Delta Folder");
 
             Dictionary<string, List<TvShow>> results = ScanManager.SearchNewShows(
-                this.StorageProvider, dataProvider, new[] { this.Root });
+                this.StorageProvider, this.dataProvider, new[] { this.Root });
 
             // Assert that dataProvider.SearchShow was not called for Alpha and Beta since they already exist in storage.
-            dataProvider.DidNotReceive().SearchShow("Alpha Folder");
-            dataProvider.DidNotReceive().SearchShow("Beta Folder");
+            this.dataProvider.DidNotReceive().SearchShow("Alpha Folder");
+            this.dataProvider.DidNotReceive().SearchShow("Beta Folder");
 
             // Assert that other shows where only searched once.
-            dataProvider.Received(1).SearchShow("Gamma Folder");
-            dataProvider.Received(1).SearchShow("Delta Folder");
+            this.dataProvider.Received(1).SearchShow("Gamma Folder");
+            this.dataProvider.Received(1).SearchShow("Delta Folder");
 
             // Ensure that there were only 2 calls in total.
-            dataProvider.ReceivedWithAnyArgs(2).SearchShow(Arg.Any<string>());
+            this.dataProvider.ReceivedWithAnyArgs(2).SearchShow(Arg.Any<string>());
 
             // Ensure that the Gamma show was saved as there was only one result.
             this.StorageProvider.Received(1).SaveShow(gamma);
@@ -311,8 +377,8 @@ namespace TVSorter.Test
         {
             base.Setup();
 
-            var dataProvider = Substitute.For<IDataProvider>();
-            this.scanManager = new ScanManager(this.StorageProvider, dataProvider);
+            this.dataProvider = Substitute.For<IDataProvider>();
+            this.scanManager = new ScanManager(this.StorageProvider, this.dataProvider);
         }
 
         /// <summary>

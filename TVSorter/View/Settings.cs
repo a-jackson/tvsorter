@@ -152,6 +152,11 @@ namespace TVSorter.View
         /// </param>
         private void FormatBuilderButtonClick(object sender, EventArgs e)
         {
+            var formatBuilderDialog = new FormatBuilder(this.formatText.Text);
+            if (formatBuilderDialog.ShowDialog(this) == DialogResult.OK)
+            {
+                this.formatText.Text = formatBuilderDialog.FormatString;
+            }
         }
 
         /// <summary>

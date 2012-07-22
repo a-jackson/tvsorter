@@ -144,11 +144,11 @@ namespace TVSorter.View
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Settings));
             System.Windows.Forms.GroupBox searchOptionsGroup;
             System.Windows.Forms.FlowLayoutPanel searchOptionsFlow;
+            System.Windows.Forms.Button editOverwriteKeywordsButton;
             System.Windows.Forms.GroupBox formatOptionsGroup;
             System.Windows.Forms.TableLayoutPanel formatTable;
             System.Windows.Forms.Label formatLabel;
             System.Windows.Forms.FlowLayoutPanel flowBottomButtons;
-            System.Windows.Forms.Button editOverwriteKeywordsButton;
             this.groupDirectories = new System.Windows.Forms.GroupBox();
             this.sourceText = new System.Windows.Forms.TextBox();
             this.sourceBrowse = new System.Windows.Forms.Button();
@@ -179,11 +179,11 @@ namespace TVSorter.View
             sortOptionsFlow = new System.Windows.Forms.FlowLayoutPanel();
             searchOptionsGroup = new System.Windows.Forms.GroupBox();
             searchOptionsFlow = new System.Windows.Forms.FlowLayoutPanel();
+            editOverwriteKeywordsButton = new System.Windows.Forms.Button();
             formatOptionsGroup = new System.Windows.Forms.GroupBox();
             formatTable = new System.Windows.Forms.TableLayoutPanel();
             formatLabel = new System.Windows.Forms.Label();
             flowBottomButtons = new System.Windows.Forms.FlowLayoutPanel();
-            editOverwriteKeywordsButton = new System.Windows.Forms.Button();
             mainTable.SuspendLayout();
             this.groupDirectories.SuspendLayout();
             tableDirectories.SuspendLayout();
@@ -489,6 +489,17 @@ namespace TVSorter.View
             this.fileExtensionsButton.UseVisualStyleBackColor = true;
             this.fileExtensionsButton.Click += new System.EventHandler(this.FileExtensionsButtonClick);
             // 
+            // editOverwriteKeywordsButton
+            // 
+            editOverwriteKeywordsButton.Location = new System.Drawing.Point(287, 3);
+            editOverwriteKeywordsButton.Name = "editOverwriteKeywordsButton";
+            editOverwriteKeywordsButton.Size = new System.Drawing.Size(146, 23);
+            editOverwriteKeywordsButton.TabIndex = 2;
+            editOverwriteKeywordsButton.Text = "Edit Overwrite Keywords";
+            this.toolTip.SetToolTip(editOverwriteKeywordsButton, resources.GetString("editOverwriteKeywordsButton.ToolTip"));
+            editOverwriteKeywordsButton.UseVisualStyleBackColor = true;
+            editOverwriteKeywordsButton.Click += new System.EventHandler(this.EditOverwriteKeywordsButtonClick);
+            // 
             // formatOptionsGroup
             // 
             formatOptionsGroup.Controls.Add(formatTable);
@@ -578,17 +589,6 @@ namespace TVSorter.View
             this.saveButton.Text = "Save";
             this.saveButton.UseVisualStyleBackColor = true;
             this.saveButton.Click += new System.EventHandler(this.SaveButtonClick);
-            // 
-            // editOverwriteKeywordsButton
-            // 
-            editOverwriteKeywordsButton.Location = new System.Drawing.Point(287, 3);
-            editOverwriteKeywordsButton.Name = "editOverwriteKeywordsButton";
-            editOverwriteKeywordsButton.Size = new System.Drawing.Size(146, 23);
-            editOverwriteKeywordsButton.TabIndex = 2;
-            editOverwriteKeywordsButton.Text = "Edit Overwrite Keywords";
-            this.toolTip.SetToolTip(editOverwriteKeywordsButton, resources.GetString("editOverwriteKeywordsButton.ToolTip"));
-            editOverwriteKeywordsButton.UseVisualStyleBackColor = true;
-            editOverwriteKeywordsButton.Click += new System.EventHandler(this.EditOverwriteKeywordsButtonClick);
             // 
             // Settings
             // 

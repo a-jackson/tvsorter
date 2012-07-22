@@ -122,15 +122,6 @@ namespace TVSorter.Model
             }
         }
 
-        /// <summary>
-        /// Updates the file counts of all the episodes.
-        /// </summary>
-        public void UpdateFileCounts()
-        {
-            var scanManager = new ScanManager(Factory.StorageProvider, Factory.DataProvider);
-            scanManager.RefreshFileCounts();
-        }
-
         #endregion
     }
 }

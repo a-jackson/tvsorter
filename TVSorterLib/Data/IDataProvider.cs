@@ -38,6 +38,14 @@ namespace TVSorter.Data
         /// </param>
         void UpdateShow(TvShow show);
 
+        /// <summary>
+        /// Updates the collection of shows.
+        /// </summary>
+        /// <param name="shows">
+        /// The shows to update.
+        /// </param>
+        void UpdateShows(IList<TvShow> shows);
+
         #endregion
     }
 }

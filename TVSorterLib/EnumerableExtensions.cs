@@ -10,6 +10,7 @@ namespace TVSorter
 {
     using System.Collections.Generic;
 
+    using TVSorter.Data;
     using TVSorter.Model;
     using TVSorter.Storage;
 
@@ -32,6 +33,25 @@ namespace TVSorter
         internal static void Save(this IEnumerable<TvShow> shows, IStorageProvider provider)
         {
             provider.SaveShows(shows);
+        }
+
+        /// <summary>
+        /// Updates the collection of TVShows.
+        /// </summary>
+        /// <param name="shows">
+        /// The collection of shows to update.
+        /// </param>
+        /// <param name="storageProvider">
+        /// The storage provider to use
+        /// </param>
+        /// <param name="dataProvider">
+        /// The data provider to use.
+        /// </param>
+        internal static void Update(
+            this IList<TvShow> shows, IStorageProvider storageProvider, IDataProvider dataProvider)
+        {
+            dataProvider.UpdateShows(shows);
+            shows.Save(storageProvider);
         }
 
         #endregion

@@ -41,6 +41,31 @@ namespace TVSorter.Model
         #region Public Properties
 
         /// <summary>
+        /// Gets an example result.
+        /// </summary>
+        public static FileResult Example
+        {
+            get
+            {
+                var result = new FileResult
+                    {
+                        Episode =
+                            new Episode
+                                {
+                                    EpisodeNumber = 1, 
+                                    SeasonNumber = 1, 
+                                    FirstAir = DateTime.Today, 
+                                    Name = "Episode Name"
+                                }, 
+                        Show = new TvShow { Name = "Show Name", FolderName = "Show Name", UseCustomFormat = false }, 
+                        InputFile = new FileInfoWrap("Show Name.S01E01.avi")
+                    };
+                result.Episodes = new List<Episode> { result.Episode };
+                return result;
+            }
+        }
+
+        /// <summary>
         /// Gets or sets a value indicating whether the result is checked.
         /// </summary>
         public bool Checked { get; set; }
@@ -95,21 +120,7 @@ namespace TVSorter.Model
 
         #endregion
 
-        #region Methods
-
-        /// <summary>
-        /// Determines the file's name contains any of the specified keywords.
-        /// </summary>
-        /// <param name="keywords">
-        /// The keywords to check for.
-        /// </param>
-        /// <returns>
-        /// A value indicating whether the file name contains the keywords.
-        /// </returns>
-        internal bool ContainsKeyword(IEnumerable<string> keywords)
-        {
-            return keywords.Any(keyword => this.InputFile.Name.ToLower().Contains(keyword.ToLower()));
-        }
+        #region Public Methods and Operators
 
         /// <summary>
         /// Formats the output path of the episode.
@@ -120,7 +131,7 @@ namespace TVSorter.Model
         /// <returns>
         /// The formatted output path. 
         /// </returns>
-        internal string FormatOutputPath(string formatString)
+        public string FormatOutputPath(string formatString)
         {
             if (this.Show == null || this.Episode == null || this.InputFile == null)
             {
@@ -147,6 +158,24 @@ namespace TVSorter.Model
             // Remove any characters that can't be in a filename from the formatString.
             return invalidChars.Aggregate(
                 formatString, (current, ch) => current.Replace(ch.ToString(CultureInfo.InvariantCulture), string.Empty));
+        }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Determines the file's name contains any of the specified keywords.
+        /// </summary>
+        /// <param name="keywords">
+        /// The keywords to check for.
+        /// </param>
+        /// <returns>
+        /// A value indicating whether the file name contains the keywords.
+        /// </returns>
+        internal bool ContainsKeyword(IEnumerable<string> keywords)
+        {
+            return keywords.Any(keyword => this.InputFile.Name.ToLower().Contains(keyword.ToLower()));
         }
 
         /// <summary>
