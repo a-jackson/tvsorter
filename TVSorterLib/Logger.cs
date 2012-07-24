@@ -35,15 +35,18 @@ namespace TVSorter
         /// <param name="message">
         /// The message.
         /// </param>
+        /// <param name="type">
+        /// The type of the message.
+        /// </param>
         /// <param name="args">
         /// The string format args.
         /// </param>
-        internal static void OnLogMessage(object sender, string message, params object[] args)
+        internal static void OnLogMessage(object sender, string message, LogType type, params object[] args)
         {
             message = string.Format(message, args);
             if (LogMessage != null)
             {
-                LogMessage(sender, new LogMessageEventArgs(message, DateTime.Now));
+                LogMessage(sender, new LogMessageEventArgs(message, DateTime.Now, type));
             }
         }
 

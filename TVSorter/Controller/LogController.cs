@@ -38,7 +38,7 @@ namespace TVSorter.Controller
         /// </summary>
         public LogController()
         {
-            this.Log = new List<string>();
+            this.Log = new List<LogMessageEventArgs>();
             Logger.LogMessage += this.OnLogMessageReceived;
             this.initialised = false;
         }
@@ -59,7 +59,7 @@ namespace TVSorter.Controller
         /// <summary>
         ///   Gets the list of log messages.
         /// </summary>
-        public List<string> Log { get; private set; }
+        public List<LogMessageEventArgs> Log { get; private set; }
 
         #endregion
 
@@ -109,7 +109,7 @@ namespace TVSorter.Controller
             // Then the message can be sent directly to the view.
             if (!this.initialised)
             {
-                this.Log.Add(e.ToString());
+                this.Log.Add(e);
             }
             else
             {

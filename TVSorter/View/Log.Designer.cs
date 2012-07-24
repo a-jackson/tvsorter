@@ -67,12 +67,14 @@ namespace TVSorter.View
             // logList
             // 
             this.logList.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.logList.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.logList.FormattingEnabled = true;
             this.logList.HorizontalScrollbar = true;
             this.logList.Location = new System.Drawing.Point(0, 0);
             this.logList.Name = "logList";
             this.logList.Size = new System.Drawing.Size(760, 367);
             this.logList.TabIndex = 0;
+            this.logList.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.LogListDrawItem);
             // 
             // Log
             // 

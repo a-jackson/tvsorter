@@ -396,7 +396,7 @@ namespace TVSorter.Model
         /// </param>
         internal void LockIfNoEpisodes(IStorageProvider storageProvider)
         {
-            if (Settings.LoadSettings(storageProvider).LockShowsWithNoEpisodes)
+            if (Settings.LoadSettings(storageProvider).LockShowsWithNoEpisodes && this.LastUpdated != DateTime.MinValue)
             {
                 DateTime mostRecentAirDate = (from episode in this.Episodes
                                               where episode.FirstAir < DateTime.Today
@@ -409,7 +409,7 @@ namespace TVSorter.Model
                 {
                     this.Locked = true;
                     Logger.OnLogMessage(
-                        this, "Locking {0}. No new episodes since {1:dd-MMM-yyyy}", this.Name, mostRecentAirDate);
+                        this, "Locking {0}. No new episodes since {1:dd-MMM-yyyy}", LogType.Info, this.Name, mostRecentAirDate);
                 }
             }
         }
@@ -460,6 +460,7 @@ namespace TVSorter.Model
                 yield return name.GetFileSafeName();
                 yield return name.RemoveSpacerChars();
                 yield return name.RemoveSpecialChars();
+                yield return name.AlphaNumericOnly();
             }
         }
 
@@ -532,7 +533,7 @@ namespace TVSorter.Model
             foreach (IFileInfo file in files.Where(x => x.Exists))
             {
                 file.WriteAllText(url);
-                Logger.OnLogMessage(this, "Created nfo file {0}", file);
+                Logger.OnLogMessage(this, "Created nfo file {0}", LogType.Info, file);
             }
         }
 

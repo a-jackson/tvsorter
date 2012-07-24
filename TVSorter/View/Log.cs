@@ -11,6 +11,7 @@ namespace TVSorter.View
     #region Using Directives
 
     using System;
+    using System.Drawing;
     using System.Linq;
     using System.Windows.Forms;
 
@@ -64,7 +65,7 @@ namespace TVSorter.View
             }
             else
             {
-                this.logList.Items.Add(e.ToString());
+                this.logList.Items.Add(e);
                 this.logList.SelectedIndex = this.logList.Items.Count - 1;
             }
         }
@@ -90,5 +91,31 @@ namespace TVSorter.View
         }
 
         #endregion
+
+        /// <summary>
+        /// Handles drawing a list item.
+        /// </summary>
+        /// <param name="sender">The sender of the event.</param>
+        /// <param name="e">The arguments of the event.</param>
+        private void LogListDrawItem(object sender, DrawItemEventArgs e)
+        {
+            var log = (LogMessageEventArgs)this.logList.Items[e.Index];
+
+            e.DrawBackground();
+            Graphics g = e.Graphics;
+
+            if (log.Type == LogType.Error)
+            {
+                g.FillRectangle(new SolidBrush(Color.Red), e.Bounds);
+            }
+
+            g.DrawString(
+                this.logList.Items[e.Index].ToString(),
+                e.Font,
+                new SolidBrush(e.ForeColor),
+                new PointF(e.Bounds.X, e.Bounds.Y));
+
+            e.DrawFocusRectangle();
+        }
     }
 }
