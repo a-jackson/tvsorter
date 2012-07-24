@@ -85,7 +85,7 @@ namespace TVSorter.Model
 
             var scanManager = new ScanManager(Factory.StorageProvider, Factory.DataProvider);
             this.Results = scanManager.Refresh(subDirectory);
-            Logger.OnLogMessage(this, "Scan complete. Found {0} files.", this.Results.Count);
+            Logger.OnLogMessage(this, "Scan complete. Found {0} files.", LogType.Info, this.Results.Count);
         }
 
         /// <summary>

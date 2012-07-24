@@ -184,13 +184,13 @@ namespace TVSorter.Files
                 {
                     TvShow show = TvShow.FromSearchResult(results[0]);
                     show.Save(storageProvider);
-                    Logger.OnLogMessage(show, "Found show {0}", show.Name);
+                    Logger.OnLogMessage(show, "Found show {0}", LogType.Info, show.Name);
                 }
                 else
                 {
                     // Any 0 or more than 1 result should be added to the dictionary for user selection.
                     searchResults.Add(showName, results);
-                    Logger.OnLogMessage(results, "Found {0} results for {1}", results.Count, showName);
+                    Logger.OnLogMessage(results, "Found {0} results for {1}", LogType.Info, results.Count, showName);
                 }
             }
 
@@ -230,7 +230,7 @@ namespace TVSorter.Files
             List<FileResult> matchedFiles =
                 directories.SelectMany(dir => this.ProcessDirectory(dir, true)).Where(x => !x.Incomplete).ToList();
 
-            Logger.OnLogMessage(this, "Updating file counts...");
+            Logger.OnLogMessage(this, "Updating file counts...", LogType.Info);
 
             // Get all of the matched episodes.
             List<Episode> matchedEpsiodes = matchedFiles.SelectMany(x => x.Episodes).ToList();
@@ -245,7 +245,7 @@ namespace TVSorter.Files
                 episode.FileCount = matchedEpsiodes.Count(x => episode.Equals(x));
             }
 
-            Logger.OnLogMessage(this, "Saving file counts...");
+            Logger.OnLogMessage(this, "Saving file counts...", LogType.Info);
 
             // Save all the shows.
             shows.Save(this.storageProvider);
@@ -310,21 +310,26 @@ namespace TVSorter.Files
             // Replace any spacer characters with spaces
             showName = showName.RemoveSpacerChars();
 
-            string name = showName;
+            var names = new[]
+                {
+                    showName, showName.RemoveSpacerChars(), showName.AlphaNumericOnly(), showName.RemoveSpecialChars(),
+                    showName.GetFileSafeName()
+                }.Distinct();
+
             TvShow show =
                 this.tvShows.FirstOrDefault(
-                    x => x.GetShowNames().Contains(name, StringComparer.InvariantCultureIgnoreCase));
+                    x => x.GetShowNames().Intersect(names, StringComparer.InvariantCultureIgnoreCase).Any());
 
             if (this.settings.AddUnmatchedShows && show == null && !ignoreShowUpdate
                 && !this.unsuccessfulMatches.Contains(showName))
             {
-                Logger.OnLogMessage(this, "Attempting to add show {0}", showName);
+                Logger.OnLogMessage(this, "Attempting to add show {0}", LogType.Info, showName);
 
                 // Attempt to add the show.
                 List<TvShow> results = TvShow.SearchShow(showName, this.dataProvider);
                 if (results.Count == 0)
                 {
-                    Logger.OnLogMessage(this, "Show not found.");
+                    Logger.OnLogMessage(this, "Show not found.", LogType.Error);
                     this.unsuccessfulMatches.Add(showName);
                     return null;
                 }
@@ -334,6 +339,7 @@ namespace TVSorter.Files
                 if (results.Count == 1 || results[0].Name.Equals(showName, StringComparison.InvariantCultureIgnoreCase))
                 {
                     show = this.ProcessResult(showName, results[0]);
+                    this.updatedShows.Add(show);
                 }
             }
 
@@ -385,7 +391,7 @@ namespace TVSorter.Files
             // of a move or copy operation. It should add to log that it is scanning the directory.
             if (!ignoreShowUpdate)
             {
-                Logger.OnLogMessage(this, "Scanned directory: {0}", directory.FullName);
+                Logger.OnLogMessage(this, "Scanned directory: {0}", LogType.Info, directory.FullName);
             }
 
             if (!this.settings.RecurseSubdirectories && !overrideRecurse)
@@ -512,18 +518,19 @@ namespace TVSorter.Files
             TvShow show = this.tvShows.FirstOrDefault(x => x.Equals(result));
             if (show != null)
             {
-                Logger.OnLogMessage(this, "{0} matched as {1}. Adding alternate name.", showName, show.Name);
+                Logger.OnLogMessage(this, "{0} matched as {1}. Adding alternate name.", LogType.Info, showName, show.Name);
                 show.AlternateNames.Add(showName);
                 show.Save(this.storageProvider);
                 return show;
             }
 
-            Logger.OnLogMessage(this, "Matched {0} as a new show. Adding and updating...", showName);
+            Logger.OnLogMessage(this, "Matched {0} as a new show. Adding and updating...", LogType.Info, showName);
 
             // Doesn't exist with the same TVDB. Add a new show and update.
             show = TvShow.FromSearchResult(result);
             show.Save(this.storageProvider);
             show.Update(this.dataProvider, this.storageProvider);
+            this.tvShows.Add(show);
             return show;
         }
 

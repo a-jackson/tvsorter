@@ -1,25 +1,23 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Version.cs" company="TVSorter">
+// <copyright file="LogType.cs" company="TVSorter">
 //   2012 - Andrew Jackson
 // </copyright>
-// <summary>
-//   Contains the version information about TVSorter.
-// </summary>
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter
 {
     /// <summary>
-    /// Contains the version information about TVSorter.
+    /// The type of the log message.
     /// </summary>
-    public static class Version
+    public enum LogType
     {
-        #region Constants
+        /// <summary>
+        /// An information log message.
+        /// </summary>
+        Info, 
 
         /// <summary>
-        /// The current version of TVSorter.
+        /// An error log message.
         /// </summary>
-        public const string CurrentVersion = "1.0";
-
-        #endregion
+        Error
     }
 }

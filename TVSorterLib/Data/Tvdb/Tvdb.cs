@@ -94,7 +94,7 @@ namespace TVSorter.Data.Tvdb
             }
             catch (Exception e)
             {
-                Logger.OnLogMessage(this, "Error parsing XML for {0}. {1}", show.Name, e.Message);
+                Logger.OnLogMessage(this, "Error parsing XML for {0}. {1}", LogType.Error, show.Name, e.Message);
             }
         }
 
@@ -107,7 +107,10 @@ namespace TVSorter.Data.Tvdb
         /// <param name="storageProvider">
         /// The storage provider to use.
         /// </param>
-        public void UpdateShows(IList<TvShow> shows, IStorageProvider storageProvider)
+        /// <returns>
+        /// The collection of TVShows that have been updated.
+        /// </returns>
+        public IEnumerable<TvShow> UpdateShows(IList<TvShow> shows, IStorageProvider storageProvider)
         {
             DateTime firstUpdate = shows.Min(x => x.LastUpdated);
             List<string> updateIds;
@@ -128,13 +131,13 @@ namespace TVSorter.Data.Tvdb
             {
                 if (updateIds.Contains(show.TvdbId))
                 {
-                    Logger.OnLogMessage(this, "No updates for {0}", show.Name);
+                    Logger.OnLogMessage(this, "No updates for {0}", LogType.Info, show.Name);
                     show.LastUpdated = serverTime;
                 }
                 else
                 {
                     this.tvdbProcess.ProcessShow(show, TvdbDownload.DownloadShowEpisodes(show), serverTime);
-                    show.LockIfNoEpisodes(storageProvider);
+                    yield return show;
                 }
             }
         }

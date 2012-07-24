@@ -2,9 +2,6 @@
 // <copyright file="DirectoryInfoWrap.cs" company="TVSorter">
 //   2012 - Andrew Jackson
 // </copyright>
-// <summary>
-//   A wrapper for the DirectoryInfo class.
-// </summary>
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter.Wrappers
 {
@@ -152,6 +149,18 @@ namespace TVSorter.Wrappers
         public IFileInfo[] GetFiles()
         {
             return FileInfoWrap.ConvertFileInfoToIFileInfoArray(this.directoryInfo.GetFiles());
+        }
+
+        /// <summary>
+        /// Returns a string that represents the current object.
+        /// </summary>
+        /// <returns>
+        /// A string that represents the current object.
+        /// </returns>
+        /// <filterpriority>2</filterpriority>
+        public override string ToString()
+        {
+            return this.directoryInfo.ToString();
         }
 
         #endregion

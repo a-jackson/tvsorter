@@ -80,6 +80,16 @@ namespace TVSorter
             return SpecialChars.Aggregate(str.RemoveSpacerChars(), (current, ch) => current.Replace(ch, '\0'));
         }
 
+        /// <summary>
+        /// Removes special characters and spaces from the string.
+        /// </summary>
+        /// <param name="str">The string to process.</param>
+        /// <returns>The processed string.</returns>
+        internal static string AlphaNumericOnly(this string str)
+        {
+            return new string(str.Where(char.IsLetterOrDigit).ToArray());
+        }
+
         #endregion
     }
 }

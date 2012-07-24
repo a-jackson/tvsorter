@@ -50,8 +50,11 @@ namespace TVSorter
         internal static void Update(
             this IList<TvShow> shows, IStorageProvider storageProvider, IDataProvider dataProvider)
         {
-            dataProvider.UpdateShows(shows, storageProvider);
-            shows.Save(storageProvider);
+            foreach (var show in dataProvider.UpdateShows(shows, storageProvider))
+            {
+                show.LockIfNoEpisodes(storageProvider);
+                show.Save(storageProvider);
+            }
         }
 
         #endregion

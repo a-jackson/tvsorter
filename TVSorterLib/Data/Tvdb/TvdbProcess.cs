@@ -154,7 +154,7 @@ namespace TVSorter.Data.Tvdb
             show.Episodes = newEpisodes;
             show.LastUpdated = serverTime;
 
-            Logger.OnLogMessage(this, "Updated show {0}. Has {1} episodes.", show.Name, newEpisodes.Count);
+            Logger.OnLogMessage(this, "Updated show {0}. Has {1} episodes.", LogType.Info, show.Name, newEpisodes.Count);
         }
 
         /// <summary>

@@ -153,7 +153,7 @@ namespace TVSorter.Files
                         this.settings.SourceDirectory.TrimEnd(Path.DirectorySeparatorChar)))
                 {
                     file.InputFile.Directory.Delete(true);
-                    Logger.OnLogMessage(this, "Delete directory: {0}", file.InputFile.DirectoryName);
+                    Logger.OnLogMessage(this, "Delete directory: {0}", LogType.Info, file.InputFile.DirectoryName);
                 }
             }
         }
@@ -210,7 +210,7 @@ namespace TVSorter.Files
                         {
                             results[0].InputFile.MoveTo(destinationInfo.FullName);
                             Logger.OnLogMessage(
-                                this, "Renamed {0} to {1}", results[0].InputFile.Name, destinationInfo.Name);
+                                this, "Renamed {0} to {1}", LogType.Info, results[0].InputFile.Name, destinationInfo.Name);
 
                             return false;
                         }
@@ -240,7 +240,7 @@ namespace TVSorter.Files
         {
             if (file.Incomplete)
             {
-                Logger.OnLogMessage(this, "Skipping {0}. Not enough information.", file.InputFile.Name);
+                Logger.OnLogMessage(this, "Skipping {0}. Not enough information.", LogType.Error, file.InputFile.Name);
                 return;
             }
 
@@ -259,7 +259,7 @@ namespace TVSorter.Files
 
             if (destinationInfo.Exists)
             {
-                Logger.OnLogMessage(this, "Skipping {0}. Already exists.", destinationInfo.Name);
+                Logger.OnLogMessage(this, "Skipping {0}. Already exists.", LogType.Info, destinationInfo.Name);
                 return;
             }
 
@@ -267,7 +267,7 @@ namespace TVSorter.Files
             {
                 case SortType.Move:
                     file.InputFile.MoveTo(destinationInfo.FullName);
-                    Logger.OnLogMessage(this, "Moved {0}", file.InputFile.Name);
+                    Logger.OnLogMessage(this, "Moved {0}", LogType.Info, file.InputFile.Name);
                     if (this.settings.DeleteEmptySubdirectories)
                     {
                         this.DeleteEmptySubdirectories(file);
@@ -276,7 +276,7 @@ namespace TVSorter.Files
                     break;
                 case SortType.Copy:
                     file.InputFile.CopyTo(destinationInfo.FullName);
-                    Logger.OnLogMessage(this, "Copied {0}", file.InputFile.Name);
+                    Logger.OnLogMessage(this, "Copied {0}", LogType.Info, file.InputFile.Name);
                     break;
             }
 

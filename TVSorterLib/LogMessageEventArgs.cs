@@ -25,14 +25,16 @@ namespace TVSorter
         /// Initializes a new instance of the <see cref="LogMessageEventArgs"/> class. Initialises a new instance of the <see cref="LogMessageEventArgs"/> class.
         /// </summary>
         /// <param name="message">
-        /// The message. 
+        ///   The message. 
         /// </param>
         /// <param name="time">
-        /// The time. 
+        ///   The time. 
         /// </param>
-        public LogMessageEventArgs(string message, DateTime time)
+        /// <param name="type"> The type of the log message.</param>
+        public LogMessageEventArgs(string message, DateTime time, LogType type)
         {
             this.LogTime = time;
+            this.Type = type;
             this.LogMessage = message;
         }
 
@@ -49,6 +51,11 @@ namespace TVSorter
         ///   Gets the time the event was raised.
         /// </summary>
         public DateTime LogTime { get; private set; }
+
+        /// <summary>
+        /// Gets the type of the log message.
+        /// </summary>
+        public LogType Type { get; private set; }
 
         #endregion
 
