@@ -346,6 +346,11 @@ namespace TVSorter.Model
         /// </returns>
         private string GetOuptutFormat(IStorageProvider provider)
         {
+            if (this.Show == null)
+            {
+                return string.Empty;
+            }
+
             return this.Show.UseCustomFormat
                        ? this.Show.CustomFormat
                        : Settings.LoadSettings(provider).DefaultOutputFormat;

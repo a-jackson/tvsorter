@@ -17,6 +17,8 @@ namespace TVSorter.Data.Tvdb
     using System.Threading.Tasks;
     using System.Xml.Linq;
 
+    using Ionic.Zip;
+
     using TVSorter.Model;
 
     #endregion
@@ -148,7 +150,7 @@ namespace TVSorter.Data.Tvdb
                 try
                 {
                     var webClient = new WebClient();
-                    string showAddress = Mirror + ApiLoc + "/series/" + show.TvdbId + "/all/en.xml";
+                    string showAddress = Mirror + ApiLoc + "/series/" + show.TvdbId + "/all/en.zip";
                     string savePath = Tvdb.CacheDirectory + show.TvdbId + ".xml";
 
                     if (!Directory.Exists(Tvdb.CacheDirectory))
@@ -160,8 +162,39 @@ namespace TVSorter.Data.Tvdb
                     {
                         File.Delete(savePath);
                     }
+                    
+                    webClient.DownloadFile(showAddress, savePath + ".zip");
 
-                    webClient.DownloadFile(showAddress, savePath);
+                    // Download the zip file to a zip stream
+                    using (var stream = new ZipInputStream(savePath + ".zip"))
+                    {
+                        ZipEntry e;
+                        var buffer = new byte[2048];
+
+                        // Loop through all the entries looking for en.xml.
+                        while ((e = stream.GetNextEntry()) != null)
+                        {
+                            if (!e.FileName.Equals("en.xml"))
+                            {
+                                while (stream.Read(buffer, 0, buffer.Length) > 0)
+                                {
+                                }
+                            }
+                            
+                            // Write the file to savePath.
+                            using (var output = File.Open(savePath, FileMode.Create, FileAccess.ReadWrite))
+                            {
+                                int n;
+                                while ((n = stream.Read(buffer, 0, buffer.Length)) > 0)
+                                {
+                                    output.Write(buffer, 0, n);
+                                }
+                            }
+
+                            break;
+                        }
+                    }
+
                     return savePath;
                 }
                 catch (WebException)
