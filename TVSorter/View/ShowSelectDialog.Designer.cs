@@ -72,6 +72,7 @@ namespace TVSorter.View
         private void InitializeComponent()
         {
             System.Windows.Forms.FlowLayoutPanel buttonsFlow;
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ShowSelectDialog));
             this.selectButton = new System.Windows.Forms.Button();
             this.closeButton = new System.Windows.Forms.Button();
             this.showList = new System.Windows.Forms.ListBox();
@@ -126,6 +127,7 @@ namespace TVSorter.View
             this.ClientSize = new System.Drawing.Size(221, 342);
             this.Controls.Add(buttonsFlow);
             this.Controls.Add(this.showList);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "ShowSelectDialog";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Select Show";

@@ -37,6 +37,7 @@
             System.Windows.Forms.GroupBox otherGroup;
             System.Windows.Forms.GroupBox namesGroup;
             System.Windows.Forms.GroupBox dateGroup;
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormatBuilder));
             this.okButton = new System.Windows.Forms.Button();
             this.cancelButton = new System.Windows.Forms.Button();
             this.textExample = new System.Windows.Forms.TextBox();
@@ -368,6 +369,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(371, 221);
             this.Controls.Add(tableMain);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(387, 259);
             this.Name = "FormatBuilder";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;

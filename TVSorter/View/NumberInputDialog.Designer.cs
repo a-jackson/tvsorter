@@ -75,10 +75,10 @@ namespace TVSorter.View
             System.Windows.Forms.FlowLayoutPanel flowButtons;
             System.Windows.Forms.Label seasonLabel;
             System.Windows.Forms.Label episodeLabel;
-            this.seasonNumber = new System.Windows.Forms.TextBox();
             this.okButton = new System.Windows.Forms.Button();
             this.cancelButton = new System.Windows.Forms.Button();
             this.episodeNumber = new System.Windows.Forms.TextBox();
+            this.seasonNumber = new System.Windows.Forms.TextBox();
             table = new System.Windows.Forms.TableLayoutPanel();
             flowButtons = new System.Windows.Forms.FlowLayoutPanel();
             seasonLabel = new System.Windows.Forms.Label();
@@ -86,34 +86,6 @@ namespace TVSorter.View
             table.SuspendLayout();
             flowButtons.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // seasonNumber
-            // 
-            this.seasonNumber.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.seasonNumber.Location = new System.Drawing.Point(96, 3);
-            this.seasonNumber.Name = "seasonNumber";
-            this.seasonNumber.Size = new System.Drawing.Size(114, 20);
-            this.seasonNumber.TabIndex = 0;
-            // 
-            // okButton
-            // 
-            this.okButton.Location = new System.Drawing.Point(135, 3);
-            this.okButton.Name = "okButton";
-            this.okButton.Size = new System.Drawing.Size(75, 23);
-            this.okButton.TabIndex = 1;
-            this.okButton.Text = "OK";
-            this.okButton.UseVisualStyleBackColor = true;
-            this.okButton.Click += new System.EventHandler(this.OkButtonClick);
-            // 
-            // cancelButton
-            // 
-            this.cancelButton.Location = new System.Drawing.Point(54, 3);
-            this.cancelButton.Name = "cancelButton";
-            this.cancelButton.Size = new System.Drawing.Size(75, 23);
-            this.cancelButton.TabIndex = 2;
-            this.cancelButton.Text = "Cancel";
-            this.cancelButton.UseVisualStyleBackColor = true;
-            this.cancelButton.Click += new System.EventHandler(this.CancelButtonClick);
             // 
             // table
             // 
@@ -148,6 +120,26 @@ namespace TVSorter.View
             flowButtons.Size = new System.Drawing.Size(213, 56);
             flowButtons.TabIndex = 0;
             // 
+            // okButton
+            // 
+            this.okButton.Location = new System.Drawing.Point(135, 3);
+            this.okButton.Name = "okButton";
+            this.okButton.Size = new System.Drawing.Size(75, 23);
+            this.okButton.TabIndex = 1;
+            this.okButton.Text = "OK";
+            this.okButton.UseVisualStyleBackColor = true;
+            this.okButton.Click += new System.EventHandler(this.OkButtonClick);
+            // 
+            // cancelButton
+            // 
+            this.cancelButton.Location = new System.Drawing.Point(54, 3);
+            this.cancelButton.Name = "cancelButton";
+            this.cancelButton.Size = new System.Drawing.Size(75, 23);
+            this.cancelButton.TabIndex = 2;
+            this.cancelButton.Text = "Cancel";
+            this.cancelButton.UseVisualStyleBackColor = true;
+            this.cancelButton.Click += new System.EventHandler(this.CancelButtonClick);
+            // 
             // episodeNumber
             // 
             this.episodeNumber.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -155,6 +147,14 @@ namespace TVSorter.View
             this.episodeNumber.Name = "episodeNumber";
             this.episodeNumber.Size = new System.Drawing.Size(114, 20);
             this.episodeNumber.TabIndex = 1;
+            // 
+            // seasonNumber
+            // 
+            this.seasonNumber.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.seasonNumber.Location = new System.Drawing.Point(96, 3);
+            this.seasonNumber.Name = "seasonNumber";
+            this.seasonNumber.Size = new System.Drawing.Size(114, 20);
+            this.seasonNumber.TabIndex = 0;
             // 
             // seasonLabel
             // 
