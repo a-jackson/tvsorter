@@ -2,9 +2,6 @@
 // <copyright file="FileInfoWrap.cs" company="TVSorter">
 //   2012 - Andrew Jackson
 // </copyright>
-// <summary>
-//   Wrapper for the FileInfo class.
-// </summary>
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter.Wrappers
 {
@@ -156,6 +153,18 @@ namespace TVSorter.Wrappers
         }
 
         /// <summary>
+        /// Returns a string that represents the current object.
+        /// </summary>
+        /// <returns>
+        /// A string that represents the current object.
+        /// </returns>
+        /// <filterpriority>2</filterpriority>
+        public override string ToString()
+        {
+            return this.fileInfo.ToString();
+        }
+
+        /// <summary>
         /// Writes all the specified text into the file, creating it if it doesn't exist.
         /// </summary>
         /// <param name="text">
@@ -191,17 +200,5 @@ namespace TVSorter.Wrappers
         }
 
         #endregion
-
-        /// <summary>
-        /// Returns a string that represents the current object.
-        /// </summary>
-        /// <returns>
-        /// A string that represents the current object.
-        /// </returns>
-        /// <filterpriority>2</filterpriority>
-        public override string ToString()
-        {
-            return this.fileInfo.ToString();
-        }
     }
 }

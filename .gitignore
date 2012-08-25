@@ -7,3 +7,5 @@ packages
 
 *.suo
 *.ncrunchsolution
+*.user
+*.Cache
