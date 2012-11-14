@@ -185,7 +185,7 @@ namespace TVSorter.Files
                 // Get the files that are already in the destination directory.
                 List<FileResult> results =
                     this.scanManager.SearchDestinationFolder(destinationInfo.Directory).Where(
-                        x => !x.Episodes.Where((t, i) => !file.Episodes[i].Equals(t)).Any()).ToList();
+                        x => x.Episodes != null && !x.Episodes.Where((t, i) => !file.Episodes[i].Equals(t)).Any()).ToList();
 
                 // If the episode already exists.
                 if (results.Count > 0)

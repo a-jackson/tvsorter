@@ -123,16 +123,21 @@ namespace TVSorter.Data.Tvdb
             }
             else
             {
-                updateIds = new List<string>();
+                // Update all shows
+                updateIds = shows.Select(x => x.TvdbId).ToList();
             }
 
             DateTime serverTime = TvdbDownload.GetServerTime();
             foreach (TvShow show in shows)
             {
-                if (updateIds.Contains(show.TvdbId))
+                // Skip the show if it isn't in the updateIds list.
+                if (!updateIds.Contains(show.TvdbId))
                 {
                     Logger.OnLogMessage(this, "No updates for {0}", LogType.Info, show.Name);
+
+                    // Update the last updated time anyway, it is still up to date at this time.
                     show.LastUpdated = serverTime;
+                    show.Save();
                 }
                 else
                 {

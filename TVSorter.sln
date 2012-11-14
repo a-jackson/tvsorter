@@ -1,13 +1,20 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TVSorter", "TVSorter\TVSorter.csproj", "{90CB0336-FD4A-48CF-AAA3-92DD2F0CED94}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TVSorter", "tvsorter\TVSorter.csproj", "{90CB0336-FD4A-48CF-AAA3-92DD2F0CED94}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TVSorterLib", "TVSorterLib\TVSorterLib.csproj", "{70096D06-63B7-4057-A40E-C5CCBE6BACE9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TVSorterCmd", "TVSorterCmd\TVSorterCmd.csproj", "{AB5BF33E-EA7D-4475-9B4B-5CE9CBFD32E4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TVSorter.Test", "TVSorter.Test\TVSorter.Test.csproj", "{6551555C-2B88-4359-8CEF-ECB89FFC8205}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{70F00E33-00F5-426F-B038-93F24C0D9419}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
