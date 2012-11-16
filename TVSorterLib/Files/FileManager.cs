@@ -214,11 +214,14 @@ namespace TVSorter.Files
                             }
                         }
                     }
-                    else if (this.settings.RenameIfExists)
+                    else if (this.settings.RenameIfExists && results[0].InputFile.Extension.Equals(destinationInfo.Extension))
                     {
                         // Can't rename more than 1 file to the same thing.
                         // Also don't rename if the file name is already the same.
-                        if (results.Count == 1 && !results[0].InputFile.Name.Equals(destinationInfo.Name))
+                        string currentName = results[0].InputFile.Name;
+                        string newName = destinationInfo.Name;
+
+                        if (results.Count == 1 && !currentName.Equals(newName))
                         {
                             string originalName = results[0].InputFile.Name;
                             results[0].InputFile.MoveTo(destinationInfo.FullName);
