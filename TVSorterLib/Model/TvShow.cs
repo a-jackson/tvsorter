@@ -454,6 +454,16 @@ namespace TVSorter.Model
         }
 
         /// <summary>
+        /// Gets the custom destination directory for the show.
+        /// </summary>
+        /// <returns>The IDirectoryInfo the show's custom directory.</returns>
+        internal IDirectoryInfo GetCustomDestinationDirectory()
+        {
+            // TODO: This needs to be able to return a substituted one for the tests
+            return new DirectoryInfoWrap(this.CustomDestinationDir);
+        }
+
+        /// <summary>
         /// Gets the names from the specified collection of names.
         /// </summary>
         /// <param name="names">

@@ -124,14 +124,26 @@ namespace TVSorter.Files
         /// <param name="type">
         /// The operation to perform on the files. 
         /// </param>
-        /// <param name="destination">
+        /// <param name="defaultDestination">
         /// The destination to process the files into.
         /// </param>
-        internal void ProcessFiles(IEnumerable<FileResult> files, SortType type, IDirectoryInfo destination)
+        internal void ProcessFiles(IEnumerable<FileResult> files, SortType type, IDirectoryInfo defaultDestination)
         {
             foreach (FileResult file in files)
             {
-                this.ProcessFile(type, file, destination);
+                if (file.Incomplete)
+                {
+                    Logger.OnLogMessage(this, "Skipping {0}. Not enough information.", LogType.Error, file.InputFile.Name);
+                    continue;
+                }
+
+                var showDestination = defaultDestination;
+                if (file.Show.UseCustomDestination)
+                {
+                    showDestination = file.Show.GetCustomDestinationDirectory();
+                }
+
+                this.ProcessFile(type, file, showDestination);
             }
         }
 
@@ -239,12 +251,6 @@ namespace TVSorter.Files
         /// </param>
         private void ProcessFile(SortType type, FileResult file, IDirectoryInfo destination)
         {
-            if (file.Incomplete)
-            {
-                Logger.OnLogMessage(this, "Skipping {0}. Not enough information.", LogType.Error, file.InputFile.Name);
-                return;
-            }
-
             IFileInfo destinationInfo = file.GetFullPath(destination, this.storageProvider);
             if (destinationInfo.Directory != null && !destinationInfo.Directory.Exists)
             {
