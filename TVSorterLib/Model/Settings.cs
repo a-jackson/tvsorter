@@ -70,7 +70,7 @@ namespace TVSorter.Model
         /// <summary>
         ///   Gets or sets the selected destination directory.
         /// </summary>
-        public string DestinationDirectory { get; set; }
+        public string DefaultDestinationDirectory { get; set; }
 
         /// <summary>
         ///   Gets or sets the list of file extensions to search.
@@ -217,7 +217,7 @@ namespace TVSorter.Model
 
             this.SourceDirectory = Path.DirectorySeparatorChar.ToString(CultureInfo.InvariantCulture);
             this.DestinationDirectories = new List<string>();
-            this.DestinationDirectory = Path.DirectorySeparatorChar.ToString(CultureInfo.InvariantCulture);
+            this.DefaultDestinationDirectory = Path.DirectorySeparatorChar.ToString(CultureInfo.InvariantCulture);
             this.FileExtensions = new List<string> { ".avi", ".mkv", ".wmv", ".mpg", ".mp4" };
             this.RegularExpressions = regularExpressions;
             this.DefaultOutputFormat = "{FName}" + Path.DirectorySeparatorChar + "Season {SNum(1)}"

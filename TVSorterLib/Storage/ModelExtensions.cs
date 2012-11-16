@@ -40,10 +40,11 @@ namespace TVSorter.Storage
                 bool.Parse(settingsNode.GetAttribute("deleteemptysubdirectories", "false"));
             settings.RenameIfExists = bool.Parse(settingsNode.GetAttribute("renameifexists", "false"));
             settings.DestinationDirectories = new List<string>();
-            settings.DestinationDirectory = string.Empty;
+            settings.DefaultDestinationDirectory = string.Empty;
             settings.UnlockMatchedShows = bool.Parse(settingsNode.GetAttribute("unlockmatchedshows", "false"));
             settings.AddUnmatchedShows = bool.Parse(settingsNode.GetAttribute("addunmatchedshows", "false"));
             settings.LockShowsWithNoEpisodes = bool.Parse(settingsNode.GetAttribute("lockshowsnonewepisodes", "false"));
+            settings.DefaultDestinationDirectory = settingsNode.GetAttribute("defaultdestinationdir", string.Empty);
 
             XElement destinationDirectories = settingsNode.Element(Xml.GetName("DestinationDirectories"));
 
@@ -51,13 +52,6 @@ namespace TVSorter.Storage
             {
                 settings.DestinationDirectories =
                     destinationDirectories.GetElementsText(Xml.GetName("Destination")).ToList();
-                foreach (XElement dir in from dir in destinationDirectories.Descendants(Xml.GetName("Destination"))
-                                         let selected = dir.GetAttribute("selected", "false")
-                                         where bool.Parse(selected)
-                                         select dir)
-                {
-                    settings.DestinationDirectory = dir.Value;
-                }
             }
 
             settings.FileExtensions =
@@ -88,6 +82,8 @@ namespace TVSorter.Storage
             show.UseDvdOrder = bool.Parse(showNode.GetAttribute("usedvdorder", "false"));
             show.Locked = bool.Parse(showNode.GetAttribute("locked", "false"));
             show.LastUpdated = DateTime.Parse(showNode.GetAttribute("lastupdated", "1970-01-01 00:00:00"));
+            show.UseCustomDestination = bool.Parse(showNode.GetAttribute("usecustomdestination", "false"));
+            show.CustomDestinationDir = showNode.GetAttribute("customdestination");
             show.AlternateNames =
                 showNode.Descendants(Xml.GetName("AlternateName")).Select(altName => altName.Value).ToList();
             show.Episodes = showNode.Descendants(Xml.GetName("Episode")).Select(
@@ -153,7 +149,6 @@ namespace TVSorter.Storage
                     dir =>
                     new XElement(
                         Xml.GetName("Destination"), 
-                        new XAttribute("selected", dir == settings.DestinationDirectory), 
                         dir)));
 
             var fileExtensions = new XElement(
@@ -178,6 +173,7 @@ namespace TVSorter.Storage
                 new XAttribute("addunmatchedshows", settings.AddUnmatchedShows), 
                 new XAttribute("unlockmatchedshows", settings.UnlockMatchedShows), 
                 new XAttribute("lockshowsnonewepisodes", settings.LockShowsWithNoEpisodes), 
+                new XAttribute("defaultdestinationdir", settings.DefaultDestinationDirectory),
                 destinationDirectories, 
                 fileExtensions, 
                 regularExpressions, 
@@ -221,6 +217,8 @@ namespace TVSorter.Storage
                 new XAttribute("usedvdorder", show.UseDvdOrder), 
                 new XAttribute("locked", show.Locked), 
                 new XAttribute("lastupdated", show.LastUpdated), 
+                new XAttribute("usecustomdestination", show.UseCustomDestination),
+                new XAttribute("customdestination", show.CustomDestinationDir),
                 alternateNames, 
                 episodes);
 

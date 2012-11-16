@@ -38,7 +38,7 @@ namespace TVSorter.Storage
         /// <summary>
         /// The current verison of the XML file.
         /// </summary>
-        private const int XmlVersion = 3;
+        private static readonly int XmlVersion = 4;
 
         /// <summary>
         /// The file path of the XSD file. Contains the version number of the XML file.
@@ -452,12 +452,45 @@ namespace TVSorter.Storage
             XElement settingsNode = root.Element(GetName("Settings"));
             if (settingsNode == null)
             {
-                throw new XmlException("XML is no valid");
+                throw new XmlException("XML is not valid");
             }
 
             settingsNode.Add(new XAttribute("addunmatchedshows", false));
             settingsNode.Add(new XAttribute("unlockmatchedshows", false));
             settingsNode.Add(new XAttribute("lockshowsnonewepisodes", false));
+        }
+
+        /// <summary>
+        /// Updates the XML to version 4
+        /// </summary>
+        /// <param name="root">The root of the document.</param>
+        private static void UpdateToVersion4(XElement root)
+        {
+            XElement settingsNode = root.Element(GetName("Settings"));
+            if (settingsNode == null)
+            {
+                throw new XmlException("Xml is not valid");
+            }
+
+            string selectedDestination = string.Empty;
+            var destinations = settingsNode.Descendants(GetName("Destination"));
+            foreach (XElement destination in destinations)
+            {
+                if (bool.Parse(destination.GetAttribute("selected", "false")))
+                {
+                    selectedDestination = destination.Value;
+                }
+
+                destination.RemoveAttributes();
+            }
+
+            settingsNode.Add(new XAttribute("defaultdestinationdir", selectedDestination));
+
+            foreach (XElement show in root.Descendants(GetName("Show")))
+            {
+                show.Add(new XAttribute("usecustomdestination", false));
+                show.Add(new XAttribute("customdestinationdir", string.Empty));
+            }
         }
 
         /// <summary>
@@ -503,6 +536,11 @@ namespace TVSorter.Storage
                 if (version < 3)
                 {
                     UpdateToVersion3(root);
+                }
+
+                if (version < 4)
+                {
+                    UpdateToVersion4(root);
                 }
 
                 XAttribute versionAttribute = root.Attribute("version");
@@ -638,10 +676,6 @@ namespace TVSorter.Storage
                     {
                     }
                 }
-            }
-            else
-            {
-                throw new FileNotFoundException("The XSD schema could not be found.", schema);
             }
         }
 

@@ -95,7 +95,7 @@ namespace TVSorter.Files
         /// </param>
         public void CopyFile(IEnumerable<FileResult> files)
         {
-            string destination = this.settings.DestinationDirectory;
+            string destination = this.settings.DefaultDestinationDirectory;
             this.ProcessFiles(files, SortType.Copy, new DirectoryInfoWrap(destination));
         }
 
@@ -107,7 +107,7 @@ namespace TVSorter.Files
         /// </param>
         public void MoveFile(IEnumerable<FileResult> files)
         {
-            string destination = this.settings.DestinationDirectory;
+            string destination = this.settings.DefaultDestinationDirectory;
             this.ProcessFiles(files, SortType.Move, new DirectoryInfoWrap(destination));
         }
 

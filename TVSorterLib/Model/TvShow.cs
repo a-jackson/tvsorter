@@ -113,6 +113,16 @@ namespace TVSorter.Model
         /// </summary>
         public bool UseDvdOrder { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether to use a custom destination.
+        /// </summary>
+        public bool UseCustomDestination { get; set; }
+
+        /// <summary>
+        /// Gets or sets the custom output destination directory to use.
+        /// </summary>
+        public string CustomDestinationDir { get; set; }
+
         #endregion
 
         #region Public Methods and Operators
