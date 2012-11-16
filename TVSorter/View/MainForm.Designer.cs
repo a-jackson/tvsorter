@@ -142,7 +142,7 @@ namespace TVSorter.View
             this.mainTabs.Location = new System.Drawing.Point(0, 0);
             this.mainTabs.Name = "mainTabs";
             this.mainTabs.SelectedIndex = 0;
-            this.mainTabs.Size = new System.Drawing.Size(941, 587);
+            this.mainTabs.Size = new System.Drawing.Size(942, 636);
             this.mainTabs.TabIndex = 0;
             // 
             // sortEpisodesPage
@@ -151,7 +151,7 @@ namespace TVSorter.View
             this.sortEpisodesPage.Location = new System.Drawing.Point(4, 22);
             this.sortEpisodesPage.Name = "sortEpisodesPage";
             this.sortEpisodesPage.Padding = new System.Windows.Forms.Padding(3);
-            this.sortEpisodesPage.Size = new System.Drawing.Size(933, 561);
+            this.sortEpisodesPage.Size = new System.Drawing.Size(934, 565);
             this.sortEpisodesPage.TabIndex = 1;
             this.sortEpisodesPage.Text = "Sort Episode Files";
             this.sortEpisodesPage.UseVisualStyleBackColor = true;
@@ -161,7 +161,7 @@ namespace TVSorter.View
             this.sortEpisodes.Dock = System.Windows.Forms.DockStyle.Fill;
             this.sortEpisodes.Location = new System.Drawing.Point(3, 3);
             this.sortEpisodes.Name = "sortEpisodes";
-            this.sortEpisodes.Size = new System.Drawing.Size(927, 555);
+            this.sortEpisodes.Size = new System.Drawing.Size(928, 559);
             this.sortEpisodes.TabIndex = 0;
             // 
             // tvShowsPage
@@ -169,7 +169,7 @@ namespace TVSorter.View
             this.tvShowsPage.Controls.Add(this.tvShows);
             this.tvShowsPage.Location = new System.Drawing.Point(4, 22);
             this.tvShowsPage.Name = "tvShowsPage";
-            this.tvShowsPage.Size = new System.Drawing.Size(933, 561);
+            this.tvShowsPage.Size = new System.Drawing.Size(934, 610);
             this.tvShowsPage.TabIndex = 2;
             this.tvShowsPage.Text = "TV Shows";
             this.tvShowsPage.UseVisualStyleBackColor = true;
@@ -179,7 +179,7 @@ namespace TVSorter.View
             this.tvShows.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tvShows.Location = new System.Drawing.Point(0, 0);
             this.tvShows.Name = "tvShows";
-            this.tvShows.Size = new System.Drawing.Size(933, 561);
+            this.tvShows.Size = new System.Drawing.Size(934, 610);
             this.tvShows.TabIndex = 0;
             // 
             // missingDuplicatePage
@@ -197,7 +197,7 @@ namespace TVSorter.View
             this.missingDuplicateEpisodes.Dock = System.Windows.Forms.DockStyle.Fill;
             this.missingDuplicateEpisodes.Location = new System.Drawing.Point(0, 0);
             this.missingDuplicateEpisodes.Name = "missingDuplicateEpisodes";
-            this.missingDuplicateEpisodes.Size = new System.Drawing.Size(933, 561);
+            this.missingDuplicateEpisodes.Size = new System.Drawing.Size(192, 74);
             this.missingDuplicateEpisodes.TabIndex = 0;
             // 
             // settingsPage
@@ -215,7 +215,7 @@ namespace TVSorter.View
             this.settings.Dock = System.Windows.Forms.DockStyle.Fill;
             this.settings.Location = new System.Drawing.Point(0, 0);
             this.settings.Name = "settings";
-            this.settings.Size = new System.Drawing.Size(933, 561);
+            this.settings.Size = new System.Drawing.Size(192, 74);
             this.settings.TabIndex = 0;
             // 
             // logPage
@@ -233,17 +233,17 @@ namespace TVSorter.View
             this.log.Dock = System.Windows.Forms.DockStyle.Fill;
             this.log.Location = new System.Drawing.Point(0, 0);
             this.log.Name = "log";
-            this.log.Size = new System.Drawing.Size(933, 561);
+            this.log.Size = new System.Drawing.Size(192, 74);
             this.log.TabIndex = 0;
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(941, 587);
+            this.ClientSize = new System.Drawing.Size(942, 636);
             this.Controls.Add(this.mainTabs);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MinimumSize = new System.Drawing.Size(950, 625);
+            this.MinimumSize = new System.Drawing.Size(950, 670);
             this.Name = "MainForm";
             this.Text = "TV Sorter";
             this.Load += new System.EventHandler(this.MainFormLoad);

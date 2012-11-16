@@ -207,6 +207,8 @@ namespace TVSorter.View
                             this.selectedShowLockButton.BackColor = this.selectedShowLocked ? Color.Red : Color.Green;
                             this.selectedShowLockButton.Enabled = true;
                             this.alternateNames = new List<string>(this.controller.SelectedShow.AlternateNames);
+                            this.useCustomDestinationDirectory.Checked = this.controller.SelectedShow.UseCustomDestination;
+                            this.customDestination.SelectedItem = this.controller.SelectedShow.CustomDestinationDir;
                         }
                         else
                         {
@@ -223,8 +225,13 @@ namespace TVSorter.View
                             this.selectedShowLockButton.Text = "Unlock Show";
                             this.selectedShowLockButton.BackColor = Color.Red;
                             this.selectedShowLockButton.Enabled = false;
+                            this.useCustomDestinationDirectory.Checked = false;
+                            this.customDestination.SelectedItem = null;
                         }
 
+                        break;
+                    case "DestinationDirectories":
+                        this.customDestination.DataSource = this.controller.DestinationDirectories;
                         break;
                 }
             }
@@ -294,6 +301,8 @@ namespace TVSorter.View
             this.controller.SelectedShow.UseDvdOrder = this.selectedShowUseDvdOrder.Checked;
             this.controller.SelectedShow.Locked = this.selectedShowLocked;
             this.controller.SelectedShow.AlternateNames = this.alternateNames;
+            this.controller.SelectedShow.UseCustomDestination = this.useCustomDestinationDirectory.Checked;
+            this.controller.SelectedShow.CustomDestinationDir = (string)this.customDestination.SelectedItem ?? string.Empty;
             this.controller.SaveSelectedShow();
 
             this.tvShowsList.Refresh();
@@ -508,6 +517,16 @@ namespace TVSorter.View
         private void UpdateShowButtonClick(object sender, EventArgs e)
         {
             this.controller.UpdateSelectedShow();
+        }
+
+        /// <summary>
+        /// The the check changed event of the Use Custom Destination Directory check box.
+        /// </summary>
+        /// <param name="sender">The sender of the event.</param>
+        /// <param name="e">The arguments of the event.</param>
+        private void UseCustomDestinationDirectoryCheckedChanged(object sender, EventArgs e)
+        {
+            this.customDestination.Enabled = this.useCustomDestinationDirectory.Checked;
         }
 
         #endregion

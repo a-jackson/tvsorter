@@ -184,7 +184,8 @@ namespace TVSorter.View
                     // Update directories
                     this.sourceText.Text = this.controller.Settings.SourceDirectory;
                     this.destinationList.DataSource = this.destinationDirectories;
-                    this.destinationList.SelectedItem = this.controller.Settings.DefaultDestinationDirectory;
+                    this.defaultDestinationDirectory.DataSource = this.destinationDirectories;
+                    this.defaultDestinationDirectory.SelectedItem = this.controller.Settings.DefaultDestinationDirectory;
 
                     // Checkboxes
                     this.recurseSubdirectoriesCheck.Checked = this.controller.Settings.RecurseSubdirectories;
@@ -267,7 +268,7 @@ namespace TVSorter.View
             this.controller.Settings.OverwriteKeywords = this.overwriteKeywords.ToList();
 
             this.controller.Settings.SourceDirectory = this.sourceText.Text;
-            this.controller.Settings.DefaultDestinationDirectory = (string)this.destinationList.SelectedItem;
+            this.controller.Settings.DefaultDestinationDirectory = (string)this.defaultDestinationDirectory.SelectedItem ?? string.Empty;
 
             this.controller.Settings.RecurseSubdirectories = this.recurseSubdirectoriesCheck.Checked;
             this.controller.Settings.DeleteEmptySubdirectories = this.deleteEmptyCheck.Checked;

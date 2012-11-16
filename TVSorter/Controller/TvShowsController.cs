@@ -42,6 +42,16 @@ namespace TVSorter.Controller
         /// </summary>
         private IView tvView;
 
+        /// <summary>
+        /// The collection of destination directories.
+        /// </summary>
+        private BindingList<string> destinationDirectories;
+
+        /// <summary>
+        /// The settings.
+        /// </summary>
+        private Model.Settings settings;
+
         #endregion
 
         #region Public Events
@@ -99,6 +109,23 @@ namespace TVSorter.Controller
             }
         }
 
+        /// <summary>
+        /// Gets the destination directories.
+        /// </summary>
+        public BindingList<string> DestinationDirectories
+        {
+            get
+            {
+                return this.destinationDirectories;
+            }
+
+            private set
+            {
+                this.destinationDirectories = value;
+                this.OnPropertyChanged("DestinationDirectories");
+            }
+        }
+
         #endregion
 
         #region Public Methods and Operators
@@ -122,12 +149,15 @@ namespace TVSorter.Controller
         public override void Initialise(IView view)
         {
             this.tvView = view;
+            this.settings = Model.Settings.LoadSettings();
             this.Shows = new BindingList<TvShow>(TvShow.GetTvShows().ToList());
+            this.DestinationDirectories = new BindingList<string>(this.settings.DestinationDirectories);
             this.Shows.ListChanged += (sender, e) => this.OnPropertyChanged("Shows");
             this.TvShowSelected(0);
             TvShow.TvShowAdded += this.OnTvShowAdded;
             TvShow.TvShowChanged += this.OnTvShowChanged;
             TvShow.TvShowRemoved += this.OnTvShowRemoved;
+            this.settings.SettingsChanged += this.OnSettingsChanged;
         }
 
         /// <summary>
@@ -317,6 +347,16 @@ namespace TVSorter.Controller
         private void OnTvShowRemoved(object sender, TvShowEventArgs e)
         {
             this.Shows.Remove(e.TvShow);
+        }
+
+        /// <summary>
+        /// Handles the settings changing.
+        /// </summary>
+        /// <param name="sender">The sender of the event.</param>
+        /// <param name="e">The arguments of the event.</param>
+        private void OnSettingsChanged(object sender, EventArgs e)
+        {
+            this.DestinationDirectories = new BindingList<string>(this.settings.DestinationDirectories);
         }
 
         #endregion

@@ -138,7 +138,6 @@ namespace TVSorter.View
             System.Windows.Forms.Label sourceLabel;
             System.Windows.Forms.Label destinationListLabel;
             System.Windows.Forms.FlowLayoutPanel destinationButtonsFlow;
-            System.Windows.Forms.Label destinationDescLabel;
             System.Windows.Forms.GroupBox sortOptionsGroup;
             System.Windows.Forms.FlowLayoutPanel sortOptionsFlow;
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Settings));
@@ -149,6 +148,7 @@ namespace TVSorter.View
             System.Windows.Forms.TableLayoutPanel formatTable;
             System.Windows.Forms.Label formatLabel;
             System.Windows.Forms.FlowLayoutPanel flowBottomButtons;
+            System.Windows.Forms.Label defaultDestinationLabel;
             this.groupDirectories = new System.Windows.Forms.GroupBox();
             this.sourceText = new System.Windows.Forms.TextBox();
             this.sourceBrowse = new System.Windows.Forms.Button();
@@ -169,12 +169,12 @@ namespace TVSorter.View
             this.saveButton = new System.Windows.Forms.Button();
             this.folderDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.defaultDestinationDirectory = new System.Windows.Forms.ComboBox();
             mainTable = new System.Windows.Forms.TableLayoutPanel();
             tableDirectories = new System.Windows.Forms.TableLayoutPanel();
             sourceLabel = new System.Windows.Forms.Label();
             destinationListLabel = new System.Windows.Forms.Label();
             destinationButtonsFlow = new System.Windows.Forms.FlowLayoutPanel();
-            destinationDescLabel = new System.Windows.Forms.Label();
             sortOptionsGroup = new System.Windows.Forms.GroupBox();
             sortOptionsFlow = new System.Windows.Forms.FlowLayoutPanel();
             searchOptionsGroup = new System.Windows.Forms.GroupBox();
@@ -184,6 +184,7 @@ namespace TVSorter.View
             formatTable = new System.Windows.Forms.TableLayoutPanel();
             formatLabel = new System.Windows.Forms.Label();
             flowBottomButtons = new System.Windows.Forms.FlowLayoutPanel();
+            defaultDestinationLabel = new System.Windows.Forms.Label();
             mainTable.SuspendLayout();
             this.groupDirectories.SuspendLayout();
             tableDirectories.SuspendLayout();
@@ -238,17 +239,18 @@ namespace TVSorter.View
             tableDirectories.Controls.Add(sourceLabel, 0, 0);
             tableDirectories.Controls.Add(this.sourceText, 1, 0);
             tableDirectories.Controls.Add(this.sourceBrowse, 2, 0);
-            tableDirectories.Controls.Add(destinationListLabel, 0, 2);
-            tableDirectories.Controls.Add(this.destinationList, 1, 2);
-            tableDirectories.Controls.Add(destinationButtonsFlow, 2, 2);
-            tableDirectories.Controls.Add(destinationDescLabel, 1, 1);
+            tableDirectories.Controls.Add(destinationListLabel, 0, 1);
+            tableDirectories.Controls.Add(this.destinationList, 1, 1);
+            tableDirectories.Controls.Add(destinationButtonsFlow, 2, 1);
+            tableDirectories.Controls.Add(defaultDestinationLabel, 0, 2);
+            tableDirectories.Controls.Add(this.defaultDestinationDirectory, 1, 2);
             tableDirectories.Dock = System.Windows.Forms.DockStyle.Fill;
             tableDirectories.Location = new System.Drawing.Point(3, 16);
             tableDirectories.Name = "tableDirectories";
             tableDirectories.RowCount = 3;
             tableDirectories.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 26F));
-            tableDirectories.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 34F));
             tableDirectories.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            tableDirectories.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 26F));
             tableDirectories.Size = new System.Drawing.Size(625, 180);
             tableDirectories.TabIndex = 0;
             // 
@@ -287,7 +289,7 @@ namespace TVSorter.View
             // 
             destinationListLabel.Anchor = System.Windows.Forms.AnchorStyles.Right;
             destinationListLabel.AutoSize = true;
-            destinationListLabel.Location = new System.Drawing.Point(7, 113);
+            destinationListLabel.Location = new System.Drawing.Point(7, 83);
             destinationListLabel.Name = "destinationListLabel";
             destinationListLabel.Size = new System.Drawing.Size(116, 13);
             destinationListLabel.TabIndex = 5;
@@ -297,9 +299,9 @@ namespace TVSorter.View
             // 
             this.destinationList.Dock = System.Windows.Forms.DockStyle.Fill;
             this.destinationList.FormattingEnabled = true;
-            this.destinationList.Location = new System.Drawing.Point(129, 63);
+            this.destinationList.Location = new System.Drawing.Point(129, 29);
             this.destinationList.Name = "destinationList";
-            this.destinationList.Size = new System.Drawing.Size(388, 114);
+            this.destinationList.Size = new System.Drawing.Size(388, 122);
             this.destinationList.TabIndex = 6;
             this.toolTip.SetToolTip(this.destinationList, "All the directories where TV Shows are stored. Only the selected one will have TV" +
         " moved to it but all will be used in Missing and Duplicate episode searches.");
@@ -310,10 +312,10 @@ namespace TVSorter.View
             destinationButtonsFlow.Controls.Add(this.removeDestinationButton);
             destinationButtonsFlow.Dock = System.Windows.Forms.DockStyle.Fill;
             destinationButtonsFlow.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-            destinationButtonsFlow.Location = new System.Drawing.Point(520, 60);
+            destinationButtonsFlow.Location = new System.Drawing.Point(520, 26);
             destinationButtonsFlow.Margin = new System.Windows.Forms.Padding(0);
             destinationButtonsFlow.Name = "destinationButtonsFlow";
-            destinationButtonsFlow.Size = new System.Drawing.Size(105, 120);
+            destinationButtonsFlow.Size = new System.Drawing.Size(105, 128);
             destinationButtonsFlow.TabIndex = 7;
             // 
             // addDestinationButton
@@ -335,17 +337,6 @@ namespace TVSorter.View
             this.removeDestinationButton.Text = "Remove";
             this.removeDestinationButton.UseVisualStyleBackColor = true;
             this.removeDestinationButton.Click += new System.EventHandler(this.RemoveDestinationButtonClick);
-            // 
-            // destinationDescLabel
-            // 
-            destinationDescLabel.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            destinationDescLabel.AutoSize = true;
-            destinationDescLabel.Location = new System.Drawing.Point(129, 30);
-            destinationDescLabel.Name = "destinationDescLabel";
-            destinationDescLabel.Size = new System.Drawing.Size(351, 26);
-            destinationDescLabel.TabIndex = 8;
-            destinationDescLabel.Text = "List the directories to sort files into. Most features will use all 3 directories" +
-    ". \r\nThe one selected will be used as the default directory to move files to.";
             // 
             // sortOptionsGroup
             // 
@@ -590,6 +581,26 @@ namespace TVSorter.View
             this.saveButton.UseVisualStyleBackColor = true;
             this.saveButton.Click += new System.EventHandler(this.SaveButtonClick);
             // 
+            // defaultDestinationLabel
+            // 
+            defaultDestinationLabel.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            defaultDestinationLabel.AutoSize = true;
+            defaultDestinationLabel.Location = new System.Drawing.Point(23, 160);
+            defaultDestinationLabel.Name = "defaultDestinationLabel";
+            defaultDestinationLabel.Size = new System.Drawing.Size(100, 13);
+            defaultDestinationLabel.TabIndex = 8;
+            defaultDestinationLabel.Text = "Default Destination:";
+            // 
+            // defaultDestinationDirectory
+            // 
+            this.defaultDestinationDirectory.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.defaultDestinationDirectory.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.defaultDestinationDirectory.FormattingEnabled = true;
+            this.defaultDestinationDirectory.Location = new System.Drawing.Point(129, 157);
+            this.defaultDestinationDirectory.Name = "defaultDestinationDirectory";
+            this.defaultDestinationDirectory.Size = new System.Drawing.Size(388, 21);
+            this.defaultDestinationDirectory.TabIndex = 9;
+            // 
             // Settings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -623,5 +634,6 @@ namespace TVSorter.View
         private CheckBox unlockAndUpdateCheck;
         private IContainer components = null;
         private CheckBox lockShowWithNoNewEpisodesCheck;
+        private ComboBox defaultDestinationDirectory;
     }
 }

@@ -154,7 +154,8 @@ namespace TVSorter.View
         {
             this.components = new System.ComponentModel.Container();
             System.Windows.Forms.TableLayoutPanel selectedShowTable;
-            System.Windows.Forms.GroupBox customFormatGroup;
+            System.Windows.Forms.GroupBox customSettingsGroup;
+            System.Windows.Forms.Label destinationLabel;
             System.Windows.Forms.FlowLayoutPanel selectedShowButtons;
             System.Windows.Forms.Label folderNameLabel;
             System.Windows.Forms.GroupBox episodesGroup;
@@ -167,6 +168,8 @@ namespace TVSorter.View
             this.selectedShowCustomFormatText = new System.Windows.Forms.TextBox();
             this.formatLabel = new System.Windows.Forms.Label();
             this.formatBuilder = new System.Windows.Forms.Button();
+            this.useCustomDestinationDirectory = new System.Windows.Forms.CheckBox();
+            this.customDestination = new System.Windows.Forms.ComboBox();
             this.saveButton = new System.Windows.Forms.Button();
             this.revertButton = new System.Windows.Forms.Button();
             this.updateShowButton = new System.Windows.Forms.Button();
@@ -187,13 +190,14 @@ namespace TVSorter.View
             this.topButtonsFlow = new System.Windows.Forms.FlowLayoutPanel();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             selectedShowTable = new System.Windows.Forms.TableLayoutPanel();
-            customFormatGroup = new System.Windows.Forms.GroupBox();
+            customSettingsGroup = new System.Windows.Forms.GroupBox();
+            destinationLabel = new System.Windows.Forms.Label();
             selectedShowButtons = new System.Windows.Forms.FlowLayoutPanel();
             folderNameLabel = new System.Windows.Forms.Label();
             episodesGroup = new System.Windows.Forms.GroupBox();
             selectedShowTable.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.selectedShowBanner)).BeginInit();
-            customFormatGroup.SuspendLayout();
+            customSettingsGroup.SuspendLayout();
             this.customFormatTable.SuspendLayout();
             selectedShowButtons.SuspendLayout();
             this.namesGroup.SuspendLayout();
@@ -211,7 +215,7 @@ namespace TVSorter.View
             selectedShowTable.Controls.Add(this.selectedShowBanner, 0, 1);
             selectedShowTable.Controls.Add(this.selectedShowLastUpdated, 0, 3);
             selectedShowTable.Controls.Add(this.selectedShowTvdb, 0, 2);
-            selectedShowTable.Controls.Add(customFormatGroup, 0, 4);
+            selectedShowTable.Controls.Add(customSettingsGroup, 0, 4);
             selectedShowTable.Controls.Add(selectedShowButtons, 0, 7);
             selectedShowTable.Controls.Add(this.namesGroup, 0, 5);
             selectedShowTable.Controls.Add(episodesGroup, 0, 6);
@@ -223,11 +227,11 @@ namespace TVSorter.View
             selectedShowTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 150F));
             selectedShowTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
             selectedShowTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
-            selectedShowTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 85F));
+            selectedShowTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 142F));
             selectedShowTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 85F));
             selectedShowTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 85F));
             selectedShowTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            selectedShowTable.Size = new System.Drawing.Size(571, 521);
+            selectedShowTable.Size = new System.Drawing.Size(571, 649);
             selectedShowTable.TabIndex = 2;
             // 
             // selectedShowName
@@ -272,16 +276,16 @@ namespace TVSorter.View
             this.selectedShowTvdb.Text = "TVDB ID: ";
             this.toolTip.SetToolTip(this.selectedShowTvdb, "The show\'s ID on TheTVDB.com");
             // 
-            // customFormatGroup
+            // customSettingsGroup
             // 
-            customFormatGroup.Controls.Add(this.customFormatTable);
-            customFormatGroup.Dock = System.Windows.Forms.DockStyle.Fill;
-            customFormatGroup.Location = new System.Drawing.Point(3, 233);
-            customFormatGroup.Name = "customFormatGroup";
-            customFormatGroup.Size = new System.Drawing.Size(565, 79);
-            customFormatGroup.TabIndex = 4;
-            customFormatGroup.TabStop = false;
-            customFormatGroup.Text = "Custom Format";
+            customSettingsGroup.Controls.Add(this.customFormatTable);
+            customSettingsGroup.Dock = System.Windows.Forms.DockStyle.Fill;
+            customSettingsGroup.Location = new System.Drawing.Point(3, 233);
+            customSettingsGroup.Name = "customSettingsGroup";
+            customSettingsGroup.Size = new System.Drawing.Size(565, 136);
+            customSettingsGroup.TabIndex = 4;
+            customSettingsGroup.TabStop = false;
+            customSettingsGroup.Text = "Custom Settings";
             // 
             // customFormatTable
             // 
@@ -293,15 +297,19 @@ namespace TVSorter.View
             this.customFormatTable.Controls.Add(this.selectedShowCustomFormatText, 1, 1);
             this.customFormatTable.Controls.Add(this.formatLabel, 0, 1);
             this.customFormatTable.Controls.Add(this.formatBuilder, 2, 1);
+            this.customFormatTable.Controls.Add(this.useCustomDestinationDirectory, 0, 2);
+            this.customFormatTable.Controls.Add(destinationLabel, 0, 3);
+            this.customFormatTable.Controls.Add(this.customDestination, 1, 3);
             this.customFormatTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.customFormatTable.Location = new System.Drawing.Point(3, 16);
             this.customFormatTable.Margin = new System.Windows.Forms.Padding(0);
             this.customFormatTable.Name = "customFormatTable";
-            this.customFormatTable.RowCount = 2;
+            this.customFormatTable.RowCount = 4;
             this.customFormatTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
             this.customFormatTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 28F));
-            this.customFormatTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.customFormatTable.Size = new System.Drawing.Size(559, 60);
+            this.customFormatTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+            this.customFormatTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 28F));
+            this.customFormatTable.Size = new System.Drawing.Size(559, 117);
             this.customFormatTable.TabIndex = 3;
             // 
             // selectedShowUseCustomFormat
@@ -332,7 +340,7 @@ namespace TVSorter.View
             // 
             this.formatLabel.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.formatLabel.AutoSize = true;
-            this.formatLabel.Location = new System.Drawing.Point(34, 38);
+            this.formatLabel.Location = new System.Drawing.Point(34, 37);
             this.formatLabel.Name = "formatLabel";
             this.formatLabel.Size = new System.Drawing.Size(42, 13);
             this.formatLabel.TabIndex = 1;
@@ -343,11 +351,45 @@ namespace TVSorter.View
             this.formatBuilder.Enabled = false;
             this.formatBuilder.Location = new System.Drawing.Point(460, 33);
             this.formatBuilder.Name = "formatBuilder";
-            this.formatBuilder.Size = new System.Drawing.Size(95, 23);
+            this.formatBuilder.Size = new System.Drawing.Size(95, 22);
             this.formatBuilder.TabIndex = 3;
             this.formatBuilder.Text = "Format Builder";
             this.formatBuilder.UseVisualStyleBackColor = true;
             this.formatBuilder.Click += new System.EventHandler(this.FormatBuilderClick);
+            // 
+            // useCustomDestinationDirectory
+            // 
+            this.useCustomDestinationDirectory.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.useCustomDestinationDirectory.AutoSize = true;
+            this.customFormatTable.SetColumnSpan(this.useCustomDestinationDirectory, 2);
+            this.useCustomDestinationDirectory.Location = new System.Drawing.Point(3, 64);
+            this.useCustomDestinationDirectory.Name = "useCustomDestinationDirectory";
+            this.useCustomDestinationDirectory.Size = new System.Drawing.Size(184, 17);
+            this.useCustomDestinationDirectory.TabIndex = 4;
+            this.useCustomDestinationDirectory.Text = "Use Custom Destination Directory";
+            this.useCustomDestinationDirectory.UseVisualStyleBackColor = true;
+            this.useCustomDestinationDirectory.CheckedChanged += new System.EventHandler(this.UseCustomDestinationDirectoryCheckedChanged);
+            // 
+            // destinationLabel
+            // 
+            destinationLabel.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            destinationLabel.AutoSize = true;
+            destinationLabel.Location = new System.Drawing.Point(13, 96);
+            destinationLabel.Name = "destinationLabel";
+            destinationLabel.Size = new System.Drawing.Size(63, 13);
+            destinationLabel.TabIndex = 5;
+            destinationLabel.Text = "Destination:";
+            // 
+            // customDestination
+            // 
+            this.customDestination.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.customDestination.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.customDestination.Enabled = false;
+            this.customDestination.FormattingEnabled = true;
+            this.customDestination.Location = new System.Drawing.Point(82, 91);
+            this.customDestination.Name = "customDestination";
+            this.customDestination.Size = new System.Drawing.Size(372, 21);
+            this.customDestination.TabIndex = 6;
             // 
             // selectedShowButtons
             // 
@@ -357,7 +399,7 @@ namespace TVSorter.View
             selectedShowButtons.Controls.Add(this.removeShowButton);
             selectedShowButtons.Controls.Add(this.resetLastUpdatedButton);
             selectedShowButtons.Dock = System.Windows.Forms.DockStyle.Fill;
-            selectedShowButtons.Location = new System.Drawing.Point(0, 485);
+            selectedShowButtons.Location = new System.Drawing.Point(0, 542);
             selectedShowButtons.Margin = new System.Windows.Forms.Padding(0);
             selectedShowButtons.Name = "selectedShowButtons";
             selectedShowButtons.Size = new System.Drawing.Size(571, 121);
@@ -423,7 +465,7 @@ namespace TVSorter.View
             // 
             this.namesGroup.Controls.Add(this.nameTable);
             this.namesGroup.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.namesGroup.Location = new System.Drawing.Point(3, 318);
+            this.namesGroup.Location = new System.Drawing.Point(3, 375);
             this.namesGroup.Name = "namesGroup";
             this.namesGroup.Size = new System.Drawing.Size(565, 79);
             this.namesGroup.TabIndex = 6;
@@ -484,7 +526,7 @@ namespace TVSorter.View
             // 
             episodesGroup.Controls.Add(this.episodesFlow);
             episodesGroup.Dock = System.Windows.Forms.DockStyle.Fill;
-            episodesGroup.Location = new System.Drawing.Point(3, 403);
+            episodesGroup.Location = new System.Drawing.Point(3, 460);
             episodesGroup.Name = "episodesGroup";
             episodesGroup.Size = new System.Drawing.Size(565, 79);
             episodesGroup.TabIndex = 7;
@@ -578,7 +620,7 @@ namespace TVSorter.View
             this.tvShowsList.ItemHeight = 20;
             this.tvShowsList.Location = new System.Drawing.Point(0, 35);
             this.tvShowsList.Name = "tvShowsList";
-            this.tvShowsList.Size = new System.Drawing.Size(178, 521);
+            this.tvShowsList.Size = new System.Drawing.Size(178, 649);
             this.tvShowsList.TabIndex = 1;
             this.tvShowsList.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.TvShowsListDrawItem);
             this.tvShowsList.SelectedIndexChanged += new System.EventHandler(this.TvShowsListSelectedIndexChanged);
@@ -603,12 +645,12 @@ namespace TVSorter.View
             this.Controls.Add(this.tvShowsList);
             this.Controls.Add(this.topButtonsFlow);
             this.Name = "TvShows";
-            this.Size = new System.Drawing.Size(749, 556);
+            this.Size = new System.Drawing.Size(749, 684);
             this.Load += new System.EventHandler(this.TvShowsLoad);
             selectedShowTable.ResumeLayout(false);
             selectedShowTable.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.selectedShowBanner)).EndInit();
-            customFormatGroup.ResumeLayout(false);
+            customSettingsGroup.ResumeLayout(false);
             this.customFormatTable.ResumeLayout(false);
             this.customFormatTable.PerformLayout();
             selectedShowButtons.ResumeLayout(false);
@@ -634,5 +676,7 @@ namespace TVSorter.View
         private Button resetLastUpdatedButton;
         private ToolTip toolTip;
         private IContainer components;
+        private ComboBox customDestination;
+        private CheckBox useCustomDestinationDirectory;
     }
 }
