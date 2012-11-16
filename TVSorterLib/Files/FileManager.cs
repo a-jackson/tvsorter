@@ -208,9 +208,10 @@ namespace TVSorter.Files
                         // Also don't rename if the file name is already the same.
                         if (results.Count == 1 && !results[0].InputFile.Name.Equals(destinationInfo.Name))
                         {
+                            string originalName = results[0].InputFile.Name;
                             results[0].InputFile.MoveTo(destinationInfo.FullName);
                             Logger.OnLogMessage(
-                                this, "Renamed {0} to {1}", LogType.Info, results[0].InputFile.Name, destinationInfo.Name);
+                                this, "Renamed {0} to {1}", LogType.Info, originalName, destinationInfo.Name);
 
                             return false;
                         }
