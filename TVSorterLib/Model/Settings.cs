@@ -205,7 +205,7 @@ namespace TVSorter.Model
         {
             var regularExpressions = new List<string>
                 {
-                    @"s(?<S>[0-9]+)e((?<E>[0-9]+)-{0,1})+", 
+                    @"s(?<S>[0-9]+)e((?<E>[0-9]+)[e-]{0,1})+", 
                     @"(?<Y>19\d\d|20\d\d)[.](?<M>0[1-9]|1[012])[.](?<D>0[1-9]|[12][0-9]|3[01])", 
                     @"(?<M>Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\.(?<D>\d\d)\.(?<Y>20\d\d)", 
                     @"(?<S>[0-9]+)\s-\s(?<E>[0-9]+)", 

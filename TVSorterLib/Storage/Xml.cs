@@ -485,6 +485,21 @@ namespace TVSorter.Storage
             }
 
             settingsNode.Add(new XAttribute("defaultdestinationdir", selectedDestination));
+         
+            // Update the first regualar expression
+            XElement regularExpression = settingsNode.Element(GetName("RegularExpression"));
+            if (regularExpression == null)
+            {
+                throw new XmlException("XML is not valid.");
+            }
+
+            XElement regex = regularExpression.Element(GetName("RegEx"));
+
+            // If it is the old text then replace with the new text
+            if (regex != null && regex.Value.Equals("s(?<S>[0-9]+)e((?<E>[0-9]+)-{0,1})+"))
+            {
+                regex.Value = "s(?<S>[0-9]+)e((?<E>[0-9]+)[e-]{0,1})+";
+            }
 
             foreach (XElement show in root.Descendants(GetName("Show")))
             {
