@@ -59,11 +59,11 @@
   <!-- A Show's Episode -->
   <xs:complexType name="Episode">
     <xs:attribute name="name" type="xs:string" use="required" />
-    <xs:attribute name="tvdbid" type="xs:unsignedInt" use="required" />
-    <xs:attribute name="seasonnum" type="xs:short" use="required" />
-    <xs:attribute name="episodenum" type="xs:short" use="required" />
+    <xs:attribute name="tvdbid" type="xs:string" use="required" />
+    <xs:attribute name="seasonnum" type="xs:int" use="required" />
+    <xs:attribute name="episodenum" type="xs:int" use="required" />
     <xs:attribute name="firstair" type="xs:dateTime" use="required" />
-    <xs:attribute name="filecount" type="xs:unsignedByte" use="required" />
+    <xs:attribute name="filecount" type="xs:int" use="required" />
   </xs:complexType>
   
   <!-- A TV Show -->
@@ -86,7 +86,7 @@
     </xs:sequence>
     <xs:attribute name="name" type="xs:string" use="required" />
     <xs:attribute name="foldername" type="xs:string" use="required" />
-    <xs:attribute name="tvdbid" type="xs:unsignedInt" use="required" />
+    <xs:attribute name="tvdbid" type="xs:string" use="required" />
     <xs:attribute name="banner" type="xs:string" use="required" />
     <xs:attribute name="customformat" type="xs:string" use="required" />
     <xs:attribute name="usecustomformat" type="xs:boolean" use="required" />
@@ -94,7 +94,7 @@
     <xs:attribute name="locked" type="xs:boolean" use="required" />
     <xs:attribute name="lastupdated" type="xs:dateTime" use="required" />
     <xs:attribute name="usecustomdestination" type="xs:boolean" use="required" />
-    <xs:attribute name="customdestination" type="xs:string" use="required"  />
+    <xs:attribute name="customdestinationdir" type="xs:string" use="required"  />
   </xs:complexType>
 
   <!-- XML Document Definition -->

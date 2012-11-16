@@ -83,7 +83,7 @@ namespace TVSorter.Storage
             show.Locked = bool.Parse(showNode.GetAttribute("locked", "false"));
             show.LastUpdated = DateTime.Parse(showNode.GetAttribute("lastupdated", "1970-01-01 00:00:00"));
             show.UseCustomDestination = bool.Parse(showNode.GetAttribute("usecustomdestination", "false"));
-            show.CustomDestinationDir = showNode.GetAttribute("customdestination");
+            show.CustomDestinationDir = showNode.GetAttribute("customdestinationdir");
             show.AlternateNames =
                 showNode.Descendants(Xml.GetName("AlternateName")).Select(altName => altName.Value).ToList();
             show.Episodes = showNode.Descendants(Xml.GetName("Episode")).Select(
@@ -218,7 +218,7 @@ namespace TVSorter.Storage
                 new XAttribute("locked", show.Locked), 
                 new XAttribute("lastupdated", show.LastUpdated), 
                 new XAttribute("usecustomdestination", show.UseCustomDestination),
-                new XAttribute("customdestination", show.CustomDestinationDir),
+                new XAttribute("customdestinationdir", show.CustomDestinationDir),
                 alternateNames, 
                 episodes);
 
