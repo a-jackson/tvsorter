@@ -15,7 +15,7 @@ namespace TVSorter
     /// <summary>
     /// Extension methods for the string type.
     /// </summary>
-    internal static class StringExtensions
+    public static class StringExtensions
     {
         #region Static Fields
 
@@ -32,6 +32,19 @@ namespace TVSorter
         #endregion
 
         #region Methods
+
+        /// <summary>
+        /// Returns a string that is exactly the length specified, either truncating or padding the specified string.
+        /// </summary>
+        /// <param name="str">The string to format.</param>
+        /// <param name="length">The target length.</param>
+        /// <returns>The formatting string.</returns>
+        public static string FormatLength(this string str, int length)
+        {
+            string format = "{0,-" + length + "}";
+            string arg = str.Length > length ? str.Substring(0, length) : str;
+            return string.Format(format, arg);
+        }
 
         /// <summary>
         /// Strips any characters that can't be in a file name from the specified string.

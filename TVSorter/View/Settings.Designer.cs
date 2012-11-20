@@ -138,6 +138,7 @@ namespace TVSorter.View
             System.Windows.Forms.Label sourceLabel;
             System.Windows.Forms.Label destinationListLabel;
             System.Windows.Forms.FlowLayoutPanel destinationButtonsFlow;
+            System.Windows.Forms.Label defaultDestinationLabel;
             System.Windows.Forms.GroupBox sortOptionsGroup;
             System.Windows.Forms.FlowLayoutPanel sortOptionsFlow;
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Settings));
@@ -148,13 +149,13 @@ namespace TVSorter.View
             System.Windows.Forms.TableLayoutPanel formatTable;
             System.Windows.Forms.Label formatLabel;
             System.Windows.Forms.FlowLayoutPanel flowBottomButtons;
-            System.Windows.Forms.Label defaultDestinationLabel;
             this.groupDirectories = new System.Windows.Forms.GroupBox();
             this.sourceText = new System.Windows.Forms.TextBox();
             this.sourceBrowse = new System.Windows.Forms.Button();
             this.destinationList = new System.Windows.Forms.ListBox();
             this.addDestinationButton = new System.Windows.Forms.Button();
             this.removeDestinationButton = new System.Windows.Forms.Button();
+            this.defaultDestinationDirectory = new System.Windows.Forms.ComboBox();
             this.recurseSubdirectoriesCheck = new System.Windows.Forms.CheckBox();
             this.deleteEmptyCheck = new System.Windows.Forms.CheckBox();
             this.renameIfExistsCheck = new System.Windows.Forms.CheckBox();
@@ -169,12 +170,12 @@ namespace TVSorter.View
             this.saveButton = new System.Windows.Forms.Button();
             this.folderDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.defaultDestinationDirectory = new System.Windows.Forms.ComboBox();
             mainTable = new System.Windows.Forms.TableLayoutPanel();
             tableDirectories = new System.Windows.Forms.TableLayoutPanel();
             sourceLabel = new System.Windows.Forms.Label();
             destinationListLabel = new System.Windows.Forms.Label();
             destinationButtonsFlow = new System.Windows.Forms.FlowLayoutPanel();
+            defaultDestinationLabel = new System.Windows.Forms.Label();
             sortOptionsGroup = new System.Windows.Forms.GroupBox();
             sortOptionsFlow = new System.Windows.Forms.FlowLayoutPanel();
             searchOptionsGroup = new System.Windows.Forms.GroupBox();
@@ -184,7 +185,6 @@ namespace TVSorter.View
             formatTable = new System.Windows.Forms.TableLayoutPanel();
             formatLabel = new System.Windows.Forms.Label();
             flowBottomButtons = new System.Windows.Forms.FlowLayoutPanel();
-            defaultDestinationLabel = new System.Windows.Forms.Label();
             mainTable.SuspendLayout();
             this.groupDirectories.SuspendLayout();
             tableDirectories.SuspendLayout();
@@ -337,6 +337,26 @@ namespace TVSorter.View
             this.removeDestinationButton.Text = "Remove";
             this.removeDestinationButton.UseVisualStyleBackColor = true;
             this.removeDestinationButton.Click += new System.EventHandler(this.RemoveDestinationButtonClick);
+            // 
+            // defaultDestinationLabel
+            // 
+            defaultDestinationLabel.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            defaultDestinationLabel.AutoSize = true;
+            defaultDestinationLabel.Location = new System.Drawing.Point(23, 160);
+            defaultDestinationLabel.Name = "defaultDestinationLabel";
+            defaultDestinationLabel.Size = new System.Drawing.Size(100, 13);
+            defaultDestinationLabel.TabIndex = 8;
+            defaultDestinationLabel.Text = "Default Destination:";
+            // 
+            // defaultDestinationDirectory
+            // 
+            this.defaultDestinationDirectory.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.defaultDestinationDirectory.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.defaultDestinationDirectory.FormattingEnabled = true;
+            this.defaultDestinationDirectory.Location = new System.Drawing.Point(129, 157);
+            this.defaultDestinationDirectory.Name = "defaultDestinationDirectory";
+            this.defaultDestinationDirectory.Size = new System.Drawing.Size(388, 21);
+            this.defaultDestinationDirectory.TabIndex = 9;
             // 
             // sortOptionsGroup
             // 
@@ -580,26 +600,6 @@ namespace TVSorter.View
             this.saveButton.Text = "Save";
             this.saveButton.UseVisualStyleBackColor = true;
             this.saveButton.Click += new System.EventHandler(this.SaveButtonClick);
-            // 
-            // defaultDestinationLabel
-            // 
-            defaultDestinationLabel.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            defaultDestinationLabel.AutoSize = true;
-            defaultDestinationLabel.Location = new System.Drawing.Point(23, 160);
-            defaultDestinationLabel.Name = "defaultDestinationLabel";
-            defaultDestinationLabel.Size = new System.Drawing.Size(100, 13);
-            defaultDestinationLabel.TabIndex = 8;
-            defaultDestinationLabel.Text = "Default Destination:";
-            // 
-            // defaultDestinationDirectory
-            // 
-            this.defaultDestinationDirectory.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.defaultDestinationDirectory.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.defaultDestinationDirectory.FormattingEnabled = true;
-            this.defaultDestinationDirectory.Location = new System.Drawing.Point(129, 157);
-            this.defaultDestinationDirectory.Name = "defaultDestinationDirectory";
-            this.defaultDestinationDirectory.Size = new System.Drawing.Size(388, 21);
-            this.defaultDestinationDirectory.TabIndex = 9;
             // 
             // Settings
             // 

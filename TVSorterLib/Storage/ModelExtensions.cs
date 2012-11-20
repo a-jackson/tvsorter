@@ -218,7 +218,7 @@ namespace TVSorter.Storage
                 new XAttribute("locked", show.Locked), 
                 new XAttribute("lastupdated", show.LastUpdated), 
                 new XAttribute("usecustomdestination", show.UseCustomDestination),
-                new XAttribute("customdestinationdir", show.CustomDestinationDir),
+                new XAttribute("customdestinationdir", show.CustomDestinationDir ?? string.Empty),
                 alternateNames, 
                 episodes);
 
