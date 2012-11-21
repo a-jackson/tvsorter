@@ -226,9 +226,19 @@ namespace TVSorter.Files
             this.refreshingFileCounts = true;
 
             // Search all the destination directories for positive matches.
-            // Incomplete matches are filtered out.
-            List<FileResult> matchedFiles =
-                directories.SelectMany(dir => this.ProcessDirectory(dir, true)).Where(x => !x.Incomplete).ToList();
+            var files = directories.SelectMany(dir => this.ProcessDirectory(dir, true));
+            List<FileResult> matchedFiles = files.Where(x => !x.Incomplete).ToList();
+            List<FileResult> unmatchedFiles = files.Where(x => x.Incomplete).ToList();
+
+            // Log the unmatched files.
+            if (unmatchedFiles.Any())
+            {
+                Logger.OnLogMessage(this, "Unable to match {0} files", LogType.Error, unmatchedFiles.Count);
+                foreach (var result in unmatchedFiles)
+                {
+                    Logger.OnLogMessage(this, "Unable to match: " + result.InputFile.FullName, LogType.Error);
+                }
+            }
 
             Logger.OnLogMessage(this, "Updating file counts...", LogType.Info);
 
@@ -305,6 +315,13 @@ namespace TVSorter.Files
         /// </returns>
         private TvShow MatchShow(string fileName, int matchIndex, out string showName, bool ignoreShowUpdate)
         {
+            if (matchIndex == 0)
+            {
+                // A season and episode number has been found but there is no show name.
+                showName = string.Empty;
+                return null;
+            }
+
             showName = fileName.Substring(0, matchIndex - 1);
 
             // Replace any spacer characters with spaces
