@@ -569,6 +569,8 @@ namespace TVSorter.Model
             this.Locked = false;
             this.UseCustomFormat = false;
             this.UseDvdOrder = false;
+            this.UseCustomDestination = false;
+            this.CustomDestinationDir = string.Empty;
         }
 
         #endregion

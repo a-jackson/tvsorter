@@ -236,7 +236,7 @@ namespace TVSorter.Files
                 Logger.OnLogMessage(this, "Unable to match {0} files", LogType.Error, unmatchedFiles.Count);
                 foreach (var result in unmatchedFiles)
                 {
-                    Logger.OnLogMessage(this, "Unable to match: " + result.InputFile.FullName, LogType.Error);
+                    Logger.OnLogMessage(this, "Unable to match: " + result.InputFile.FullName.Truncate(), LogType.Error);
                 }
             }
 
@@ -408,7 +408,7 @@ namespace TVSorter.Files
             // of a move or copy operation. It should add to log that it is scanning the directory.
             if (!ignoreShowUpdate)
             {
-                Logger.OnLogMessage(this, "Scanned directory: {0}", LogType.Info, directory.FullName);
+                Logger.OnLogMessage(this, "Scanned directory: {0}", LogType.Info, directory.FullName.Truncate());
             }
 
             if (!this.settings.RecurseSubdirectories && !overrideRecurse)

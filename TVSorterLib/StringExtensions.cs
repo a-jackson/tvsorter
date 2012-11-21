@@ -47,6 +47,17 @@ namespace TVSorter
         }
 
         /// <summary>
+        /// Returns a string that is truncated to the specified length if it is longer.
+        /// </summary>
+        /// <param name="str">The string to truncate.</param>
+        /// <param name="length">The length to truncate to.</param>
+        /// <returns>The truncated string.</returns>
+        public static string Truncate(this string str, int length = 30)
+        {
+            return str.Length > length ? str.Substring(0, length - 4) + "..." : str;
+        }
+
+        /// <summary>
         /// Strips any characters that can't be in a file name from the specified string.
         /// </summary>
         /// <param name="str">
