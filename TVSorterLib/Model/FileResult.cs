@@ -153,7 +153,7 @@ namespace TVSorter.Model
 
             // Get the invalid characters for a file name, not including the DirectorySeparatorChar.
             IEnumerable<char> invalidChars =
-                Path.GetInvalidFileNameChars().Where(x => !x.Equals(Path.DirectorySeparatorChar));
+                StringExtensions.InvalidFilenameChars.Where(x => !x.Equals(Path.DirectorySeparatorChar));
 
             // Remove any characters that can't be in a filename from the formatString.
             return invalidChars.Aggregate(
