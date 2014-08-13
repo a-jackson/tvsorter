@@ -37,6 +37,14 @@ namespace TVSorter
         /// </param>
         public static void Main(string[] args)
         {
+            // If program already running, quit.
+            if (System.Diagnostics.Process.GetProcessesByName(
+                System.IO.Path.GetFileNameWithoutExtension(
+                System.Reflection.Assembly.GetEntryAssembly().Location)).Count() > 1)
+            {
+                System.Diagnostics.Process.GetCurrentProcess().Kill();
+            }
+
             Logger.LogMessage += (sender, e) =>
                 {
                     if (e.Type == LogType.Error)
