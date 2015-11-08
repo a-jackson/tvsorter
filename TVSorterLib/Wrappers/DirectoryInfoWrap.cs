@@ -50,6 +50,18 @@ namespace TVSorter.Wrappers
         #region Public Properties
 
         /// <summary>
+        /// Gets the value of the directory attributes.
+        /// This to avoid System folders
+        /// </summary>
+        public FileAttributes DirectoryAttributes
+        {
+            get
+            {
+                return this.directoryInfo.Attributes;
+            }
+        }
+
+        /// <summary>
         /// Gets a value indicating whether the directory exists.
         /// </summary>
         public bool Exists

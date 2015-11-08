@@ -12,6 +12,7 @@ namespace TVSorter.Files
 
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using System.Text.RegularExpressions;
 
@@ -416,7 +417,7 @@ namespace TVSorter.Files
                 yield break;
             }
 
-            IDirectoryInfo[] dirs = directory.GetDirectories();
+            IDirectoryInfo[] dirs = directory.GetDirectories().Where(d => !d.DirectoryAttributes.HasFlag(FileAttributes.System)).ToArray();
             foreach (FileResult result in
                 dirs.SelectMany(dir => this.ProcessDirectory(dir, overrideRecurse, ignoreShowUpdate)))
             {
