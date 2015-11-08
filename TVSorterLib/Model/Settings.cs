@@ -68,6 +68,11 @@ namespace TVSorter.Model
         public List<string> DestinationDirectories { get; set; }
 
         /// <summary>
+        ///   Gets or sets the list of ignored directories.
+        /// </summary>
+        public List<string> IgnoredDirectories { get; set; }
+
+        /// <summary>
         ///   Gets or sets the selected destination directory.
         /// </summary>
         public string DefaultDestinationDirectory { get; set; }
@@ -217,6 +222,7 @@ namespace TVSorter.Model
 
             this.SourceDirectory = Path.DirectorySeparatorChar.ToString(CultureInfo.InvariantCulture);
             this.DestinationDirectories = new List<string>();
+            this.IgnoredDirectories = new List<string>();
             this.DefaultDestinationDirectory = Path.DirectorySeparatorChar.ToString(CultureInfo.InvariantCulture);
             this.FileExtensions = new List<string> { ".avi", ".mkv", ".wmv", ".mpg", ".mp4" };
             this.RegularExpressions = regularExpressions;
