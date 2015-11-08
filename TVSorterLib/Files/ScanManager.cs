@@ -417,7 +417,8 @@ namespace TVSorter.Files
                 yield break;
             }
 
-            IDirectoryInfo[] dirs = directory.GetDirectories().Where(d => !d.DirectoryAttributes.HasFlag(FileAttributes.System)).ToArray();
+            IDirectoryInfo[] dirs = directory.GetDirectories().Where(d => !d.DirectoryAttributes.HasFlag(FileAttributes.System)
+                && !settings.IgnoredDirectories.Contains(d.FullName)).ToArray();
             foreach (FileResult result in
                 dirs.SelectMany(dir => this.ProcessDirectory(dir, overrideRecurse, ignoreShowUpdate)))
             {

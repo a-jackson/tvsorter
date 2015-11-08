@@ -57,6 +57,12 @@ namespace TVSorter.Storage
 
             XElement ignoredDirectories = settingsNode.Element(Xml.GetName("IgnoredDirectories"));
 
+            if (ignoredDirectories != null)
+            {
+                settings.IgnoredDirectories =
+                    ignoredDirectories.GetElementsText(Xml.GetName("Ignored")).ToList();
+            }
+
             settings.FileExtensions =
                 settingsNode.Element(Xml.GetName("FileExtensions")).GetElementsText(Xml.GetName("Extension")).ToList();
             settings.RegularExpressions =
@@ -182,6 +188,7 @@ namespace TVSorter.Storage
                 new XAttribute("lockshowsnonewepisodes", settings.LockShowsWithNoEpisodes), 
                 new XAttribute("defaultdestinationdir", settings.DefaultDestinationDirectory),
                 destinationDirectories, 
+                ignoredDirectories,
                 fileExtensions, 
                 regularExpressions, 
                 overwriteKeywords);

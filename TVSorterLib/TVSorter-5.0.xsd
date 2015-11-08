@@ -14,6 +14,13 @@
           </xs:sequence>
         </xs:complexType>
       </xs:element>
+      <xs:element name="IgnoredDirectories">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="Ignored" type="xs:string" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
       <xs:element name="FileExtensions">
         <xs:complexType>
           <xs:sequence>
@@ -111,7 +118,7 @@
           </xs:complexType>
         </xs:element>
       </xs:sequence>
-      <xs:attribute name="version" type="xs:unsignedByte" use="required" fixed="4" />
+      <xs:attribute name="version" type="xs:unsignedByte" use="required" fixed="5" />
     </xs:complexType>
   </xs:element>
 </xs:schema>

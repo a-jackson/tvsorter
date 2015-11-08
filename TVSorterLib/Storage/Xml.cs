@@ -38,7 +38,7 @@ namespace TVSorter.Storage
         /// <summary>
         /// The current verison of the XML file.
         /// </summary>
-        private static readonly int XmlVersion = 4;
+        private static readonly int XmlVersion = 5;
 
         /// <summary>
         /// The file path of the XSD file. Contains the version number of the XML file.
@@ -508,6 +508,19 @@ namespace TVSorter.Storage
             }
         }
 
+        private void UpdateToVersion5(XElement root)
+        {
+            XElement settingsNode = root.Element(GetName("Settings"));
+            if (settingsNode == null)
+            {
+                throw new XmlException("Xml is not valid");
+            }
+
+            var destinationDirectories = settingsNode.FirstNode;
+            destinationDirectories.AddAfterSelf(new XElement("IgnoredDirectories", new string[] { }));         
+        }
+
+
         /// <summary>
         /// Get the XDocument instance of the XML file.
         /// </summary>
@@ -558,16 +571,41 @@ namespace TVSorter.Storage
                     UpdateToVersion4(root);
                 }
 
+                if(version < 5)
+                {
+                    UpdateToVersion5(root);
+                }
+
                 XAttribute versionAttribute = root.Attribute("version");
                 if (versionAttribute != null)
                 {
                     versionAttribute.Value = XmlVersion.ToString(CultureInfo.InvariantCulture);
                 }
 
+                SanitizeXml(this.document.Root);
                 this.document.Save(XmlFile);
             }
 
             this.ValidateXml(string.Format(XsdFile, XmlVersion));
+        }
+
+        private void SanitizeXml(XElement root)
+        {
+            foreach (var node in root.Descendants())
+            {
+                // If we have an empty namespace...
+                if (node.Name.NamespaceName == "")
+                {
+                    // Remove the xmlns='' attribute. Note the use of
+                    // Attributes rather than Attribute, in case the
+                    // attribute doesn't exist (which it might not if we'd
+                    // created the document "manually" instead of loading
+                    // it from a file.)
+                    node.Attributes("xmlns").Remove();
+                    // Inherit the parent namespace instead
+                    node.Name = node.Parent.Name.Namespace + node.Name.LocalName;
+                }
+            }
         }
 
         /// <summary>

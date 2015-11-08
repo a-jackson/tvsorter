@@ -85,8 +85,13 @@
     <Compile Include="Wrappers\FileInfoWrap.cs" />
     <Compile Include="Wrappers\IDirectoryInfo.cs" />
     <Compile Include="Wrappers\IFileInfo.cs" />
+    <Compile Include="XmlExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="TVSorter-5.0.xsd">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="TVSorter-4.0.xsd">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
