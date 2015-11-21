@@ -41,6 +41,8 @@ namespace TVSorter.View
         public SortEpisodes()
         {
             this.InitializeComponent();
+            this.setEpisodeButton.Enabled = false;
+            this.setShowButton.Enabled = false;
         }
 
         #endregion
@@ -172,6 +174,19 @@ namespace TVSorter.View
         private void ResultsListItemChecked(object sender, ItemCheckedEventArgs e)
         {
             this.controller.Results[e.Item.Index].Checked = e.Item.Checked;
+
+            if (this.controller.Results.Count(p => p.Checked) > 0)
+                setShowButton.Enabled = true;
+            if (this.controller.Results.Count(p => p.Checked) == 1)
+                setEpisodeButton.Enabled = true;
+            if (this.controller.Results.Count(p => p.Checked) > 1)
+                setEpisodeButton.Enabled = false;
+            else if (this.controller.Results.Count(p => p.Checked) == 0)
+            {
+                setEpisodeButton.Enabled = false;
+                setShowButton.Enabled = false;
+            }
+            
         }
 
         /// <summary>
