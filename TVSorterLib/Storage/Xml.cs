@@ -508,6 +508,10 @@ namespace TVSorter.Storage
             }
         }
 
+        /// <summary>
+        /// Updates the xml to version 5
+        /// </summary>
+        /// <param name="root"></param>
         private void UpdateToVersion5(XElement root)
         {
             XElement settingsNode = root.Element(GetName("Settings"));
@@ -516,8 +520,7 @@ namespace TVSorter.Storage
                 throw new XmlException("Xml is not valid");
             }
 
-            var destinationDirectories = settingsNode.FirstNode;
-            destinationDirectories.AddAfterSelf(new XElement("IgnoredDirectories", new string[] { }));         
+            settingsNode.FirstNode.AddAfterSelf(new XElement("IgnoredDirectories", new string[] { }));         
         }
 
 
@@ -589,6 +592,10 @@ namespace TVSorter.Storage
             this.ValidateXml(string.Format(XsdFile, XmlVersion));
         }
 
+        /// <summary>
+        /// Santizes the XML file of empty namespaces
+        /// </summary>
+        /// <param name="root"></param>
         private void SanitizeXml(XElement root)
         {
             foreach (var node in root.Descendants())

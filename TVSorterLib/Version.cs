@@ -18,7 +18,7 @@ namespace TVSorter
         /// <summary>
         /// The current version of TVSorter.
         /// </summary>
-        public const string CurrentVersion = "1.3";
+        public const string CurrentVersion = "1.3.1";
 
         #endregion
     }

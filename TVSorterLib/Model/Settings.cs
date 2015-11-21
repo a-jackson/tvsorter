@@ -53,22 +53,22 @@ namespace TVSorter.Model
         public bool AddUnmatchedShows { get; set; }
 
         /// <summary>
-        ///   Gets or sets DefaultOutputFormat.
+        /// Gets or sets DefaultOutputFormat.
         /// </summary>
         public string DefaultOutputFormat { get; set; }
 
         /// <summary>
-        ///   Gets or sets a value indicating whether DeleteEmptySubdirectories.
+        /// Gets or sets a value indicating whether DeleteEmptySubdirectories.
         /// </summary>
         public bool DeleteEmptySubdirectories { get; set; }
 
         /// <summary>
-        ///   Gets or sets the list of destination directories.
+        /// Gets or sets the list of destination directories.
         /// </summary>
         public List<string> DestinationDirectories { get; set; }
 
         /// <summary>
-        ///   Gets or sets the list of ignored directories.
+        /// Gets or sets the list of ignored directories.
         /// </summary>
         public List<string> IgnoredDirectories { get; set; }
 
