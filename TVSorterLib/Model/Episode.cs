@@ -66,6 +66,11 @@ namespace TVSorter.Model
         public TvShow Show { get; set; }
 
         /// <summary>
+        /// Gets or sets the episodes watched State.
+        /// </summary>
+        public bool watched { get; set; }
+
+        /// <summary>
         ///   Gets or sets TvdbId.
         /// </summary>
         public string TvdbId { get; set; }
