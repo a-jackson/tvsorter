@@ -125,14 +125,18 @@ namespace TVSorter.Files
         public void ResetShow(FileResult result, TvShow show)
         {
             result.Show = show;
-            Match match = this.GetFirstMatch(result.InputFile);
+            List<Match> match = this.GetFirstMatch(result.InputFile);
             if (match == null)
             {
                 result.Episode = null;
             }
 
-            result.Episodes = this.ProcessEpisode(match, show).ToList();
-            result.Episode = result.Episodes.FirstOrDefault();
+            //Resolve Result
+            foreach (Match m in match)
+            {
+                //result.Episodes = this.ProcessEpisode(match, show).ToList();
+                //result.Episode = result.Episodes.FirstOrDefault();
+            }
         }
 
         #endregion
@@ -288,12 +292,19 @@ namespace TVSorter.Files
         /// <returns>
         /// The first succcessful match. Null if none.
         /// </returns>
-        private Match GetFirstMatch(IFileInfo file)
+        private List<Match> GetFirstMatch(IFileInfo file)
         {
-            return (from regex in this.settings.RegularExpressions
-                    let match = Regex.Match(file.Name, regex, RegexOptions.IgnoreCase)
-                    where match.Success
-                    select match).FirstOrDefault();
+            List<Match> _results = new List<Match>();
+
+            foreach (var regex in this.settings.RegularExpressions)
+            {
+                Match m = Regex.Match(file.Name, regex, RegexOptions.IgnoreCase);
+
+                if (m.Success)
+                    _results.Add(m);
+            }
+
+            return _results;
         }
 
         /// <summary>
@@ -490,33 +501,40 @@ namespace TVSorter.Files
         private FileResult ProcessFile(IFileInfo file, bool ignoreShowUpdate)
         {
             // Attempt to match to a regular express
-            Match firstMatch = this.GetFirstMatch(file);
+            List<Match> firstMatch = this.GetFirstMatch(file);
+            FileResult emptyResult = null;
 
             if (firstMatch == null)
             {
                 return null;
             }
 
-            string showname;
+            string showname = string.Empty;
 
-            TvShow show = this.MatchShow(file.Name, firstMatch.Index, out showname, ignoreShowUpdate);
-
-            Episode episode = null;
-            IList<Episode> episodes = null;
-
-            if (show != null)
+            //Try to resolve an result
+            foreach (Match match in firstMatch)
             {
-                episodes = this.ProcessEpisode(firstMatch, show).ToList();
-                if (episodes.Count > 0)
+                TvShow show = this.MatchShow(file.Name, match.Index, out showname, ignoreShowUpdate);
+                Episode episode = null;
+                IList<Episode> episodes = null;
+
+                if (show != null)
                 {
-                    episode = episodes.First();
+                    episodes = this.ProcessEpisode(match, show).ToList();
+                    if (episodes.Count > 0)
+                    {
+                        episode = episodes.First();
+                    }
+
+                    return new FileResult { Episode = episode, Episodes = episodes, InputFile = file, Show = show, ShowName = showname };
+                }
+                else
+                {
+                    emptyResult = new FileResult { Episode = episode, Episodes = episodes, InputFile = file, Show = show, ShowName = showname };
                 }
             }
 
-            return new FileResult
-                {
-                   Episode = episode, Episodes = episodes, InputFile = file, Show = show, ShowName = showname 
-                };
+            return emptyResult;
         }
 
         /// <summary>

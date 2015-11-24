@@ -186,7 +186,7 @@ namespace TVSorter.View
                 setEpisodeButton.Enabled = false;
                 setShowButton.Enabled = false;
             }
-            
+
         }
 
         /// <summary>
