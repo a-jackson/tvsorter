@@ -6,6 +6,8 @@
 //   An interface for the directory info.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+using System.IO;
+
 namespace TVSorter.Wrappers
 {
     /// <summary>
@@ -15,6 +17,11 @@ namespace TVSorter.Wrappers
     {
         #region Public Properties
 
+        /// <summary>
+        /// Gets the value of the directory attributes.
+        /// This to avoid System folders
+        /// </summary>
+        FileAttributes DirectoryAttributes { get; }
         /// <summary>
         /// Gets a value indicating whether the directory exists.
         /// </summary>

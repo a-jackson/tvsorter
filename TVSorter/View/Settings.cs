@@ -38,6 +38,11 @@ namespace TVSorter.View
         private BindingList<string> destinationDirectories;
 
         /// <summary>
+        ///   The list of Ignored directories.
+        /// </summary>
+        private BindingList<string> ignoredDirectories;
+
+        /// <summary>
         ///   The list of file extensions.
         /// </summary>
         private List<string> fileExtensions;
@@ -100,6 +105,14 @@ namespace TVSorter.View
             if (this.folderDialog.ShowDialog(this) == DialogResult.OK)
             {
                 this.destinationDirectories.Add(this.folderDialog.SelectedPath);
+            }
+        }
+
+        private void addIgnore_btn_Click(object sender, EventArgs e)
+        {
+            if (this.folderDialog.ShowDialog(this) == DialogResult.OK)
+            {
+                this.ignoredDirectories.Add(this.folderDialog.SelectedPath);
             }
         }
 
@@ -177,6 +190,8 @@ namespace TVSorter.View
                     // Create lists
                     this.destinationDirectories =
                         new BindingList<string>(this.controller.Settings.DestinationDirectories);
+                    this.ignoredDirectories =
+                        new BindingList<string>(this.controller.Settings.IgnoredDirectories);
                     this.regularExpressions = new List<string>(this.controller.Settings.RegularExpressions);
                     this.fileExtensions = new List<string>(this.controller.Settings.FileExtensions);
                     this.overwriteKeywords = new List<string>(this.controller.Settings.OverwriteKeywords);
@@ -184,6 +199,7 @@ namespace TVSorter.View
                     // Update directories
                     this.sourceText.Text = this.controller.Settings.SourceDirectory;
                     this.destinationList.DataSource = this.destinationDirectories;
+                    this.ignoreList.DataSource = this.ignoredDirectories;
                     this.defaultDestinationDirectory.DataSource = this.destinationDirectories;
                     this.defaultDestinationDirectory.SelectedItem = this.controller.Settings.DefaultDestinationDirectory;
 
@@ -237,6 +253,14 @@ namespace TVSorter.View
             }
         }
 
+        private void removeIgnore_btn_Click(object sender, EventArgs e)
+        {
+            if (this.destinationList.SelectedIndex != -1)
+            {
+                this.ignoredDirectories.RemoveAt(this.ignoreList.SelectedIndex);
+            }
+        }
+
         /// <summary>
         /// Handles the Revert button being clicked.
         /// </summary>
@@ -265,6 +289,7 @@ namespace TVSorter.View
             this.controller.Settings.RegularExpressions = this.regularExpressions.ToList();
             this.controller.Settings.FileExtensions = this.fileExtensions.ToList();
             this.controller.Settings.DestinationDirectories = this.destinationDirectories.ToList();
+            this.controller.Settings.IgnoredDirectories = this.ignoredDirectories.ToList();
             this.controller.Settings.OverwriteKeywords = this.overwriteKeywords.ToList();
 
             this.controller.Settings.SourceDirectory = this.sourceText.Text;

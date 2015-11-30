@@ -40,6 +40,7 @@ namespace TVSorter.Storage
                 bool.Parse(settingsNode.GetAttribute("deleteemptysubdirectories", "false"));
             settings.RenameIfExists = bool.Parse(settingsNode.GetAttribute("renameifexists", "false"));
             settings.DestinationDirectories = new List<string>();
+            settings.IgnoredDirectories = new List<string>();
             settings.DefaultDestinationDirectory = string.Empty;
             settings.UnlockMatchedShows = bool.Parse(settingsNode.GetAttribute("unlockmatchedshows", "false"));
             settings.AddUnmatchedShows = bool.Parse(settingsNode.GetAttribute("addunmatchedshows", "false"));
@@ -52,6 +53,14 @@ namespace TVSorter.Storage
             {
                 settings.DestinationDirectories =
                     destinationDirectories.GetElementsText(Xml.GetName("Destination")).ToList();
+            }
+
+            XElement ignoredDirectories = settingsNode.Element(Xml.GetName("IgnoredDirectories"));
+
+            if (ignoredDirectories != null)
+            {
+                settings.IgnoredDirectories =
+                    ignoredDirectories.GetElementsText(Xml.GetName("Ignored")).ToList();
             }
 
             settings.FileExtensions =
@@ -151,6 +160,10 @@ namespace TVSorter.Storage
                         Xml.GetName("Destination"), 
                         dir)));
 
+            var ignoredDirectories = new XElement(
+                Xml.GetName("IgnoredDirectories"),
+                settings.IgnoredDirectories.Select(dir => new XElement(Xml.GetName("Ignored"), dir)));
+
             var fileExtensions = new XElement(
                 Xml.GetName("FileExtensions"), 
                 settings.FileExtensions.Select(ext => new XElement(Xml.GetName("Extension"), ext)));
@@ -175,6 +188,7 @@ namespace TVSorter.Storage
                 new XAttribute("lockshowsnonewepisodes", settings.LockShowsWithNoEpisodes), 
                 new XAttribute("defaultdestinationdir", settings.DefaultDestinationDirectory),
                 destinationDirectories, 
+                ignoredDirectories,
                 fileExtensions, 
                 regularExpressions, 
                 overwriteKeywords);

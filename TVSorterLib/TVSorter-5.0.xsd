@@ -1,0 +1,124 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://code.google.com/p/tvsorter"
+           xmlns:tvs="http://code.google.com/p/tvsorter">
+  <!-- TVS Settings -->
+  <xs:complexType name="Settings">
+    <xs:sequence>
+      <xs:element name="DestinationDirectories">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="Destination" type="xs:string" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="IgnoredDirectories">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="Ignored" type="xs:string" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="FileExtensions">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="unbounded" name="Extension" type="xs:string" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="RegularExpression">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="unbounded" name="RegEx" type="xs:string" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="OverwriteKeywords">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="unbounded" name="Keyword" type="xs:string" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="sourcedirectory" type="xs:string" use="required" />
+    <xs:attribute name="defaultformat" type="xs:string" use="required" />
+    <xs:attribute name="recursesubdirectories" type="xs:boolean" use="required" />
+    <xs:attribute name="deleteemptysubdirectories" type="xs:boolean" use="required" />
+    <xs:attribute name="renameifexists" type="xs:boolean" use="required" />
+    <xs:attribute name="addunmatchedshows" type="xs:boolean" use="required" />
+    <xs:attribute name="unlockmatchedshows" type="xs:boolean" use="required" />
+    <xs:attribute name="lockshowsnonewepisodes" type="xs:boolean" use="required" />
+    <xs:attribute name="defaultdestinationdir" type="xs:string" use="required" />
+  </xs:complexType>
+  
+  <!-- Missing Episode Settings -->
+  <xs:complexType name="MissingEpisodeSettings">
+    <xs:attribute name="hidenotaired" type="xs:boolean" use="required" />
+    <xs:attribute name="hidelocked" type="xs:boolean" use="required" />
+    <xs:attribute name="hidepart2" type="xs:boolean" use="required" />
+    <xs:attribute name="hideseason0" type="xs:boolean" use="required" />
+    <xs:attribute name="hidemissingseasons" type="xs:boolean" use="required" />
+  </xs:complexType>
+  
+  <!-- A Show's Episode -->
+  <xs:complexType name="Episode">
+    <xs:attribute name="name" type="xs:string" use="required" />
+    <xs:attribute name="tvdbid" type="xs:string" use="required" />
+    <xs:attribute name="seasonnum" type="xs:int" use="required" />
+    <xs:attribute name="episodenum" type="xs:int" use="required" />
+    <xs:attribute name="firstair" type="xs:dateTime" use="required" />
+    <xs:attribute name="filecount" type="xs:int" use="required" />
+  </xs:complexType>
+  
+  <!-- A TV Show -->
+  <xs:complexType name="Show">
+    <xs:sequence>
+      <xs:element name="AlternateNames">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="AlternateName" type="xs:string" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="Episodes">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="Episode" type="tvs:Episode" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="required" />
+    <xs:attribute name="foldername" type="xs:string" use="required" />
+    <xs:attribute name="tvdbid" type="xs:string" use="required" />
+    <xs:attribute name="banner" type="xs:string" use="required" />
+    <xs:attribute name="customformat" type="xs:string" use="required" />
+    <xs:attribute name="usecustomformat" type="xs:boolean" use="required" />
+    <xs:attribute name="usedvdorder" type="xs:boolean" use="required" />
+    <xs:attribute name="locked" type="xs:boolean" use="required" />
+    <xs:attribute name="lastupdated" type="xs:dateTime" use="required" />
+    <xs:attribute name="usecustomdestination" type="xs:boolean" use="required" />
+    <xs:attribute name="customdestinationdir" type="xs:string" use="required"  />
+  </xs:complexType>
+
+  <!-- XML Document Definition -->
+  <xs:element name="TVSorter">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Settings" type="tvs:Settings" />
+        <xs:element name="MissingEpisodeSettings" type="tvs:MissingEpisodeSettings" />
+        <xs:element name="Shows">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element minOccurs="0" maxOccurs="unbounded" name="Show" type="tvs:Show" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="version" type="xs:unsignedByte" use="required" fixed="5" />
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
