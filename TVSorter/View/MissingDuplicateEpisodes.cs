@@ -8,6 +8,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter.View
 {
+    using Files;
+    using Storage;
     #region Using Directives
 
     using System;
@@ -45,6 +47,9 @@ namespace TVSorter.View
         }
 
         #endregion
+
+        public IStorageProvider StorageProvider { get; set; }
+        public IFileSearch FileSearch { get; set; }
 
         #region Public Methods and Operators
 
@@ -114,7 +119,7 @@ namespace TVSorter.View
         {
             if (!this.DesignMode)
             {
-                this.controller = new MissingDuplicateController();
+                this.controller = new MissingDuplicateController(StorageProvider, FileSearch);
                 this.controller.PropertyChanged += this.OnPropertyChanged;
                 this.controller.Initialise(this);
                 this.hideLocked.Checked = this.controller.Settings.HideLocked;

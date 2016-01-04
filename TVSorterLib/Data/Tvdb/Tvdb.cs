@@ -23,7 +23,7 @@ namespace TVSorter.Data.Tvdb
     /// <summary>
     /// Manages accessing show data from the TVDB.
     /// </summary>
-    internal class Tvdb : IDataProvider
+    public class Tvdb : IDataProvider
     {
         #region Static Fields
 
@@ -46,6 +46,11 @@ namespace TVSorter.Data.Tvdb
         /// </summary>
         private readonly TvdbProcess tvdbProcess;
 
+        /// <summary>
+        /// The storage provider.
+        /// </summary>
+        private IStorageProvider storageProvider;
+
         #endregion
 
         #region Constructors and Destructors
@@ -53,10 +58,11 @@ namespace TVSorter.Data.Tvdb
         /// <summary>
         /// Initializes a new instance of the <see cref="Tvdb"/> class.
         /// </summary>
-        public Tvdb()
+        public Tvdb(IStorageProvider storageProvider)
         {
             this.tvdbProcess = new TvdbProcess();
             this.tvdbProcess.BannerDownloadRequired += this.BannerDownloadRequired;
+            this.storageProvider = storageProvider;
         }
 
         #endregion
@@ -104,13 +110,10 @@ namespace TVSorter.Data.Tvdb
         /// <param name="shows">
         /// The shows to update.
         /// </param>
-        /// <param name="storageProvider">
-        /// The storage provider to use.
-        /// </param>
         /// <returns>
         /// The collection of TVShows that have been updated.
         /// </returns>
-        public IEnumerable<TvShow> UpdateShows(IList<TvShow> shows, IStorageProvider storageProvider)
+        public IEnumerable<TvShow> UpdateShows(IList<TvShow> shows)
         {
             DateTime firstUpdate = shows.Min(x => x.LastUpdated);
             List<string> updateIds;
@@ -137,13 +140,13 @@ namespace TVSorter.Data.Tvdb
 
                     // Update the last updated time anyway, it is still up to date at this time.
                     show.LastUpdated = serverTime;
-                    show.Save();
                 }
                 else
                 {
                     this.tvdbProcess.ProcessShow(show, TvdbDownload.DownloadShowEpisodes(show), serverTime);
-                    yield return show;
                 }
+
+                yield return show;
             }
         }
 

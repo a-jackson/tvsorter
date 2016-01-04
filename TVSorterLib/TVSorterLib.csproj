@@ -54,11 +54,15 @@
     <Compile Include="Data\Tvdb\TvdbProcess.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Factory.cs" />
     <Compile Include="Files\FileManager.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="EnumerableExtensions.cs" />
+    <Compile Include="Files\FileResultManager.cs" />
+    <Compile Include="Files\IFileManager.cs" />
+    <Compile Include="Files\IFileResultManager.cs" />
+    <Compile Include="Files\IFileSearch.cs" />
+    <Compile Include="Files\IScanManager.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="LogMessageEventArgs.cs" />
     <Compile Include="Files\ScanManager.cs">
@@ -67,6 +71,8 @@
     <Compile Include="LogType.cs" />
     <Compile Include="Model\MissingEpisodeSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Repostitory\ITvShowRepository.cs" />
+    <Compile Include="Repostitory\TvShowRepository.cs" />
     <Compile Include="Storage\IStorageProvider.cs" />
     <Compile Include="Storage\ModelExtensions.cs" />
     <Compile Include="Storage\Xml.cs">
@@ -75,7 +81,7 @@
     <Compile Include="Storage\XElementExtensions.cs" />
     <Compile Include="Model\Episode.cs" />
     <Compile Include="Model\FileResult.cs" />
-    <Compile Include="Model\FileSearch.cs" />
+    <Compile Include="Files\FileSearch.cs" />
     <Compile Include="Model\Settings.cs" />
     <Compile Include="Model\TvShow.cs" />
     <Compile Include="StringExtensions.cs" />
@@ -110,6 +116,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

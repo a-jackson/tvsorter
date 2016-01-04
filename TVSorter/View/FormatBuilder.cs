@@ -8,6 +8,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter.View
 {
+    using Files;
     using System;
     using System.IO;
     using System.Windows.Forms;
@@ -25,6 +26,8 @@ namespace TVSorter.View
         /// The result used for the example format.
         /// </summary>
         private readonly FileResult exampleResult;
+        private readonly IFileResultManager fileResultManager;
+
 
         #endregion
 
@@ -36,9 +39,10 @@ namespace TVSorter.View
         /// <param name="currentFormat">
         /// The current format.
         /// </param>
-        public FormatBuilder(string currentFormat)
+        public FormatBuilder(string currentFormat, IFileResultManager fileResultManager)
         {
             this.InitializeComponent();
+            this.fileResultManager = fileResultManager;
             this.exampleResult = FileResult.Example;
             this.textFormat.Text = currentFormat;
         }
@@ -262,7 +266,7 @@ namespace TVSorter.View
         {
             try
             {
-                this.textExample.Text = this.exampleResult.FormatOutputPath(this.textFormat.Text);
+                this.textExample.Text = fileResultManager.FormatOutputPath(this.exampleResult, this.textFormat.Text);
             }
             catch
             {

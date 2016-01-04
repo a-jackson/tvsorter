@@ -8,6 +8,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter.Files
 {
+    using Repostitory;
     #region Using Directives
 
     using System;
@@ -26,7 +27,7 @@ namespace TVSorter.Files
     /// <summary>
     /// Handles the scanning of files.
     /// </summary>
-    internal class ScanManager
+    public class ScanManager : IScanManager
     {
         #region Fields
 
@@ -44,6 +45,8 @@ namespace TVSorter.Files
         /// The storage provider to use.
         /// </summary>
         private readonly IStorageProvider storageProvider;
+
+        private readonly ITvShowRepository tvShowRepository;
 
         /// <summary>
         /// The list of the tvshows.
@@ -78,12 +81,13 @@ namespace TVSorter.Files
         /// <param name="dataProvider">
         /// The data provider to use. 
         /// </param>
-        internal ScanManager(IStorageProvider storageProvider, IDataProvider dataProvider)
+        public ScanManager(IStorageProvider storageProvider, IDataProvider dataProvider, ITvShowRepository tvShowRepository)
         {
             this.storageProvider = storageProvider;
             this.dataProvider = dataProvider;
-            this.settings = Settings.LoadSettings(storageProvider);
-            this.tvShows = TvShow.GetTvShows(storageProvider).ToList();
+            this.settings = storageProvider.Settings;
+            this.tvShowRepository = tvShowRepository;
+            this.tvShows = tvShowRepository.GetTvShows().ToList();
         }
 
         #endregion
@@ -146,23 +150,14 @@ namespace TVSorter.Files
         /// <summary>
         /// Searches for new TVShows.
         /// </summary>
-        /// <param name="storageProvider">
-        /// The stroage provider
-        /// </param>
-        /// <param name="dataProvider">
-        /// The data provider. 
-        /// </param>
-        /// <param name="directories">
-        /// The directories to search.
-        /// </param>
         /// <returns>
         /// The ambiguous results of the search for user selection.
         /// </returns>
-        internal static Dictionary<string, List<TvShow>> SearchNewShows(
-            IStorageProvider storageProvider, IDataProvider dataProvider, IEnumerable<IDirectoryInfo> directories)
+        public Dictionary<string, List<TvShow>> SearchNewShows()
         {
+            var directories = settings.DestinationDirectories.Select(x => new DirectoryInfoWrap(x));
             var showDirs = new List<string>();
-            List<string> existingShows = TvShow.GetTvShows(storageProvider).Select(x => x.FolderName).ToList();
+            List<string> existingShows = tvShowRepository.GetTvShows().Select(x => x.FolderName).ToList();
             foreach (IDirectoryInfo dirInfo in directories)
             {
                 // Add all of dirInfo's subdirectories where they don't already exist and 
@@ -180,15 +175,15 @@ namespace TVSorter.Files
             foreach (string showName in showDirs)
             {
                 // Search for each of the shows using the directory name as the show name.
-                List<TvShow> results = TvShow.SearchShow(showName, dataProvider);
+                List<TvShow> results = tvShowRepository.SearchShow(showName);
 
                 // Any with only one result should be saved or where the first result is an exact match.
                 if (results.Count == 1
                     ||
                     (results.Count > 1 && results[0].Name.Equals(showName, StringComparison.InvariantCultureIgnoreCase)))
                 {
-                    TvShow show = TvShow.FromSearchResult(results[0]);
-                    show.Save(storageProvider);
+                    TvShow show = tvShowRepository.FromSearchResult(results[0]);
+                    tvShowRepository.Save(show);
                     Logger.OnLogMessage(show, "Found show {0}", LogType.Info, show.Name);
                 }
                 else
@@ -251,7 +246,7 @@ namespace TVSorter.Files
             List<Episode> matchedEpsiodes = matchedFiles.SelectMany(x => x.Episodes).ToList();
 
             // Get all of the shows and episodes.
-            List<TvShow> shows = TvShow.GetTvShows(this.storageProvider).ToList();
+            List<TvShow> shows = tvShowRepository.GetTvShows().ToList();
             IEnumerable<Episode> allEpisodes = shows.SelectMany(x => x.Episodes);
 
             // Update the file count of the episodes.
@@ -276,7 +271,7 @@ namespace TVSorter.Files
         /// <returns>
         /// The collection of matched files.
         /// </returns>
-        internal IEnumerable<FileResult> SearchDestinationFolder(IDirectoryInfo destination)
+        public IEnumerable<FileResult> SearchDestinationFolder(IDirectoryInfo destination)
         {
             this.unsuccessfulMatches = new List<string>();
             this.updatedShows = new List<TvShow>();
@@ -355,7 +350,7 @@ namespace TVSorter.Files
                 Logger.OnLogMessage(this, "Attempting to add show {0}", LogType.Info, showName);
 
                 // Attempt to add the show.
-                List<TvShow> results = TvShow.SearchShow(showName, this.dataProvider);
+                List<TvShow> results = tvShowRepository.SearchShow(showName);
                 if (results.Count == 0)
                 {
                     Logger.OnLogMessage(this, "Show not found.", LogType.Error);
@@ -378,8 +373,8 @@ namespace TVSorter.Files
             {
                 // Unlock and update the show.
                 show.Locked = false;
-                show.Save(this.storageProvider);
-                show.Update(this.dataProvider, this.storageProvider);
+                tvShowRepository.Save(show);
+                tvShowRepository.Update(show);
                 this.updatedShows.Add(show);
             }
 
@@ -557,16 +552,16 @@ namespace TVSorter.Files
             {
                 Logger.OnLogMessage(this, "{0} matched as {1}. Adding alternate name.", LogType.Info, showName, show.Name);
                 show.AlternateNames.Add(showName);
-                show.Save(this.storageProvider);
+                tvShowRepository.Save(show);
                 return show;
             }
 
             Logger.OnLogMessage(this, "Matched {0} as a new show. Adding and updating...", LogType.Info, showName);
 
             // Doesn't exist with the same TVDB. Add a new show and update.
-            show = TvShow.FromSearchResult(result);
-            show.Save(this.storageProvider);
-            show.Update(this.dataProvider, this.storageProvider);
+            show = tvShowRepository.FromSearchResult(show);
+            tvShowRepository.Save(show);
+            tvShowRepository.Update(show);
             this.tvShows.Add(show);
             return show;
         }

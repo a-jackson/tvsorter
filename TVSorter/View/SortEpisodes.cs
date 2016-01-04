@@ -8,6 +8,9 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter.View
 {
+    using Files;
+    using Repostitory;
+    using Storage;
     #region Using Directives
 
     using System;
@@ -46,6 +49,12 @@ namespace TVSorter.View
         }
 
         #endregion
+
+        public IFileSearch FileSearch { get; set; }
+        public ITvShowRepository TvShowRepository { get; set; }
+        public IStorageProvider StorageProvider { get; set; }
+        public IFileResultManager FileResultManager { get; set; }
+        
 
         #region Public Methods and Operators
 
@@ -148,7 +157,7 @@ namespace TVSorter.View
         private void ProcessResults()
         {
             this.resultsList.Items.Clear();
-            this.resultsList.Items.AddRange(this.controller.Results.Select(x => x.GetListViewItem()).ToArray());
+            this.resultsList.Items.AddRange(this.controller.Results.Select(x => x.GetListViewItem(FileResultManager)).ToArray());
         }
 
         /// <summary>
@@ -158,7 +167,7 @@ namespace TVSorter.View
         {
             for (int i = 0; i < this.controller.Results.Count; i++)
             {
-                this.resultsList.Items[i] = this.controller.Results[i].GetListViewItem();
+                this.resultsList.Items[i] = this.controller.Results[i].GetListViewItem(FileResultManager);
             }
         }
 
@@ -273,7 +282,7 @@ namespace TVSorter.View
         {
             if (!this.DesignMode)
             {
-                this.controller = new SortEpisodesController();
+                this.controller = new SortEpisodesController(TvShowRepository, FileSearch, StorageProvider);
                 this.controller.PropertyChanged += this.ControllerOnPropertyChanged;
                 this.controller.Initialise(this);
             }

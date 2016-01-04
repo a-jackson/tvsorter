@@ -78,25 +78,7 @@ namespace TVSorter.Model
         #endregion
 
         #region Public Methods and Operators
-
-        /// <summary>
-        /// Gets the duplicate episodes.
-        /// </summary>
-        /// <returns>A collection of episodes.</returns>
-        public static IEnumerable<Episode> GetDuplicateEpisodes()
-        {
-            return Factory.StorageProvider.GetDuplicateEpisodes();
-        }
-
-        /// <summary>
-        /// Gets the missing episodes.
-        /// </summary>
-        /// <returns>A collection of episodes.</returns>
-        public static IEnumerable<Episode> GetMissingEpisodes()
-        {
-            return Factory.StorageProvider.GetMissingEpisodes();
-        }
-
+        
         /// <summary>
         /// Determines whether the specified <see cref="T:System.Object"/> is equal to the current <see cref="T:System.Object"/> .
         /// </summary>

@@ -36,15 +36,6 @@ namespace TVSorter.Model
 
         #endregion
 
-        #region Public Events
-
-        /// <summary>
-        /// Occurs when the settings of the object are changed.
-        /// </summary>
-        public event EventHandler SettingsChanged;
-
-        #endregion
-
         #region Public Properties
 
         /// <summary>
@@ -120,89 +111,7 @@ namespace TVSorter.Model
         #endregion
 
         #region Public Methods and Operators
-
-        /// <summary>
-        /// Loads the settings from the default provider.
-        /// </summary>
-        /// <returns>The default provider.</returns>
-        public static Settings LoadSettings()
-        {
-            return LoadSettings(Factory.StorageProvider);
-        }
-
-        /// <summary>
-        /// Saves the settings.
-        /// </summary>
-        public void Save()
-        {
-            this.Save(Factory.StorageProvider);
-        }
-
-        #endregion
-
-        #region Methods
-
-        /// <summary>
-        /// Loads the settings from the specified provider.
-        /// </summary>
-        /// <param name="provider">
-        /// The provider to load the settings from.
-        /// </param>
-        /// <returns>
-        /// The new settings object.
-        /// </returns>
-        internal static Settings LoadSettings(IStorageProvider provider)
-        {
-            var settings = new Settings();
-            try
-            {
-                provider.LoadSettings(settings);
-
-                // Remove the event handler before adding it incase the 
-                // handler has been added before.
-                provider.SettingsSaved -= settings.OnSettingsSaved;
-                provider.SettingsSaved += settings.OnSettingsSaved;
-            }
-            catch (IOException)
-            {
-                // Settings file does not exist. Use default settings.
-                settings.SetDefault();
-            }
-
-            return settings;
-        }
-
-        /// <summary>
-        /// Saves the settings with the specified provider.
-        /// </summary>
-        /// <param name="provider">
-        /// The provider to save the settings to.
-        /// </param>
-        internal void Save(IStorageProvider provider)
-        {
-            provider.SaveSettings(this);
-        }
-
-        /// <summary>
-        /// Handles the StorageProvider's SettingsSaved event by firing the SettingsChanged event.
-        /// </summary>
-        /// <param name="sender">
-        /// The sender of the event.
-        /// </param>
-        /// <param name="e">
-        /// The arguments of the event.
-        /// </param>
-        private void OnSettingsSaved(object sender, EventArgs e)
-        {
-            // Reload the settings.
-            ((IStorageProvider)sender).LoadSettings(this);
-
-            if (this.SettingsChanged != null)
-            {
-                this.SettingsChanged(sender, e);
-            }
-        }
-
+        
         /// <summary>
         ///   Sets default settings.
         /// </summary>

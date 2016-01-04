@@ -8,6 +8,9 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter.Controller
 {
+    using Files;
+    using Repostitory;
+    using Storage;
     #region Using Directives
 
     using System;
@@ -52,7 +55,18 @@ namespace TVSorter.Controller
         /// </summary>
         private Model.Settings settings;
 
+        private IStorageProvider storageProvider;
+        private ITvShowRepository tvShowRepository;
+        private IScanManager scanManager;
+
         #endregion
+
+        public TvShowsController(IStorageProvider storageProvider, ITvShowRepository tvShowRepository, IScanManager scanManager)
+        {
+            this.storageProvider = storageProvider;
+            this.tvShowRepository = tvShowRepository;
+            this.scanManager = scanManager;
+        }
 
         #region Public Events
 
@@ -129,17 +143,7 @@ namespace TVSorter.Controller
         #endregion
 
         #region Public Methods and Operators
-
-        /// <summary>
-        /// The create nfo files.
-        /// </summary>
-        public void CreateNfoFiles()
-        {
-            var task = new BackgroundTask(TvShow.CreateNfoFiles);
-            task.Start();
-            this.tvView.StartTaskProgress(task, "Creating .nfo files.");
-        }
-
+        
         /// <summary>
         /// Initialises the controller.
         /// </summary>
@@ -149,15 +153,15 @@ namespace TVSorter.Controller
         public override void Initialise(IView view)
         {
             this.tvView = view;
-            this.settings = Model.Settings.LoadSettings();
-            this.Shows = new BindingList<TvShow>(TvShow.GetTvShows().ToList());
+            this.settings = storageProvider.Settings;
+            this.Shows = new BindingList<TvShow>(tvShowRepository.GetTvShows().ToList());
             this.DestinationDirectories = new BindingList<string>(this.settings.DestinationDirectories);
             this.Shows.ListChanged += (sender, e) => this.OnPropertyChanged("Shows");
             this.TvShowSelected(0);
-            TvShow.TvShowAdded += this.OnTvShowAdded;
-            TvShow.TvShowChanged += this.OnTvShowChanged;
-            TvShow.TvShowRemoved += this.OnTvShowRemoved;
-            this.settings.SettingsChanged += this.OnSettingsChanged;
+            tvShowRepository.TvShowAdded += this.OnTvShowAdded;
+            tvShowRepository.TvShowChanged += this.OnTvShowChanged;
+            tvShowRepository.TvShowRemoved += this.OnTvShowRemoved;
+            storageProvider.SettingsSaved += this.OnSettingsChanged;
         }
 
         /// <summary>
@@ -170,7 +174,7 @@ namespace TVSorter.Controller
                 return;
             }
 
-            this.SelectedShow.Delete();
+            tvShowRepository.Delete(this.SelectedShow);
             this.Shows.Remove(this.SelectedShow);
             this.SelectedShow = null;
         }
@@ -186,7 +190,7 @@ namespace TVSorter.Controller
             }
 
             this.SelectedShow.LastUpdated = new DateTime(1970, 1, 1);
-            this.SelectedShow.Save();
+            tvShowRepository.Save(this.SelectedShow);
             this.OnPropertyChanged("SelectedShow");
         }
 
@@ -200,7 +204,7 @@ namespace TVSorter.Controller
                 return;
             }
 
-            this.SelectedShow.Save();
+            tvShowRepository.Save(this.SelectedShow);
         }
 
         /// <summary>
@@ -211,7 +215,7 @@ namespace TVSorter.Controller
             var task = new BackgroundTask(
                 () =>
                     {
-                        this.SearchResults = TvShow.SearchNewShows();
+                        this.SearchResults = scanManager.SearchNewShows();
                         this.OnSearchShowsComplete();
                     });
             task.Start();
@@ -247,7 +251,7 @@ namespace TVSorter.Controller
                     {
                         // Only update the unlocked shows.
                         List<TvShow> unlockedShows = this.Shows.Where(x => !x.Locked).ToList();
-                        TvShow.UpdateShows(unlockedShows);
+                        tvShowRepository.UpdateShows(unlockedShows);
                         this.OnPropertyChanged("SelectedShow");
                     });
             task.Start();
@@ -268,7 +272,7 @@ namespace TVSorter.Controller
                             return;
                         }
 
-                        this.SelectedShow.Update();
+                        tvShowRepository.Update(this.SelectedShow);
                         this.OnPropertyChanged("SelectedShow");
                     });
             task.Start();
