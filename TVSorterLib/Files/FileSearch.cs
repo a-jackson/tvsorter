@@ -106,9 +106,11 @@ namespace TVSorter.Files
         {
             foreach (FileResult result in this.Results.Where(x => x.Checked && x.Show != null))
             {
-                result.Episode =
+                var episode =
                     result.Show.Episodes.FirstOrDefault(
                         x => x.SeasonNumber == seasonNumber && x.EpisodeNumber == episodeNumber);
+                result.Episode = episode;
+                result.Episodes = new List<Episode>() { episode };
             }
         }
 
