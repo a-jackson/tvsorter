@@ -69,7 +69,13 @@ namespace TVSorter.Controller
                             MessageBox.Show(e.Message);
                         }
                     });
-            task.ContinueWith(delegate { this.TaskComplete(this, EventArgs.Empty); });
+            task.ContinueWith(delegate
+            {
+                if (this.TaskComplete != null)
+                {
+                    this.TaskComplete(this, EventArgs.Empty);
+                }
+            });
         }
 
         #endregion
