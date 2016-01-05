@@ -55,57 +55,9 @@ namespace TVSorter.Model
         public bool HideSeason0 { get; set; }
 
         #endregion
-
-        #region Public Methods and Operators
-
-        /// <summary>
-        /// Loads a new MissingEpisodeSettings objects.
-        /// </summary>
-        /// <returns>The new MissingEpisodeSettings object.</returns>
-        public static MissingEpisodeSettings LoadSettings()
-        {
-            return LoadSettings(Factory.StorageProvider);
-        }
-
-        /// <summary>
-        /// Saves the missing episode settings.
-        /// </summary>
-        public void Save()
-        {
-            this.Save(Factory.StorageProvider);
-        }
-
-        #endregion
-
+        
         #region Methods
-
-        /// <summary>
-        /// Loads the settings.
-        /// </summary>
-        /// <param name="provider">
-        /// The storage provider to load the settings from.
-        /// </param>
-        /// <returns>
-        /// The new MissingEpisodeSettings object.
-        /// </returns>
-        internal static MissingEpisodeSettings LoadSettings(IStorageProvider provider)
-        {
-            var settings = new MissingEpisodeSettings();
-            provider.LoadMissingEpisodeSettings(settings);
-            return settings;
-        }
-
-        /// <summary>
-        /// Saves the missing episode settings.
-        /// </summary>
-        /// <param name="provider">
-        /// The settings to save.
-        /// </param>
-        internal void Save(IStorageProvider provider)
-        {
-            provider.SaveMissingEpisodeSettings(this);
-        }
-
+        
         /// <summary>
         /// Initiaises the settings to default values.
         /// </summary>

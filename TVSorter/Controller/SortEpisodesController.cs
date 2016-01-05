@@ -8,6 +8,9 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter.Controller
 {
+    using Files;
+    using Repostitory;
+    using Storage;
     #region Using Directives
 
     using System.Collections.Generic;
@@ -33,7 +36,10 @@ namespace TVSorter.Controller
         /// <summary>
         /// The file searcher.
         /// </summary>
-        private FileSearch fileSearch;
+        private IFileSearch fileSearch;
+
+        private ITvShowRepository tvShowRepository;
+        private IStorageProvider storageProvider;
 
         /// <summary>
         ///   The last subdirectory scanned.
@@ -56,6 +62,13 @@ namespace TVSorter.Controller
         private BindingList<string> subDirectories;
 
         #endregion
+        
+        public SortEpisodesController(ITvShowRepository tvShowRepository, IFileSearch fileSearch, IStorageProvider storageProvider)
+        {
+            this.tvShowRepository = tvShowRepository;
+            this.fileSearch = fileSearch;
+            this.storageProvider = storageProvider;
+        }
 
         #region Public Properties
 
@@ -77,7 +90,7 @@ namespace TVSorter.Controller
         {
             get
             {
-                return TvShow.GetTvShows().ToList();
+                return tvShowRepository.GetTvShows().ToList();
             }
         }
 
@@ -121,7 +134,6 @@ namespace TVSorter.Controller
         public override void Initialise(IView view)
         {
             this.lastSubdirectoryScanned = Path.DirectorySeparatorChar.ToString(CultureInfo.InvariantCulture);
-            this.fileSearch = new FileSearch();
 
             this.sortView = view;
 
@@ -191,8 +203,8 @@ namespace TVSorter.Controller
         /// </summary>
         private void LoadSettings()
         {
-            this.settings = Settings.LoadSettings();
-            this.settings.SettingsChanged += (sender, e) => { this.SubDirectories = this.LoadSubDirectories(); };
+            this.settings = storageProvider.Settings;
+            storageProvider.SettingsSaved += (sender, e) => { this.SubDirectories = this.LoadSubDirectories(); };
             this.SubDirectories = this.LoadSubDirectories();
         }
 

@@ -59,22 +59,16 @@ namespace TVSorter.Storage
         /// The collection of episodes that are missing. 
         /// </returns>
         IEnumerable<Episode> GetMissingEpisodes();
+        
+        /// <summary>
+        /// Gets the settings object.
+        /// </summary>
+        Settings Settings { get; }
 
         /// <summary>
-        /// Loads the missing episode settings from the XML file.
+        /// Gets the missing episode settings.
         /// </summary>
-        /// <param name="settings">
-        /// The settings to load into.
-        /// </param>
-        void LoadMissingEpisodeSettings(MissingEpisodeSettings settings);
-
-        /// <summary>
-        /// Reads the settings from the XML file.
-        /// </summary>
-        /// <param name="settings">
-        /// The settings to set from the XML.
-        /// </param>
-        void LoadSettings(Settings settings);
+        MissingEpisodeSettings MissingEpisodeSettings { get; }
 
         /// <summary>
         /// Loads all the TVShows from the XML file.
@@ -103,18 +97,12 @@ namespace TVSorter.Storage
         /// <summary>
         /// Saves the missing episode settings into the XML file.
         /// </summary>
-        /// <param name="settings">
-        /// The settings to save.
-        /// </param>
-        void SaveMissingEpisodeSettings(MissingEpisodeSettings settings);
+        void SaveMissingEpisodeSettings();
 
         /// <summary>
         /// Saves the specified settings into the XML file.
         /// </summary>
-        /// <param name="settings">
-        /// The settings to save. 
-        /// </param>
-        void SaveSettings(Settings settings);
+        void SaveSettings();
 
         /// <summary>
         /// Saves the specified show. Updates if it already exists and adds if it doesn't
@@ -132,6 +120,15 @@ namespace TVSorter.Storage
         /// </param>
         void SaveShows(IEnumerable<TvShow> shows);
 
+        /// <summary>
+        /// Reads the settings from the XML file.
+        /// </summary>
+        Settings LoadSettings();
+
+        /// <summary>
+        /// Loads the missing episode settings from the XML file.
+        /// </summary>
+        MissingEpisodeSettings LoadMissingEpisodeSettings();
         #endregion
     }
 }

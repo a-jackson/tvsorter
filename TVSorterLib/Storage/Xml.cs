@@ -26,7 +26,7 @@ namespace TVSorter.Storage
     /// <summary>
     /// Class that manages access to the XML file.
     /// </summary>
-    internal class Xml : IStorageProvider
+    public class Xml : IStorageProvider
     {
         #region Constants
 
@@ -63,6 +63,16 @@ namespace TVSorter.Storage
         /// </summary>
         private XDocument document;
 
+        /// <summary>
+        /// The settings.
+        /// </summary>
+        private Settings settings;
+
+        /// <summary>
+        /// The missing episode settings.
+        /// </summary>
+        private MissingEpisodeSettings missingEpisodeSettings;
+
         #endregion
 
         #region Constructors and Destructors
@@ -98,6 +108,16 @@ namespace TVSorter.Storage
         /// Occurs when a TV Show is removed.
         /// </summary>
         public event EventHandler<TvShowEventArgs> TvShowRemoved;
+
+        /// <summary>
+        /// The settings.
+        /// </summary>
+        public Settings Settings { get { return settings; } }
+
+        /// <summary>
+        /// The missing episode settings.
+        /// </summary>
+        public MissingEpisodeSettings MissingEpisodeSettings { get { return missingEpisodeSettings; } }
 
         #endregion
 
@@ -142,10 +162,7 @@ namespace TVSorter.Storage
         /// <summary>
         /// Loads the missing episode settings from the XML file.
         /// </summary>
-        /// <param name="settings">
-        /// The settings to load into.
-        /// </param>
-        public void LoadMissingEpisodeSettings(MissingEpisodeSettings settings)
+        public MissingEpisodeSettings LoadMissingEpisodeSettings()
         {
             if (this.document.Root == null)
             {
@@ -157,17 +174,15 @@ namespace TVSorter.Storage
             {
                 throw new XmlSchemaException("The XML file is invalid.");
             }
-
-            settings.FromXml(settingsNode);
+            
+            missingEpisodeSettings.FromXml(settingsNode);
+            return missingEpisodeSettings;
         }
 
         /// <summary>
         /// Reads the settings from the XML file.
         /// </summary>
-        /// <param name="settings">
-        /// The settings to set from the XML.
-        /// </param>
-        public void LoadSettings(Settings settings)
+        public Settings LoadSettings()
         {
             if (this.document.Root == null)
             {
@@ -179,8 +194,9 @@ namespace TVSorter.Storage
             {
                 throw new XmlSchemaException("The XML file is invalid.");
             }
-
+            
             settings.FromXml(settingsNode);
+            return settings;
         }
 
         /// <summary>
@@ -276,11 +292,8 @@ namespace TVSorter.Storage
 
         /// <summary>
         /// Saves the missing episode settings into the XML file.
-        /// </summary>
-        /// <param name="settings">
-        /// The settings to save.
-        /// </param>
-        public void SaveMissingEpisodeSettings(MissingEpisodeSettings settings)
+        /// </summary> 
+        public void SaveMissingEpisodeSettings()
         {
             if (this.document.Root == null)
             {
@@ -293,17 +306,14 @@ namespace TVSorter.Storage
                 throw new XmlException("Xml is invalid");
             }
 
-            settingsNode.ReplaceWith(settings.ToXml());
+            settingsNode.ReplaceWith(missingEpisodeSettings.ToXml());
             this.document.Save(XmlFile);
         }
 
         /// <summary>
         /// Saves the specified settings into the XML file.
         /// </summary>
-        /// <param name="settings">
-        /// The settings to save. 
-        /// </param>
-        public void SaveSettings(Settings settings)
+        public void SaveSettings()
         {
             if (this.document.Root == null)
             {
@@ -485,7 +495,7 @@ namespace TVSorter.Storage
             }
 
             settingsNode.Add(new XAttribute("defaultdestinationdir", selectedDestination));
-         
+
             // Update the first regualar expression
             XElement regularExpression = settingsNode.Element(GetName("RegularExpression"));
             if (regularExpression == null)
@@ -520,7 +530,7 @@ namespace TVSorter.Storage
                 throw new XmlException("Xml is not valid");
             }
 
-            settingsNode.FirstNode.AddAfterSelf(new XElement("IgnoredDirectories", new string[] { }));         
+            settingsNode.FirstNode.AddAfterSelf(new XElement("IgnoredDirectories", new string[] { }));
         }
 
 
@@ -574,7 +584,7 @@ namespace TVSorter.Storage
                     UpdateToVersion4(root);
                 }
 
-                if(version < 5)
+                if (version < 5)
                 {
                     UpdateToVersion5(root);
                 }
@@ -637,23 +647,28 @@ namespace TVSorter.Storage
         {
             try
             {
+                settings = new Settings();
+                missingEpisodeSettings = new MissingEpisodeSettings();
+
                 // Check that the file exists
                 if (!File.Exists(XmlFile))
                 {
                     // Create the file and populate with default settings.
                     var doc = new XDocument(
-                        new XDeclaration("1.0", "utf-8", "yes"), 
+                        new XDeclaration("1.0", "utf-8", "yes"),
                         new XElement(
-                            GetName("TVSorter"), 
-                            new XAttribute("version", XmlVersion), 
-                            new Settings().ToXml(), 
-                            new MissingEpisodeSettings().ToXml(), 
+                            GetName("TVSorter"),
+                            new XAttribute("version", XmlVersion),
+                            settings.ToXml(),
+                            missingEpisodeSettings.ToXml(),
                             new XElement(GetName("Shows"))));
 
                     doc.Save(XmlFile);
                 }
 
                 this.GetDocument();
+                LoadSettings();
+                LoadMissingEpisodeSettings();
             }
             catch (Exception e)
             {

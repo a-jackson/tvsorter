@@ -24,14 +24,14 @@ namespace TVSorter.Files
     /// <summary>
     /// The file manager.
     /// </summary>
-    internal class FileManager
+    public class FileManager : IFileManager
     {
         #region Fields
 
         /// <summary>
         /// A instance of scan manager.
         /// </summary>
-        private readonly ScanManager scanManager;
+        private readonly IScanManager scanManager;
 
         /// <summary>
         ///   The settings.
@@ -42,6 +42,11 @@ namespace TVSorter.Files
         /// The storage provider.
         /// </summary>
         private readonly IStorageProvider storageProvider;
+
+        /// <summary>
+        /// The file result manager.
+        /// </summary>
+        private readonly IFileResultManager fileResultManager;
 
         #endregion
 
@@ -56,11 +61,12 @@ namespace TVSorter.Files
         /// <param name="dataProvider">
         /// The data provider.
         /// </param>
-        internal FileManager(IStorageProvider storageProvider, IDataProvider dataProvider)
+        public FileManager(IStorageProvider storageProvider, IDataProvider dataProvider, IScanManager scanManager, IFileResultManager fileResultManager)
         {
             this.storageProvider = storageProvider;
-            this.settings = Settings.LoadSettings(storageProvider);
-            this.scanManager = new ScanManager(this.storageProvider, dataProvider);
+            this.settings = storageProvider.Settings;
+            this.scanManager = scanManager;
+            this.fileResultManager = fileResultManager;
         }
 
         #endregion
@@ -234,7 +240,7 @@ namespace TVSorter.Files
                 }
 
                 // Refresh the destination info as it may have changed.
-                destinationInfo = file.GetFullPath(destination, this.storageProvider);
+                destinationInfo = fileResultManager.GetFullPath(file, destination);
             }
 
             return true;
@@ -254,7 +260,7 @@ namespace TVSorter.Files
         /// </param>
         private void ProcessFile(SortType type, FileResult file, IDirectoryInfo destination)
         {
-            IFileInfo destinationInfo = file.GetFullPath(destination, this.storageProvider);
+            IFileInfo destinationInfo = fileResultManager.GetFullPath(file, destination);
             if (destinationInfo.Directory != null && !destinationInfo.Directory.Exists)
             {
                 destinationInfo.Directory.Create();

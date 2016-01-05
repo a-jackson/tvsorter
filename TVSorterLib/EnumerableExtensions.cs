@@ -34,28 +34,7 @@ namespace TVSorter
         {
             provider.SaveShows(shows);
         }
-
-        /// <summary>
-        /// Updates the collection of TVShows.
-        /// </summary>
-        /// <param name="shows">
-        /// The collection of shows to update.
-        /// </param>
-        /// <param name="storageProvider">
-        /// The storage provider to use
-        /// </param>
-        /// <param name="dataProvider">
-        /// The data provider to use.
-        /// </param>
-        internal static void Update(
-            this IList<TvShow> shows, IStorageProvider storageProvider, IDataProvider dataProvider)
-        {
-            foreach (var show in dataProvider.UpdateShows(shows, storageProvider))
-            {
-                show.LockIfNoEpisodes(storageProvider);
-                show.Save(storageProvider);
-            }
-        }
+        
 
         #endregion
     }

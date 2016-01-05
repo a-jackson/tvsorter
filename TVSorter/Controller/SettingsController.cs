@@ -8,6 +8,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter.Controller
 {
+    using Storage;
     #region Using Directives
 
     using TVSorter.View;
@@ -27,8 +28,13 @@ namespace TVSorter.Controller
         ///   The current settings.
         /// </summary>
         private Settings settings;
-
+        private IStorageProvider storageProvider;
         #endregion
+
+        public SettingsController(IStorageProvider storageProvider)
+        {
+            this.storageProvider = storageProvider;
+        }
 
         #region Public Properties
 
@@ -69,7 +75,7 @@ namespace TVSorter.Controller
         /// </summary>
         public void Revert()
         {
-            this.Settings = Settings.LoadSettings();
+            this.Settings = storageProvider.LoadSettings();
         }
 
         /// <summary>
@@ -77,7 +83,7 @@ namespace TVSorter.Controller
         /// </summary>
         public void Save()
         {
-            this.settings.Save();
+            storageProvider.SaveSettings();
         }
 
         #endregion

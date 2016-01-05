@@ -8,6 +8,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter.Controller
 {
+    using Repostitory;
     #region Using Directives
 
     using System.Collections.Generic;
@@ -23,6 +24,10 @@ namespace TVSorter.Controller
     /// </summary>
     public class SearchResultsController : ShowSearchController
     {
+        public SearchResultsController(ITvShowRepository tvShowRepository) : base(tvShowRepository)
+        {
+        }
+
         #region Fields
 
         /// <summary>

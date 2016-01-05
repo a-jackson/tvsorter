@@ -8,6 +8,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter.View
 {
+    using Files;
+    using Storage;
     #region Using Directives
 
     using System;
@@ -70,6 +72,9 @@ namespace TVSorter.View
         }
 
         #endregion
+
+        public IStorageProvider StorageProvider { get; set; }
+        public IFileResultManager FileResultManager { get; set; }
 
         #region Public Methods and Operators
 
@@ -165,7 +170,7 @@ namespace TVSorter.View
         /// </param>
         private void FormatBuilderButtonClick(object sender, EventArgs e)
         {
-            var formatBuilderDialog = new FormatBuilder(this.formatText.Text);
+            var formatBuilderDialog = new FormatBuilder(this.formatText.Text, FileResultManager);
             if (formatBuilderDialog.ShowDialog(this) == DialogResult.OK)
             {
                 this.formatText.Text = formatBuilderDialog.FormatString;
@@ -320,7 +325,7 @@ namespace TVSorter.View
         {
             if (!this.DesignMode)
             {
-                this.controller = new SettingsController();
+                this.controller = new SettingsController(StorageProvider);
                 this.controller.PropertyChanged += this.PropertyChanged;
                 this.controller.Initialise(this);
             }

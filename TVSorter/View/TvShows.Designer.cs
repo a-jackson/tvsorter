@@ -37,11 +37,6 @@ namespace TVSorter.View
         private Button alternateNamesButton;
 
         /// <summary>
-        ///   The create nfo files button.
-        /// </summary>
-        private Button createNfoFilesButton;
-
-        /// <summary>
         ///   The format builder.
         /// </summary>
         private Button formatBuilder;
@@ -185,7 +180,6 @@ namespace TVSorter.View
             this.updateAllButton = new System.Windows.Forms.Button();
             this.addShowButton = new System.Windows.Forms.Button();
             this.searchShowsButton = new System.Windows.Forms.Button();
-            this.createNfoFilesButton = new System.Windows.Forms.Button();
             this.tvShowsList = new System.Windows.Forms.ListBox();
             this.topButtonsFlow = new System.Windows.Forms.FlowLayoutPanel();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
@@ -600,18 +594,6 @@ namespace TVSorter.View
             this.searchShowsButton.UseVisualStyleBackColor = true;
             this.searchShowsButton.Click += new System.EventHandler(this.SearchShowsButtonClick);
             // 
-            // createNfoFilesButton
-            // 
-            this.createNfoFilesButton.Location = new System.Drawing.Point(283, 3);
-            this.createNfoFilesButton.Name = "createNfoFilesButton";
-            this.createNfoFilesButton.Size = new System.Drawing.Size(105, 23);
-            this.createNfoFilesButton.TabIndex = 3;
-            this.createNfoFilesButton.Text = "Create Nfo Files";
-            this.toolTip.SetToolTip(this.createNfoFilesButton, "Creates a tvshow.nfo file in each show\'s directoy with\r\nthe URL to the show on Th" +
-        "e TVDB. This is read by \r\nXBMC when scanning.");
-            this.createNfoFilesButton.UseVisualStyleBackColor = true;
-            this.createNfoFilesButton.Click += new System.EventHandler(this.CreateNfoFilesButtonClick);
-            // 
             // tvShowsList
             // 
             this.tvShowsList.Dock = System.Windows.Forms.DockStyle.Left;
@@ -630,7 +612,6 @@ namespace TVSorter.View
             this.topButtonsFlow.Controls.Add(this.updateAllButton);
             this.topButtonsFlow.Controls.Add(this.addShowButton);
             this.topButtonsFlow.Controls.Add(this.searchShowsButton);
-            this.topButtonsFlow.Controls.Add(this.createNfoFilesButton);
             this.topButtonsFlow.Dock = System.Windows.Forms.DockStyle.Top;
             this.topButtonsFlow.Location = new System.Drawing.Point(0, 0);
             this.topButtonsFlow.Name = "topButtonsFlow";

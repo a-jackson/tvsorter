@@ -8,6 +8,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter.Controller
 {
+    using Repostitory;
     #region Using Directives
 
     using System.ComponentModel;
@@ -39,7 +40,14 @@ namespace TVSorter.Controller
         /// </summary>
         private string title;
 
+        private ITvShowRepository tvShowRepository;
+
         #endregion
+
+        public ShowSearchController(ITvShowRepository tvShowRepository)
+        {
+            this.tvShowRepository = tvShowRepository;
+        }
 
         #region Public Properties
 
@@ -116,7 +124,7 @@ namespace TVSorter.Controller
         /// </param>
         public void Search(string name)
         {
-            this.SearchResults = new BindingList<TvShow>(TvShow.SearchShow(name));
+            this.SearchResults = new BindingList<TvShow>(tvShowRepository.SearchShow(name));
         }
 
         /// <summary>
@@ -127,8 +135,8 @@ namespace TVSorter.Controller
         /// </param>
         public virtual void Select(int index)
         {
-            TvShow show = TvShow.FromSearchResult(this.SearchResults[index]);
-            show.Save();
+            TvShow show = tvShowRepository.FromSearchResult(this.SearchResults[index]);
+            tvShowRepository.Save(show);
         }
 
         #endregion

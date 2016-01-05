@@ -33,11 +33,6 @@ namespace TVSorter.Test
         protected IDirectoryInfo Root { get; private set; }
 
         /// <summary>
-        /// Gets the scan manager's settings.
-        /// </summary>
-        protected Settings Settings { get; private set; }
-
-        /// <summary>
         /// Gets the mocked storage provider.
         /// </summary>
         protected IStorageProvider StorageProvider { get; private set; }
@@ -51,52 +46,52 @@ namespace TVSorter.Test
             {
                 yield return
                     new TvShow
-                        {
-                            Name = "Alpha Show", 
-                            FolderName = "Alpha Folder", 
-                            TvdbId = "1", 
-                            Episodes =
+                    {
+                        Name = "Alpha Show",
+                        FolderName = "Alpha Folder",
+                        TvdbId = "1",
+                        Episodes =
                                 new List<Episode>
                                     {
                                         new Episode
                                             {
-                                                EpisodeNumber = 1, 
-                                                SeasonNumber = 1, 
-                                                FirstAir = new DateTime(2012, 1, 1), 
-                                                Name = "Episode One (1)", 
+                                                EpisodeNumber = 1,
+                                                SeasonNumber = 1,
+                                                FirstAir = new DateTime(2012, 1, 1),
+                                                Name = "Episode One (1)",
                                                 TvdbId = "111"
-                                            }, 
+                                            },
                                         new Episode
                                             {
-                                                EpisodeNumber = 2, 
-                                                SeasonNumber = 1, 
-                                                FirstAir = new DateTime(2012, 1, 2), 
-                                                Name = "Episode One (2)", 
+                                                EpisodeNumber = 2,
+                                                SeasonNumber = 1,
+                                                FirstAir = new DateTime(2012, 1, 2),
+                                                Name = "Episode One (2)",
                                                 TvdbId = "112"
                                             }
-                                    }, 
-                            AlternateNames = new List<string> { "alt name", "alpha" }
-                        };
+                                    },
+                        AlternateNames = new List<string> { "alt name", "alpha" }
+                    };
                 yield return
                     new TvShow
-                        {
-                            Name = "Beta Show", 
-                            FolderName = "Beta Folder", 
-                            TvdbId = "2", 
-                            Episodes =
+                    {
+                        Name = "Beta Show",
+                        FolderName = "Beta Folder",
+                        TvdbId = "2",
+                        Episodes =
                                 new List<Episode>
                                     {
                                         new Episode
                                             {
-                                                EpisodeNumber = 1, 
-                                                SeasonNumber = 1, 
-                                                FirstAir = new DateTime(2012, 2, 2), 
-                                                Name = "Episode One", 
-                                                TvdbId = "211", 
+                                                EpisodeNumber = 1,
+                                                SeasonNumber = 1,
+                                                FirstAir = new DateTime(2012, 2, 2),
+                                                Name = "Episode One",
+                                                TvdbId = "211",
                                             }
-                                    }, 
-                            AlternateNames = new List<string> { "beta" }, 
-                        };
+                                    },
+                        AlternateNames = new List<string> { "beta" },
+                    };
             }
         }
 
@@ -117,17 +112,15 @@ namespace TVSorter.Test
             this.StorageProvider.LoadTvShows().Returns(this.TestShows);
 
             // When LoadSettings is called, set the settings.
-            this.StorageProvider.When(x => x.LoadSettings(Arg.Any<Settings>())).Do(
-                x =>
-                    {
-                        x.Arg<Settings>().SourceDirectory = "TV";
-                        x.Arg<Settings>().RecurseSubdirectories = false;
-                        x.Arg<Settings>().FileExtensions = new List<string> { ".avi" };
-                        x.Arg<Settings>().DestinationDirectories = new List<string> { "TV" };
-                        x.Arg<Settings>().DefaultDestinationDirectory = "TV";
-                        x.Arg<Settings>().AddUnmatchedShows = true;
-                        this.Settings = x.Arg<Settings>();
-                    });
+            this.StorageProvider.Settings.Returns(new Settings
+            {
+                SourceDirectory = "TV",
+                RecurseSubdirectories = false,
+                FileExtensions = new List<string> { ".avi" },
+                DestinationDirectories = new List<string> { "TV" },
+                DefaultDestinationDirectory = "TV",
+                AddUnmatchedShows = true
+            });
 
             this.Root = this.CreateTestDirectory(null, "TV")[0];
         }

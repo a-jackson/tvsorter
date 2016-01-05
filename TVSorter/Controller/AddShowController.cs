@@ -8,6 +8,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter.Controller
 {
+    using Repostitory;
     #region Using Directives
 
     using TVSorter.View;
@@ -19,6 +20,10 @@ namespace TVSorter.Controller
     /// </summary>
     public class AddShowController : ShowSearchController
     {
+        public AddShowController(ITvShowRepository tvShowRepository) : base(tvShowRepository)
+        {
+        }
+
         #region Public Methods and Operators
 
         /// <summary>

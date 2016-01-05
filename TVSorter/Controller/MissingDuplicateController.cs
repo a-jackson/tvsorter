@@ -15,8 +15,9 @@ namespace TVSorter.Controller
     using System.Linq;
 
     using TVSorter.Model;
+    using Storage;
     using TVSorter.View;
-
+    using Files;
     #endregion
 
     /// <summary>
@@ -31,7 +32,16 @@ namespace TVSorter.Controller
         /// </summary>
         private List<Episode> episodes;
 
+        private IStorageProvider storageProvider;
+        private IFileSearch fileSearch;
+
         #endregion
+
+        public MissingDuplicateController(IStorageProvider storageProvider, IFileSearch fileSearch)
+        {
+            this.storageProvider = storageProvider;
+            this.fileSearch = fileSearch;
+        }
 
         #region Public Properties
 
@@ -79,7 +89,7 @@ namespace TVSorter.Controller
         public override void Initialise(IView view)
         {
             this.View = view;
-            this.Settings = MissingEpisodeSettings.LoadSettings();
+            this.Settings = storageProvider.MissingEpisodeSettings;
         }
 
         /// <summary>
@@ -87,7 +97,7 @@ namespace TVSorter.Controller
         /// </summary>
         public void RefreshFileCounts()
         {
-            var task = new BackgroundTask(FileSearch.RefreshFileCounts);
+            var task = new BackgroundTask(fileSearch.RefreshFileCounts);
             task.Start();
 
             this.View.StartTaskProgress(task, "Refreshing file counts");
@@ -98,7 +108,7 @@ namespace TVSorter.Controller
         /// </summary>
         public void SearchDuplicateEpisodes()
         {
-            this.Episodes = Episode.GetDuplicateEpisodes().ToList();
+            this.Episodes = storageProvider.GetDuplicateEpisodes().ToList();
         }
 
         /// <summary>
@@ -106,9 +116,9 @@ namespace TVSorter.Controller
         /// </summary>
         public void SearchMissingEpisodes()
         {
-            this.Settings.Save();
+            storageProvider.SaveMissingEpisodeSettings();
 
-            List<Episode> missingEpisodes = Episode.GetMissingEpisodes().ToList();
+            List<Episode> missingEpisodes = storageProvider.GetMissingEpisodes().ToList();
 
             if (this.Settings.HideMissingSeasons)
             {

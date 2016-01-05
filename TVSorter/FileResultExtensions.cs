@@ -8,6 +8,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter
 {
+    using Files;
     using System.Drawing;
     using System.Globalization;
     using System.Windows.Forms;
@@ -30,7 +31,7 @@ namespace TVSorter
         /// <returns>
         /// The ListViewItem.
         /// </returns>
-        public static ListViewItem GetListViewItem(this FileResult result)
+        public static ListViewItem GetListViewItem(this FileResult result, IFileResultManager fileResultManager)
         {
             return
                 new ListViewItem(
@@ -43,7 +44,7 @@ namespace TVSorter
                             result.Episode == null
                                 ? string.Empty
                                 : result.Episode.EpisodeNumber.ToString(CultureInfo.InvariantCulture), 
-                            result.Episode == null ? string.Empty : result.Episode.Name, result.OutputPath
+                            result.Episode == null ? string.Empty : result.Episode.Name, fileResultManager.FormatOutputPath(result)
                         })
                     {
                        BackColor = result.Incomplete ? Color.Red : Color.White, Checked = result.Checked 

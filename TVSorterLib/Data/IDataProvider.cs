@@ -45,13 +45,10 @@ namespace TVSorter.Data
         /// <param name="shows">
         /// The shows to update.
         /// </param>
-        /// <param name="storageProvider">
-        /// The storage provider to use.
-        /// </param>
         /// <returns>
         /// The collection of TVShows that have been updated.
         /// </returns>
-        IEnumerable<TvShow> UpdateShows(IList<TvShow> shows, IStorageProvider storageProvider);
+        IEnumerable<TvShow> UpdateShows(IList<TvShow> shows);
 
         #endregion
     }
