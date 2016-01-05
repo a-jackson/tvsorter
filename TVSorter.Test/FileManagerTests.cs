@@ -59,7 +59,7 @@ namespace TVSorter.Test
                         // Check that the path is as expected
                         string expectedPath =
                             string.Format(
-                                "Alpha Folder{0}Season 1{0}Alpha.Show.S01E01.Episode.One.(1).avi", 
+                                "Alpha Folder{0}Season 1{0}Alpha.Show.S01E01.Episode.One.(1).avi",
                                 Path.DirectorySeparatorChar);
                         Assert.AreEqual(expectedPath, path, "The path is incorrect.");
 
@@ -112,7 +112,9 @@ namespace TVSorter.Test
         {
             base.Setup();
             var dataProvider = Substitute.For<IDataProvider>();
-            this.fileManager = new FileManager(this.StorageProvider, dataProvider);
+            var scanManager = Substitute.For<IScanManager>();
+            var fileResultManager = new FileResultManager(this.StorageProvider);
+            this.fileManager = new FileManager(this.StorageProvider, dataProvider, scanManager, fileResultManager);
         }
 
         #endregion

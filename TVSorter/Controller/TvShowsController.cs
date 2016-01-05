@@ -20,7 +20,7 @@ namespace TVSorter.Controller
 
     using TVSorter.Model;
     using TVSorter.View;
-
+    using Wrappers;
     #endregion
 
     /// <summary>
@@ -215,7 +215,7 @@ namespace TVSorter.Controller
             var task = new BackgroundTask(
                 () =>
                     {
-                        this.SearchResults = scanManager.SearchNewShows();
+                        this.SearchResults = scanManager.SearchNewShows(settings.DestinationDirectories.Select(x => new DirectoryInfoWrap(x)));
                         this.OnSearchShowsComplete();
                     });
             task.Start();

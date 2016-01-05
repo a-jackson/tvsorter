@@ -10,6 +10,6 @@ namespace TVSorter.Files
         void RefreshFileCounts();
         void ResetShow(FileResult result, TvShow show);
         IEnumerable<FileResult> SearchDestinationFolder(IDirectoryInfo destination);
-        Dictionary<string, List<TvShow>> SearchNewShows();
+        Dictionary<string, List<TvShow>> SearchNewShows(IEnumerable<IDirectoryInfo> directories);
     }
 }

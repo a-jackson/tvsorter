@@ -19,7 +19,8 @@ namespace TVSorter
 
     using TVSorter.Model;
     using TVSorter;
-
+    using Repostitory;
+    using Files;
     #endregion
 
     /// <summary>
@@ -63,20 +64,28 @@ namespace TVSorter
                 Environment.Exit(1);
             }
 
+            var storageProvider = new Storage.Xml();
+            var dataProvider = new Data.Tvdb.Tvdb(storageProvider);
+            var tvshowRepository = new TvShowRepository(storageProvider, dataProvider);
+            var scanManager = new ScanManager(storageProvider, dataProvider, tvshowRepository);
+            var fileResultManager = new FileResultManager(storageProvider);
+            var fileManager = new FileManager(storageProvider, dataProvider, scanManager, fileResultManager);
+            var fileSearch = new FileSearch(storageProvider, dataProvider, scanManager, fileManager);
+
             if (options.UpdateAll)
             {
-                List<TvShow> shows = TvShow.GetTvShows().Where(x => !x.Locked).ToList();
-                TvShow.UpdateShows(shows);
+                List<TvShow> shows = tvshowRepository.GetTvShows().Where(x => !x.Locked).ToList();
+                tvshowRepository.UpdateShows(shows);
             }
 
             if (options.UpdateShow != null)
             {
                 var show =
-                    TvShow.GetTvShows().FirstOrDefault(
+                    tvshowRepository.GetTvShows().FirstOrDefault(
                         x => x.Name.Equals(options.UpdateShow, StringComparison.InvariantCultureIgnoreCase));
                 if (show != null)
                 {
-                    show.Update();
+                    tvshowRepository.Update(show);
                 }
                 else
                 {
@@ -86,7 +95,6 @@ namespace TVSorter
 
             if (options.Copy || options.Move || options.Scan)
             {
-                var fileSearch = new FileSearch();
                 fileSearch.Search(null);
                 foreach (FileResult result in fileSearch.Results)
                 {
@@ -106,11 +114,11 @@ namespace TVSorter
                     Console.WriteLine();
                     Console.WriteLine("* indicates incomplete match.\n");
                     Console.WriteLine(
-                        "{0} {1} {2} {3} {4}", 
-                        "File Name".FormatLength(19), 
-                        "Show Name".FormatLength(19), 
-                        "Season".FormatLength(7), 
-                        "Episode".FormatLength(7), 
+                        "{0} {1} {2} {3} {4}",
+                        "File Name".FormatLength(19),
+                        "Show Name".FormatLength(19),
+                        "Season".FormatLength(7),
+                        "Episode".FormatLength(7),
                         "Episode Name".FormatLength(22));
 
                     foreach (var result in fileSearch.Results)

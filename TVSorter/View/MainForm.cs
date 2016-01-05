@@ -9,6 +9,7 @@
 namespace TVSorter.View
 {
     using Files;
+    using Repostitory;
     #region Using Directives
 
     using System;
@@ -34,7 +35,7 @@ namespace TVSorter.View
 
             var storageProvider = new Storage.Xml();
             var dataProvider = new Data.Tvdb.Tvdb(storageProvider);
-            var tvshowRepository = new Repostitory.TvShowRepository(storageProvider, dataProvider);
+            var tvshowRepository = new TvShowRepository(storageProvider, dataProvider);
             var scanManager = new ScanManager(storageProvider, dataProvider, tvshowRepository);
             var fileResultManager = new FileResultManager(storageProvider);
             var fileManager = new FileManager(storageProvider, dataProvider, scanManager, fileResultManager);

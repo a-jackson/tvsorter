@@ -134,12 +134,10 @@ namespace TVSorter.Files
             {
                 result.Episode = null;
             }
-
-            //Resolve Result
-            foreach (Match m in match)
+            else
             {
-                //result.Episodes = this.ProcessEpisode(match, show).ToList();
-                //result.Episode = result.Episodes.FirstOrDefault();
+                result.Episodes = this.ProcessEpisode(match.First(), show).ToList();
+                result.Episode = result.Episodes.FirstOrDefault();
             }
         }
 
@@ -153,9 +151,8 @@ namespace TVSorter.Files
         /// <returns>
         /// The ambiguous results of the search for user selection.
         /// </returns>
-        public Dictionary<string, List<TvShow>> SearchNewShows()
+        public Dictionary<string, List<TvShow>> SearchNewShows(IEnumerable<IDirectoryInfo> directories)
         {
-            var directories = settings.DestinationDirectories.Select(x => new DirectoryInfoWrap(x));
             var showDirs = new List<string>();
             List<string> existingShows = tvShowRepository.GetTvShows().Select(x => x.FolderName).ToList();
             foreach (IDirectoryInfo dirInfo in directories)
@@ -559,7 +556,7 @@ namespace TVSorter.Files
             Logger.OnLogMessage(this, "Matched {0} as a new show. Adding and updating...", LogType.Info, showName);
 
             // Doesn't exist with the same TVDB. Add a new show and update.
-            show = tvShowRepository.FromSearchResult(show);
+            show = tvShowRepository.FromSearchResult(result);
             tvShowRepository.Save(show);
             tvShowRepository.Update(show);
             this.tvShows.Add(show);
