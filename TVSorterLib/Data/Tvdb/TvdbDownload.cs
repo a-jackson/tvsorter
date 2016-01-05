@@ -117,7 +117,7 @@ namespace TVSorter.Data.Tvdb
         /// </param>
         public static void DownloadBanner(TvShow tvShow)
         {
-            var webClient = new WebClient();
+            var webClient = GetWebClient();
             string bannerAddress = Mirror + "/banners/" + tvShow.Banner;
             string saveAddress = Tvdb.ImageDirectory + tvShow.TvdbId + ".jpg";
 
@@ -149,7 +149,7 @@ namespace TVSorter.Data.Tvdb
             {
                 try
                 {
-                    var webClient = new WebClient();
+                    var webClient = GetWebClient();
                     string showAddress = Mirror + ApiLoc + "/series/" + show.TvdbId + "/all/en.zip";
                     string savePath = Tvdb.CacheDirectory + show.TvdbId + ".xml";
 
@@ -266,7 +266,7 @@ namespace TVSorter.Data.Tvdb
         /// </returns>
         private static StringReader DownloadXml(string url)
         {
-            var client = new WebClient();
+            var client = GetWebClient();
             string xml = client.DownloadString(url);
             return new StringReader(xml);
         }
@@ -293,6 +293,17 @@ namespace TVSorter.Data.Tvdb
                     let mirrorPath = mirrorElement.Element("mirrorpath")
                     where mirrorPath != null
                     select mirrorPath.Value).FirstOrDefault();
+        }
+
+        private static WebClient GetWebClient()
+        {
+            var client = new WebClient();
+            if (client.Proxy != null)
+            {
+                client.Proxy.Credentials = CredentialCache.DefaultNetworkCredentials;
+            }
+
+            return client;
         }
 
         #endregion
