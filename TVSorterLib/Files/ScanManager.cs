@@ -88,6 +88,19 @@ namespace TVSorter.Files
             this.settings = storageProvider.Settings;
             this.tvShowRepository = tvShowRepository;
             this.tvShows = tvShowRepository.GetTvShows().ToList();
+            this.tvShowRepository.TvShowAdded += TvShowChange;
+            this.tvShowRepository.TvShowRemoved += TvShowChange;
+            this.tvShowRepository.TvShowChanged += TvShowChange;
+        }
+        
+        private void TvShowChange(object sender, TvShowEventArgs e)
+        {
+            if (this.tvShows.Contains(e.TvShow))
+            {
+                this.tvShows.Remove(e.TvShow);
+            }
+
+            this.tvShows.Add(e.TvShow);
         }
 
         #endregion
