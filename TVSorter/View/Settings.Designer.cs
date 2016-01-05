@@ -156,6 +156,11 @@ namespace TVSorter.View
             this.addDestinationButton = new System.Windows.Forms.Button();
             this.removeDestinationButton = new System.Windows.Forms.Button();
             this.defaultDestinationDirectory = new System.Windows.Forms.ComboBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
+            this.addIgnore_btn = new System.Windows.Forms.Button();
+            this.removeIgnore_btn = new System.Windows.Forms.Button();
+            this.ignoreList = new System.Windows.Forms.ListBox();
             this.recurseSubdirectoriesCheck = new System.Windows.Forms.CheckBox();
             this.deleteEmptyCheck = new System.Windows.Forms.CheckBox();
             this.renameIfExistsCheck = new System.Windows.Forms.CheckBox();
@@ -170,11 +175,6 @@ namespace TVSorter.View
             this.saveButton = new System.Windows.Forms.Button();
             this.folderDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.label1 = new System.Windows.Forms.Label();
-            this.ignoreList = new System.Windows.Forms.ListBox();
-            this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
-            this.addIgnore_btn = new System.Windows.Forms.Button();
-            this.removeIgnore_btn = new System.Windows.Forms.Button();
             mainTable = new System.Windows.Forms.TableLayoutPanel();
             tableDirectories = new System.Windows.Forms.TableLayoutPanel();
             sourceLabel = new System.Windows.Forms.Label();
@@ -194,6 +194,7 @@ namespace TVSorter.View
             this.groupDirectories.SuspendLayout();
             tableDirectories.SuspendLayout();
             destinationButtonsFlow.SuspendLayout();
+            this.flowLayoutPanel1.SuspendLayout();
             sortOptionsGroup.SuspendLayout();
             sortOptionsFlow.SuspendLayout();
             searchOptionsGroup.SuspendLayout();
@@ -201,7 +202,6 @@ namespace TVSorter.View
             formatOptionsGroup.SuspendLayout();
             formatTable.SuspendLayout();
             flowBottomButtons.SuspendLayout();
-            this.flowLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // mainTable
@@ -222,22 +222,26 @@ namespace TVSorter.View
             mainTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 95F));
             mainTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 56F));
             mainTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
-            mainTable.Size = new System.Drawing.Size(637, 450);
+            mainTable.Size = new System.Drawing.Size(734, 652);
             mainTable.TabIndex = 0;
             // 
             // groupDirectories
             // 
+            this.groupDirectories.AutoSize = true;
+            this.groupDirectories.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.groupDirectories.Controls.Add(tableDirectories);
             this.groupDirectories.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupDirectories.Location = new System.Drawing.Point(3, 3);
             this.groupDirectories.Name = "groupDirectories";
-            this.groupDirectories.Size = new System.Drawing.Size(631, 199);
+            this.groupDirectories.Size = new System.Drawing.Size(728, 401);
             this.groupDirectories.TabIndex = 0;
             this.groupDirectories.TabStop = false;
             this.groupDirectories.Text = "Directory Settings";
             // 
             // tableDirectories
             // 
+            tableDirectories.AutoSize = true;
+            tableDirectories.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             tableDirectories.ColumnCount = 3;
             tableDirectories.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 126F));
             tableDirectories.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
@@ -248,20 +252,20 @@ namespace TVSorter.View
             tableDirectories.Controls.Add(destinationListLabel, 0, 1);
             tableDirectories.Controls.Add(this.destinationList, 1, 1);
             tableDirectories.Controls.Add(destinationButtonsFlow, 2, 1);
-            tableDirectories.Controls.Add(defaultDestinationLabel, 0, 3);
             tableDirectories.Controls.Add(this.defaultDestinationDirectory, 1, 3);
             tableDirectories.Controls.Add(this.label1, 0, 2);
-            tableDirectories.Controls.Add(this.ignoreList, 1, 2);
             tableDirectories.Controls.Add(this.flowLayoutPanel1, 2, 2);
+            tableDirectories.Controls.Add(this.ignoreList, 1, 2);
+            tableDirectories.Controls.Add(defaultDestinationLabel, 0, 3);
             tableDirectories.Dock = System.Windows.Forms.DockStyle.Fill;
             tableDirectories.Location = new System.Drawing.Point(3, 16);
             tableDirectories.Name = "tableDirectories";
             tableDirectories.RowCount = 4;
-            tableDirectories.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 26F));
-            tableDirectories.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            tableDirectories.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 71F));
-            tableDirectories.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            tableDirectories.Size = new System.Drawing.Size(625, 180);
+            tableDirectories.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            tableDirectories.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            tableDirectories.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            tableDirectories.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            tableDirectories.Size = new System.Drawing.Size(722, 382);
             tableDirectories.TabIndex = 0;
             // 
             // sourceLabel
@@ -280,14 +284,14 @@ namespace TVSorter.View
             this.sourceText.Location = new System.Drawing.Point(129, 3);
             this.sourceText.Name = "sourceText";
             this.sourceText.ReadOnly = true;
-            this.sourceText.Size = new System.Drawing.Size(388, 20);
+            this.sourceText.Size = new System.Drawing.Size(485, 20);
             this.sourceText.TabIndex = 1;
             this.toolTip.SetToolTip(this.sourceText, "The source directory to search for TV Show files.");
             // 
             // sourceBrowse
             // 
             this.sourceBrowse.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.sourceBrowse.Location = new System.Drawing.Point(523, 3);
+            this.sourceBrowse.Location = new System.Drawing.Point(620, 3);
             this.sourceBrowse.Name = "sourceBrowse";
             this.sourceBrowse.Size = new System.Drawing.Size(99, 20);
             this.sourceBrowse.TabIndex = 2;
@@ -299,7 +303,7 @@ namespace TVSorter.View
             // 
             destinationListLabel.Anchor = System.Windows.Forms.AnchorStyles.Right;
             destinationListLabel.AutoSize = true;
-            destinationListLabel.Location = new System.Drawing.Point(7, 51);
+            destinationListLabel.Location = new System.Drawing.Point(7, 101);
             destinationListLabel.Name = "destinationListLabel";
             destinationListLabel.Size = new System.Drawing.Size(116, 13);
             destinationListLabel.TabIndex = 5;
@@ -311,21 +315,23 @@ namespace TVSorter.View
             this.destinationList.FormattingEnabled = true;
             this.destinationList.Location = new System.Drawing.Point(129, 29);
             this.destinationList.Name = "destinationList";
-            this.destinationList.Size = new System.Drawing.Size(388, 57);
+            this.destinationList.Size = new System.Drawing.Size(485, 158);
             this.destinationList.TabIndex = 6;
             this.toolTip.SetToolTip(this.destinationList, "All the directories where TV Shows are stored. Only the selected one will have TV" +
         " moved to it but all will be used in Missing and Duplicate episode searches.");
             // 
             // destinationButtonsFlow
             // 
+            destinationButtonsFlow.AutoSize = true;
+            destinationButtonsFlow.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             destinationButtonsFlow.Controls.Add(this.addDestinationButton);
             destinationButtonsFlow.Controls.Add(this.removeDestinationButton);
             destinationButtonsFlow.Dock = System.Windows.Forms.DockStyle.Fill;
             destinationButtonsFlow.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-            destinationButtonsFlow.Location = new System.Drawing.Point(520, 26);
+            destinationButtonsFlow.Location = new System.Drawing.Point(617, 26);
             destinationButtonsFlow.Margin = new System.Windows.Forms.Padding(0);
             destinationButtonsFlow.Name = "destinationButtonsFlow";
-            destinationButtonsFlow.Size = new System.Drawing.Size(105, 63);
+            destinationButtonsFlow.Size = new System.Drawing.Size(105, 164);
             destinationButtonsFlow.TabIndex = 7;
             // 
             // addDestinationButton
@@ -348,33 +354,89 @@ namespace TVSorter.View
             this.removeDestinationButton.UseVisualStyleBackColor = true;
             this.removeDestinationButton.Click += new System.EventHandler(this.RemoveDestinationButtonClick);
             // 
-            // defaultDestinationLabel
-            // 
-            defaultDestinationLabel.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            defaultDestinationLabel.AutoSize = true;
-            defaultDestinationLabel.Location = new System.Drawing.Point(23, 163);
-            defaultDestinationLabel.Name = "defaultDestinationLabel";
-            defaultDestinationLabel.Size = new System.Drawing.Size(100, 13);
-            defaultDestinationLabel.TabIndex = 8;
-            defaultDestinationLabel.Text = "Default Destination:";
-            // 
             // defaultDestinationDirectory
             // 
             this.defaultDestinationDirectory.Dock = System.Windows.Forms.DockStyle.Fill;
             this.defaultDestinationDirectory.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.defaultDestinationDirectory.FormattingEnabled = true;
-            this.defaultDestinationDirectory.Location = new System.Drawing.Point(129, 163);
+            this.defaultDestinationDirectory.Location = new System.Drawing.Point(129, 357);
             this.defaultDestinationDirectory.Name = "defaultDestinationDirectory";
-            this.defaultDestinationDirectory.Size = new System.Drawing.Size(388, 21);
+            this.defaultDestinationDirectory.Size = new System.Drawing.Size(485, 21);
             this.defaultDestinationDirectory.TabIndex = 9;
+            // 
+            // label1
+            // 
+            this.label1.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(43, 265);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(80, 13);
+            this.label1.TabIndex = 10;
+            this.label1.Text = "Ignored folders:";
+            // 
+            // flowLayoutPanel1
+            // 
+            this.flowLayoutPanel1.AutoSize = true;
+            this.flowLayoutPanel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.flowLayoutPanel1.Controls.Add(this.addIgnore_btn);
+            this.flowLayoutPanel1.Controls.Add(this.removeIgnore_btn);
+            this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(617, 190);
+            this.flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(0);
+            this.flowLayoutPanel1.Name = "flowLayoutPanel1";
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(105, 164);
+            this.flowLayoutPanel1.TabIndex = 12;
+            // 
+            // addIgnore_btn
+            // 
+            this.addIgnore_btn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.addIgnore_btn.Location = new System.Drawing.Point(3, 3);
+            this.addIgnore_btn.Name = "addIgnore_btn";
+            this.addIgnore_btn.Size = new System.Drawing.Size(96, 23);
+            this.addIgnore_btn.TabIndex = 0;
+            this.addIgnore_btn.Text = "Add";
+            this.addIgnore_btn.UseVisualStyleBackColor = true;
+            this.addIgnore_btn.Click += new System.EventHandler(this.addIgnore_btn_Click);
+            // 
+            // removeIgnore_btn
+            // 
+            this.removeIgnore_btn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.removeIgnore_btn.Location = new System.Drawing.Point(3, 32);
+            this.removeIgnore_btn.Name = "removeIgnore_btn";
+            this.removeIgnore_btn.Size = new System.Drawing.Size(96, 23);
+            this.removeIgnore_btn.TabIndex = 1;
+            this.removeIgnore_btn.Text = "Remove";
+            this.removeIgnore_btn.UseVisualStyleBackColor = true;
+            this.removeIgnore_btn.Click += new System.EventHandler(this.removeIgnore_btn_Click);
+            // 
+            // ignoreList
+            // 
+            this.ignoreList.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ignoreList.FormattingEnabled = true;
+            this.ignoreList.Location = new System.Drawing.Point(129, 193);
+            this.ignoreList.Name = "ignoreList";
+            this.ignoreList.Size = new System.Drawing.Size(485, 158);
+            this.ignoreList.TabIndex = 11;
+            // 
+            // defaultDestinationLabel
+            // 
+            defaultDestinationLabel.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            defaultDestinationLabel.AutoSize = true;
+            defaultDestinationLabel.Location = new System.Drawing.Point(23, 361);
+            defaultDestinationLabel.Name = "defaultDestinationLabel";
+            defaultDestinationLabel.Size = new System.Drawing.Size(100, 13);
+            defaultDestinationLabel.TabIndex = 8;
+            defaultDestinationLabel.Text = "Default Destination:";
             // 
             // sortOptionsGroup
             // 
             sortOptionsGroup.Controls.Add(sortOptionsFlow);
             sortOptionsGroup.Dock = System.Windows.Forms.DockStyle.Fill;
-            sortOptionsGroup.Location = new System.Drawing.Point(3, 262);
+            sortOptionsGroup.Location = new System.Drawing.Point(3, 464);
             sortOptionsGroup.Name = "sortOptionsGroup";
-            sortOptionsGroup.Size = new System.Drawing.Size(631, 89);
+            sortOptionsGroup.Size = new System.Drawing.Size(728, 89);
             sortOptionsGroup.TabIndex = 1;
             sortOptionsGroup.TabStop = false;
             sortOptionsGroup.Text = "Sort Options";
@@ -391,7 +453,7 @@ namespace TVSorter.View
             sortOptionsFlow.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             sortOptionsFlow.Location = new System.Drawing.Point(3, 16);
             sortOptionsFlow.Name = "sortOptionsFlow";
-            sortOptionsFlow.Size = new System.Drawing.Size(625, 70);
+            sortOptionsFlow.Size = new System.Drawing.Size(722, 70);
             sortOptionsFlow.TabIndex = 0;
             // 
             // recurseSubdirectoriesCheck
@@ -469,9 +531,9 @@ namespace TVSorter.View
             // 
             searchOptionsGroup.Controls.Add(searchOptionsFlow);
             searchOptionsGroup.Dock = System.Windows.Forms.DockStyle.Fill;
-            searchOptionsGroup.Location = new System.Drawing.Point(3, 357);
+            searchOptionsGroup.Location = new System.Drawing.Point(3, 559);
             searchOptionsGroup.Name = "searchOptionsGroup";
-            searchOptionsGroup.Size = new System.Drawing.Size(631, 50);
+            searchOptionsGroup.Size = new System.Drawing.Size(728, 50);
             searchOptionsGroup.TabIndex = 2;
             searchOptionsGroup.TabStop = false;
             searchOptionsGroup.Text = "Search Options";
@@ -484,7 +546,7 @@ namespace TVSorter.View
             searchOptionsFlow.Dock = System.Windows.Forms.DockStyle.Fill;
             searchOptionsFlow.Location = new System.Drawing.Point(3, 16);
             searchOptionsFlow.Name = "searchOptionsFlow";
-            searchOptionsFlow.Size = new System.Drawing.Size(625, 31);
+            searchOptionsFlow.Size = new System.Drawing.Size(722, 31);
             searchOptionsFlow.TabIndex = 0;
             // 
             // regExButton
@@ -525,9 +587,9 @@ namespace TVSorter.View
             // 
             formatOptionsGroup.Controls.Add(formatTable);
             formatOptionsGroup.Dock = System.Windows.Forms.DockStyle.Fill;
-            formatOptionsGroup.Location = new System.Drawing.Point(3, 208);
+            formatOptionsGroup.Location = new System.Drawing.Point(3, 410);
             formatOptionsGroup.Name = "formatOptionsGroup";
-            formatOptionsGroup.Size = new System.Drawing.Size(631, 48);
+            formatOptionsGroup.Size = new System.Drawing.Size(728, 48);
             formatOptionsGroup.TabIndex = 3;
             formatOptionsGroup.TabStop = false;
             formatOptionsGroup.Text = "Format Options";
@@ -546,7 +608,7 @@ namespace TVSorter.View
             formatTable.Name = "formatTable";
             formatTable.RowCount = 1;
             formatTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            formatTable.Size = new System.Drawing.Size(625, 29);
+            formatTable.Size = new System.Drawing.Size(722, 29);
             formatTable.TabIndex = 0;
             // 
             // formatLabel
@@ -564,7 +626,7 @@ namespace TVSorter.View
             this.formatText.Dock = System.Windows.Forms.DockStyle.Fill;
             this.formatText.Location = new System.Drawing.Point(129, 3);
             this.formatText.Name = "formatText";
-            this.formatText.Size = new System.Drawing.Size(388, 20);
+            this.formatText.Size = new System.Drawing.Size(485, 20);
             this.formatText.TabIndex = 1;
             this.toolTip.SetToolTip(this.formatText, "The formatting string used to set the output path for an episode. This setting ca" +
         "n be overriden on a per show basis.");
@@ -572,7 +634,7 @@ namespace TVSorter.View
             // formatBuilderButton
             // 
             this.formatBuilderButton.Dock = System.Windows.Forms.DockStyle.Top;
-            this.formatBuilderButton.Location = new System.Drawing.Point(523, 3);
+            this.formatBuilderButton.Location = new System.Drawing.Point(620, 3);
             this.formatBuilderButton.Name = "formatBuilderButton";
             this.formatBuilderButton.Size = new System.Drawing.Size(99, 23);
             this.formatBuilderButton.TabIndex = 2;
@@ -586,14 +648,14 @@ namespace TVSorter.View
             flowBottomButtons.Controls.Add(this.saveButton);
             flowBottomButtons.Dock = System.Windows.Forms.DockStyle.Fill;
             flowBottomButtons.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft;
-            flowBottomButtons.Location = new System.Drawing.Point(3, 413);
+            flowBottomButtons.Location = new System.Drawing.Point(3, 615);
             flowBottomButtons.Name = "flowBottomButtons";
-            flowBottomButtons.Size = new System.Drawing.Size(631, 34);
+            flowBottomButtons.Size = new System.Drawing.Size(728, 34);
             flowBottomButtons.TabIndex = 4;
             // 
             // revertButton
             // 
-            this.revertButton.Location = new System.Drawing.Point(553, 3);
+            this.revertButton.Location = new System.Drawing.Point(650, 3);
             this.revertButton.Name = "revertButton";
             this.revertButton.Size = new System.Drawing.Size(75, 23);
             this.revertButton.TabIndex = 0;
@@ -603,7 +665,7 @@ namespace TVSorter.View
             // 
             // saveButton
             // 
-            this.saveButton.Location = new System.Drawing.Point(472, 3);
+            this.saveButton.Location = new System.Drawing.Point(569, 3);
             this.saveButton.Name = "saveButton";
             this.saveButton.Size = new System.Drawing.Size(75, 23);
             this.saveButton.TabIndex = 1;
@@ -611,71 +673,22 @@ namespace TVSorter.View
             this.saveButton.UseVisualStyleBackColor = true;
             this.saveButton.Click += new System.EventHandler(this.SaveButtonClick);
             // 
-            // label1
-            // 
-            this.label1.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(43, 118);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(80, 13);
-            this.label1.TabIndex = 10;
-            this.label1.Text = "Ignored folders:";
-            // 
-            // ignoreList
-            // 
-            this.ignoreList.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.ignoreList.FormattingEnabled = true;
-            this.ignoreList.Location = new System.Drawing.Point(129, 92);
-            this.ignoreList.Name = "ignoreList";
-            this.ignoreList.Size = new System.Drawing.Size(388, 65);
-            this.ignoreList.TabIndex = 11;
-            // 
-            // flowLayoutPanel1
-            // 
-            this.flowLayoutPanel1.Controls.Add(this.addIgnore_btn);
-            this.flowLayoutPanel1.Controls.Add(this.removeIgnore_btn);
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(523, 92);
-            this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(99, 65);
-            this.flowLayoutPanel1.TabIndex = 12;
-            // 
-            // addIgnore_btn
-            // 
-            this.addIgnore_btn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.addIgnore_btn.Location = new System.Drawing.Point(3, 3);
-            this.addIgnore_btn.Name = "addIgnore_btn";
-            this.addIgnore_btn.Size = new System.Drawing.Size(96, 23);
-            this.addIgnore_btn.TabIndex = 0;
-            this.addIgnore_btn.Text = "Add";
-            this.addIgnore_btn.UseVisualStyleBackColor = true;
-            this.addIgnore_btn.Click += new System.EventHandler(this.addIgnore_btn_Click);
-            // 
-            // removeIgnore_btn
-            // 
-            this.removeIgnore_btn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.removeIgnore_btn.Location = new System.Drawing.Point(3, 32);
-            this.removeIgnore_btn.Name = "removeIgnore_btn";
-            this.removeIgnore_btn.Size = new System.Drawing.Size(96, 23);
-            this.removeIgnore_btn.TabIndex = 1;
-            this.removeIgnore_btn.Text = "Remove";
-            this.removeIgnore_btn.UseVisualStyleBackColor = true;
-            this.removeIgnore_btn.Click += new System.EventHandler(this.removeIgnore_btn_Click);
-            // 
             // Settings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(mainTable);
             this.Name = "Settings";
-            this.Size = new System.Drawing.Size(637, 450);
+            this.Size = new System.Drawing.Size(734, 652);
             this.Load += new System.EventHandler(this.SettingsLoad);
             mainTable.ResumeLayout(false);
+            mainTable.PerformLayout();
             this.groupDirectories.ResumeLayout(false);
+            this.groupDirectories.PerformLayout();
             tableDirectories.ResumeLayout(false);
             tableDirectories.PerformLayout();
             destinationButtonsFlow.ResumeLayout(false);
+            this.flowLayoutPanel1.ResumeLayout(false);
             sortOptionsGroup.ResumeLayout(false);
             sortOptionsFlow.ResumeLayout(false);
             sortOptionsFlow.PerformLayout();
@@ -685,7 +698,6 @@ namespace TVSorter.View
             formatTable.ResumeLayout(false);
             formatTable.PerformLayout();
             flowBottomButtons.ResumeLayout(false);
-            this.flowLayoutPanel1.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
