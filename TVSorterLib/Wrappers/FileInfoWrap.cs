@@ -24,7 +24,7 @@ namespace TVSorter.Wrappers
         #region Constructors and Destructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FileInfoWrap"/> class.
+        /// Initialises a new instance of the <see cref="FileInfoWrap"/> class.
         /// </summary>
         /// <param name="fileName">
         /// The file name.
@@ -35,7 +35,7 @@ namespace TVSorter.Wrappers
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FileInfoWrap"/> class.
+        /// Initialises a new instance of the <see cref="FileInfoWrap"/> class.
         /// </summary>
         /// <param name="fileInfo">
         /// The file info.
@@ -142,7 +142,7 @@ namespace TVSorter.Wrappers
         }
 
         /// <summary>
-        /// Moves the file to the specfied location.
+        /// Moves the file to the specified location.
         /// </summary>
         /// <param name="destFileName">
         /// The destination to move to.

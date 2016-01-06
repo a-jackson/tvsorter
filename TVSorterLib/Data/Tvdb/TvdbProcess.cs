@@ -21,7 +21,7 @@ namespace TVSorter.Data.Tvdb
     #endregion
 
     /// <summary>
-    /// The tvdb process.
+    /// The TVDB process.
     /// </summary>
     internal class TvdbProcess
     {
@@ -223,7 +223,7 @@ namespace TVSorter.Data.Tvdb
         }
 
         /// <summary>
-        /// Parses an int and returns the default value if unsuccessful.
+        /// Parses an integer and returns the default value if unsuccessful.
         /// </summary>
         /// <param name="str">
         /// The string to parse. 
@@ -232,7 +232,7 @@ namespace TVSorter.Data.Tvdb
         /// The default value to return. 
         /// </param>
         /// <returns>
-        /// The parsed int. 
+        /// The parsed integer. 
         /// </returns>
         private int ParseInt(string str, int defaultValue = -1)
         {

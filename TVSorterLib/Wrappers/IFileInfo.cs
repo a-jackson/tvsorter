@@ -66,7 +66,7 @@ namespace TVSorter.Wrappers
         void Delete();
 
         /// <summary>
-        /// Moves the file to the specfied location.
+        /// Moves the file to the specified location.
         /// </summary>
         /// <param name="destFileName">
         /// The destination to move to.

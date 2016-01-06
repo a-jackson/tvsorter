@@ -8,13 +8,13 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter.View
 {
-    using Files;
-    using Repostitory;
     #region Using Directives
 
     using System;
     using System.Windows.Forms;
 
+    using Files;
+    using Repostitory;
     using Version = TVSorter.Version;
 
     #endregion
@@ -27,7 +27,7 @@ namespace TVSorter.View
         #region Constructors and Destructors
 
         /// <summary>
-        ///   Initializes a new instance of the <see cref="MainForm" /> class.
+        ///   Initialises a new instance of the <see cref="MainForm" /> class.
         /// </summary>
         public MainForm()
         {

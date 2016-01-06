@@ -8,12 +8,12 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter.View
 {
-    using Files;
     using System;
     using System.IO;
     using System.Windows.Forms;
 
-    using TVSorter.Model;
+    using Files;
+    using Model;
 
     /// <summary>
     /// The class for the FormatBuilder form.
@@ -26,18 +26,24 @@ namespace TVSorter.View
         /// The result used for the example format.
         /// </summary>
         private readonly FileResult exampleResult;
+
+        /// <summary>
+        /// The file result manager.
+        /// </summary>
         private readonly IFileResultManager fileResultManager;
-
-
+        
         #endregion
 
         #region Constructors and Destructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FormatBuilder"/> class.
+        /// Initialises a new instance of the <see cref="FormatBuilder"/> class.
         /// </summary>
         /// <param name="currentFormat">
         /// The current format.
+        /// </param>
+        /// <param name="fileResultManager">
+        /// The file result manager.
         /// </param>
         public FormatBuilder(string currentFormat, IFileResultManager fileResultManager)
         {

@@ -8,8 +8,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter.View
 {
-    using Files;
-    using Storage;
     #region Using Directives
 
     using System;
@@ -18,7 +16,9 @@ namespace TVSorter.View
     using System.Linq;
     using System.Windows.Forms;
 
-    using TVSorter.Controller;
+    using Controller;
+    using Files;
+    using Storage;
 
     #endregion
 
@@ -39,7 +39,7 @@ namespace TVSorter.View
         #region Constructors and Destructors
 
         /// <summary>
-        ///   Initializes a new instance of the <see cref="MissingDuplicateEpisodes" /> class.
+        ///   Initialises a new instance of the <see cref="MissingDuplicateEpisodes" /> class.
         /// </summary>
         public MissingDuplicateEpisodes()
         {
@@ -48,7 +48,14 @@ namespace TVSorter.View
 
         #endregion
 
+        /// <summary>
+        /// Gets or sets the Storage Provider.
+        /// </summary>
         public IStorageProvider StorageProvider { get; set; }
+
+        /// <summary>
+        /// Gets or sets the File Searcher.
+        /// </summary>
         public IFileSearch FileSearch { get; set; }
 
         #region Public Methods and Operators

@@ -40,7 +40,7 @@ namespace TVSorter.Controller
         #region Constructors and Destructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ListController"/> class.
+        /// Initialises a new instance of the <see cref="ListController"/> class.
         /// </summary>
         /// <param name="list">
         /// The list. 

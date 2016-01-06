@@ -29,7 +29,7 @@ namespace TVSorter.Model
         #region Constructors and Destructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TvShow"/> class.
+        /// Initialises a new instance of the <see cref="TvShow"/> class.
         /// </summary>
         internal TvShow()
         {
@@ -80,17 +80,17 @@ namespace TVSorter.Model
         public string Name { get; set; }
 
         /// <summary>
-        ///   Gets or sets TvdbId.
+        ///   Gets or sets the TVDB ID.
         /// </summary>
         public string TvdbId { get; set; }
 
         /// <summary>
-        ///   Gets or sets a value indicating whether UseCustomFormat.
+        ///   Gets or sets a value indicating whether to Use Custom Format.
         /// </summary>
         public bool UseCustomFormat { get; set; }
 
         /// <summary>
-        ///   Gets or sets a value indicating whether UseDvdOrder.
+        ///   Gets or sets a value indicating whether to use DVD Order.
         /// </summary>
         public bool UseDvdOrder { get; set; }
 
@@ -184,9 +184,8 @@ namespace TVSorter.Model
         /// <returns>The possible names of the show.</returns>
         internal IEnumerable<string> GetShowNames()
         {
-            return GetNames(new[] { this.Name, this.FolderName }.Concat(this.AlternateNames)).Distinct();
+            return this.GetNames(new[] { this.Name, this.FolderName }.Concat(this.AlternateNames)).Distinct();
         }
-
 
         /// <summary>
         /// Gets the custom destination directory for the show.
@@ -198,6 +197,22 @@ namespace TVSorter.Model
             return new DirectoryInfoWrap(this.CustomDestinationDir);
         }
 
+        /// <summary>
+        /// Initialises the show with default values.
+        /// </summary>
+        internal void InitialiseDefaultData()
+        {
+            this.AlternateNames = new List<string>();
+            this.Banner = string.Empty;
+            this.CustomFormat = string.Empty;
+            this.LastUpdated = DateTime.MinValue;
+            this.Locked = false;
+            this.UseCustomFormat = false;
+            this.UseDvdOrder = false;
+            this.UseCustomDestination = false;
+            this.CustomDestinationDir = string.Empty;
+        }
+        
         /// <summary>
         /// Gets the names from the specified collection of names.
         /// </summary>
@@ -217,22 +232,6 @@ namespace TVSorter.Model
                 yield return name.RemoveSpecialChars();
                 yield return name.AlphaNumericOnly();
             }
-        }
-        
-        /// <summary>
-        /// Initialises the show with default values.
-        /// </summary>
-        internal void InitialiseDefaultData()
-        {
-            this.AlternateNames = new List<string>();
-            this.Banner = string.Empty;
-            this.CustomFormat = string.Empty;
-            this.LastUpdated = DateTime.MinValue;
-            this.Locked = false;
-            this.UseCustomFormat = false;
-            this.UseDvdOrder = false;
-            this.UseCustomDestination = false;
-            this.CustomDestinationDir = string.Empty;
         }
 
         #endregion

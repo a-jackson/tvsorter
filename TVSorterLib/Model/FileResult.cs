@@ -30,7 +30,7 @@ namespace TVSorter.Model
         #region Constructors and Destructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FileResult"/> class.
+        /// Initialises a new instance of the <see cref="FileResult"/> class.
         /// </summary>
         internal FileResult()
         {
@@ -76,7 +76,7 @@ namespace TVSorter.Model
         public Episode Episode { get; internal set; }
 
         /// <summary>
-        /// Gets the files's episodes matches.
+        /// Gets the file's episodes matches.
         /// </summary>
         public IList<Episode> Episodes { get; internal set; }
 

@@ -20,6 +20,10 @@ namespace TVSorter.Controller
     /// </summary>
     public class AddShowController : ShowSearchController
     {
+        /// <summary>
+        /// Initialises a new instance of the <see cref="AddShowController" /> class.
+        /// </summary>
+        /// <param name="tvShowRepository">The TV Show Repository.</param>
         public AddShowController(ITvShowRepository tvShowRepository) : base(tvShowRepository)
         {
         }

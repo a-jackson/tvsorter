@@ -14,15 +14,14 @@ namespace TVSorter.Test
     using System.Collections.Generic;
     using System.Linq;
 
+    using Data;
+    using Files;
+    using Model;
     using NSubstitute;
-
     using NUnit.Framework;
-
-    using TVSorter.Data;
-    using TVSorter.Files;
-    using TVSorter.Model;
-    using TVSorter.Wrappers;
     using Repostitory;
+    using Wrappers;
+
     #endregion
 
     /// <summary>
@@ -43,6 +42,9 @@ namespace TVSorter.Test
         /// </summary>
         private ScanManager scanManager;
 
+        /// <summary>
+        /// The TV show repository.
+        /// </summary>
         private ITvShowRepository tvShowRepository;
 
         #endregion
@@ -155,7 +157,7 @@ namespace TVSorter.Test
         }
 
         /// <summary>
-        /// Tests the precendece of the the regular expressions to ensure that the higher listed match is used in the case of multiple matches.
+        /// Tests the precedence of the the regular expressions to ensure that the higher listed match is used in the case of multiple matches.
         /// </summary>
         /// <param name="seasonEpisodeNumber">
         /// The season and episode number string format. 

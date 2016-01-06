@@ -24,7 +24,7 @@ namespace TVSorter.Wrappers
         #region Constructors and Destructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DirectoryInfoWrap"/> class.
+        /// Initialises a new instance of the <see cref="DirectoryInfoWrap"/> class.
         /// </summary>
         /// <param name="path">
         /// The path.
@@ -35,7 +35,7 @@ namespace TVSorter.Wrappers
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DirectoryInfoWrap"/> class.
+        /// Initialises a new instance of the <see cref="DirectoryInfoWrap"/> class.
         /// </summary>
         /// <param name="directoryInfo">
         /// The directory info.
@@ -144,7 +144,7 @@ namespace TVSorter.Wrappers
         /// Gets a sub file of the directory at the specified path.
         /// </summary>
         /// <param name="outputPath">
-        /// The path toget the file for.
+        /// The path to get the file for.
         /// </param>
         /// <returns>
         /// The IFileInfo for the file.

@@ -20,16 +20,6 @@ namespace TVSorter
         #region Static Fields
 
         /// <summary>
-        ///   An array of characters that can be used as spaces.
-        /// </summary>
-        private static readonly char[] SpacerChars = new[] { '.', '_', '-' };
-
-        /// <summary>
-        /// An array of special characters to be removed.
-        /// </summary>
-        private static readonly char[] SpecialChars = new[] { '?', ':', ';', ',', '#', '~', '(', ')', '&', '%', '$' };
-
-        /// <summary>
         /// A collecting of characters not to be used in file names.
         /// </summary>
         internal static readonly char[] InvalidFilenameChars =
@@ -42,6 +32,16 @@ namespace TVSorter
                 '\u0019', '\u001A', '\u001B', '\u001C', '\u001D', '\u001E',
                 '\u001F', '\u003A', '\u002A', '\u003F', '\u005C', '\u002F'
             };
+
+        /// <summary>
+        ///   An array of characters that can be used as spaces.
+        /// </summary>
+        private static readonly char[] SpacerChars = new[] { '.', '_', '-' };
+
+        /// <summary>
+        /// An array of special characters to be removed.
+        /// </summary>
+        private static readonly char[] SpecialChars = new[] { '?', ':', ';', ',', '#', '~', '(', ')', '&', '%', '$' };
 
         #endregion
 
@@ -91,7 +91,7 @@ namespace TVSorter
         }
 
         /// <summary>
-        /// Removes the spacer chars from the specfied string.
+        /// Removes the spacer chars from the specified string.
         /// </summary>
         /// <param name="str">
         /// The string to process.

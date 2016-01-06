@@ -53,13 +53,19 @@ namespace TVSorter.Files
         #region Constructors and Destructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FileManager"/> class. Initialises a new instance of the <see cref="FileManager"/> class.
+        /// Initialises a new instance of the <see cref="FileManager"/> class. Initialises a new instance of the <see cref="FileManager"/> class.
         /// </summary>
         /// <param name="storageProvider">
         /// The storage provider.
         /// </param>
         /// <param name="dataProvider">
         /// The data provider.
+        /// </param>
+        /// <param name="scanManager">
+        /// The scan manager.
+        /// </param>
+        /// <param name="fileResultManager">
+        /// The file result manager.
         /// </param>
         public FileManager(IStorageProvider storageProvider, IDataProvider dataProvider, IScanManager scanManager, IFileResultManager fileResultManager)
         {
@@ -240,7 +246,7 @@ namespace TVSorter.Files
                 }
 
                 // Refresh the destination info as it may have changed.
-                destinationInfo = fileResultManager.GetFullPath(file, destination);
+                destinationInfo = this.fileResultManager.GetFullPath(file, destination);
             }
 
             return true;
@@ -260,7 +266,7 @@ namespace TVSorter.Files
         /// </param>
         private void ProcessFile(SortType type, FileResult file, IDirectoryInfo destination)
         {
-            IFileInfo destinationInfo = fileResultManager.GetFullPath(file, destination);
+            IFileInfo destinationInfo = this.fileResultManager.GetFullPath(file, destination);
             if (destinationInfo.Directory != null && !destinationInfo.Directory.Exists)
             {
                 destinationInfo.Directory.Create();

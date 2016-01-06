@@ -17,14 +17,13 @@ namespace TVSorter
 
     using CommandLine;
 
-    using TVSorter.Model;
-    using TVSorter;
-    using Repostitory;
     using Files;
+    using Model;
+    using Repostitory;
     #endregion
 
     /// <summary>
-    /// TVSorterCmd's program.
+    /// Entry point class for the TVSorter Command Line application.
     /// </summary>
     internal static class Program
     {
@@ -146,8 +145,6 @@ namespace TVSorter
                     }
                 }
             }
-
-
         }
 
         #endregion

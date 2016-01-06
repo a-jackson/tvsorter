@@ -8,28 +8,65 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter.Files
 {
+    #region Using Directives
+
     using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
     using System.Linq;
+
     using Data;
-    using Storage;
     using Model;
+    using Storage;
+
+    #endregion
+
     /// <summary>
     /// Searches the files and presents the results.
     /// </summary>
     public class FileSearch : IFileSearch
     {
-        private IStorageProvider storageProvider;
-        private IDataProvider dataProvider;
-        private IFileManager fileManager;
-        private IScanManager scanManager;
+        #region Fields
 
+        /// <summary>
+        /// The storage provider.
+        /// </summary>
+        private IStorageProvider storageProvider;
+
+        /// <summary>
+        /// The data provider.
+        /// </summary>
+        private IDataProvider dataProvider;
+
+        /// <summary>
+        /// The file manager.
+        /// </summary>
+        private IFileManager fileManager;
+
+        /// <summary>
+        /// The scan manager.
+        /// </summary>
+        private IScanManager scanManager;
+        
+        #endregion
+        
         #region Constructors and Destructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FileSearch"/> class.
+        /// Initialises a new instance of the <see cref="FileSearch"/> class.
         /// </summary>
+        /// <param name="storageProvider">
+        /// The storage provider.
+        /// </param>
+        /// <param name="dataProvider">
+        /// The data provider.
+        /// </param>
+        /// <param name="scanManager">
+        /// The scan manager.
+        /// </param>
+        /// <param name="fileManager">
+        /// The file manager.
+        /// </param>
         public FileSearch(IStorageProvider storageProvider, IDataProvider dataProvider, IScanManager scanManager, IFileManager fileManager)
         {
             this.Results = new List<FileResult>();
@@ -57,7 +94,7 @@ namespace TVSorter.Files
         /// </summary>
         public void RefreshFileCounts()
         {
-            scanManager.RefreshFileCounts();
+            this.scanManager.RefreshFileCounts();
         }
 
         /// <summary>
@@ -65,7 +102,7 @@ namespace TVSorter.Files
         /// </summary>
         public void Copy()
         {
-            fileManager.CopyFile(this.Results.Where(x => x.Checked).ToList());
+            this.fileManager.CopyFile(this.Results.Where(x => x.Checked).ToList());
         }
 
         /// <summary>
@@ -73,7 +110,7 @@ namespace TVSorter.Files
         /// </summary>
         public void Move()
         {
-            fileManager.MoveFile(this.Results.Where(x => x.Checked).ToList());
+            this.fileManager.MoveFile(this.Results.Where(x => x.Checked).ToList());
         }
 
         /// <summary>
@@ -88,8 +125,8 @@ namespace TVSorter.Files
             {
                 subDirectory = Path.DirectorySeparatorChar.ToString(CultureInfo.InvariantCulture);
             }
-            
-            this.Results = scanManager.Refresh(subDirectory);
+
+            this.Results = this.scanManager.Refresh(subDirectory);
             Logger.OnLogMessage(this, "Scan complete. Found {0} files.", LogType.Info, this.Results.Count);
         }
 
@@ -124,7 +161,7 @@ namespace TVSorter.Files
         {
             foreach (FileResult result in this.Results.Where(x => x.Checked))
             {
-                scanManager.ResetShow(result, show);
+                this.scanManager.ResetShow(result, show);
             }
         }
 

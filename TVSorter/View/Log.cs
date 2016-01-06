@@ -36,7 +36,7 @@ namespace TVSorter.View
         #region Constructors and Destructors
 
         /// <summary>
-        ///   Initializes a new instance of the <see cref="Log" /> class.
+        ///   Initialises a new instance of the <see cref="Log" /> class.
         /// </summary>
         public Log()
         {
@@ -49,7 +49,7 @@ namespace TVSorter.View
         #region Public Methods and Operators
 
         /// <summary>
-        /// Handles a log message being recieved.
+        /// Handles a log message being received.
         /// </summary>
         /// <param name="sender">
         /// The sender of the event. 

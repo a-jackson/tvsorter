@@ -36,12 +36,12 @@ namespace TVSorter.Data.Tvdb
         private const string ApiKey = "D4DCAEBFCA5A6BC1";
 
         /// <summary>
-        ///   The addess of the api on the site.
+        ///   The address of the API on the site.
         /// </summary>
         private const string ApiLoc = "/api/" + ApiKey + "/";
 
         /// <summary>
-        ///   The address to donwload mirrors from.
+        ///   The address to download mirrors from.
         /// </summary>
         private const string MirrorsAddress = SiteAddress + ApiLoc + "/mirrors.xml";
 
@@ -74,7 +74,7 @@ namespace TVSorter.Data.Tvdb
         #region Constructors and Destructors
 
         /// <summary>
-        /// Initializes static members of the <see cref="TvdbDownload"/> class. 
+        /// Initialises static members of the <see cref="TvdbDownload"/> class. 
         /// </summary>
         /// <exception cref="Exception">
         /// Throws an exception if a mirror cannot be found.
@@ -262,7 +262,7 @@ namespace TVSorter.Data.Tvdb
         /// The XML to download. 
         /// </param>
         /// <returns>
-        /// A stringreader of the XML file. 
+        /// A string reader of the XML file. 
         /// </returns>
         private static StringReader DownloadXml(string url)
         {
@@ -295,6 +295,12 @@ namespace TVSorter.Data.Tvdb
                     select mirrorPath.Value).FirstOrDefault();
         }
 
+        /// <summary>
+        /// Gets the Web Client object to use.
+        /// </summary>
+        /// <returns>
+        /// The Web Client.
+        /// </returns>
         private static WebClient GetWebClient()
         {
             var client = new WebClient();

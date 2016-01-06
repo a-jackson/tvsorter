@@ -8,8 +8,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter.View
 {
-    using Files;
-    using Storage;
     #region Using Directives
 
     using System;
@@ -18,7 +16,9 @@ namespace TVSorter.View
     using System.Linq;
     using System.Windows.Forms;
 
-    using TVSorter.Controller;
+    using Controller;
+    using Files;
+    using Storage;
 
     #endregion
 
@@ -64,7 +64,7 @@ namespace TVSorter.View
         #region Constructors and Destructors
 
         /// <summary>
-        ///   Initializes a new instance of the <see cref="Settings" /> class.
+        ///   Initialises a new instance of the <see cref="Settings" /> class.
         /// </summary>
         public Settings()
         {
@@ -73,7 +73,14 @@ namespace TVSorter.View
 
         #endregion
 
+        /// <summary>
+        /// Gets or sets the storage provider.
+        /// </summary>
         public IStorageProvider StorageProvider { get; set; }
+
+        /// <summary>
+        /// Gets or sets the file result manager.
+        /// </summary>
         public IFileResultManager FileResultManager { get; set; }
 
         #region Public Methods and Operators
@@ -97,7 +104,7 @@ namespace TVSorter.View
         #region Methods
 
         /// <summary>
-        /// Handles the Add desination button being clicked.
+        /// Handles the Add destination button being clicked.
         /// </summary>
         /// <param name="sender">
         /// The sender of the event. 
@@ -113,7 +120,16 @@ namespace TVSorter.View
             }
         }
 
-        private void addIgnore_btn_Click(object sender, EventArgs e)
+        /// <summary>
+        /// Handles the Add Ignore button being clicked.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender of the event. 
+        /// </param>
+        /// <param name="e">
+        /// The arguments of the event. 
+        /// </param>
+        private void AddIgnoreButtonClick(object sender, EventArgs e)
         {
             if (this.folderDialog.ShowDialog(this) == DialogResult.OK)
             {
@@ -258,7 +274,16 @@ namespace TVSorter.View
             }
         }
 
-        private void removeIgnore_btn_Click(object sender, EventArgs e)
+        /// <summary>
+        /// Handles the Remove ignore button being clicked.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender of the event. 
+        /// </param>
+        /// <param name="e">
+        /// The arguments of the event. 
+        /// </param>
+        private void RemoveIgnoreButtonClick(object sender, EventArgs e)
         {
             if (this.destinationList.SelectedIndex != -1)
             {

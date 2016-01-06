@@ -34,7 +34,7 @@ namespace TVSorter.View
         #region Constructors and Destructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ProgressDialog"/> class.
+        /// Initialises a new instance of the <see cref="ProgressDialog"/> class.
         /// </summary>
         /// <param name="task">
         /// The task. 

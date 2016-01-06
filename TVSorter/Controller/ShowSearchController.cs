@@ -8,13 +8,13 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter.Controller
 {
-    using Repostitory;
     #region Using Directives
 
     using System.ComponentModel;
 
-    using TVSorter.Model;
-    using TVSorter.View;
+    using Model;
+    using Repostitory;
+    using View;
 
     #endregion
 
@@ -40,10 +40,17 @@ namespace TVSorter.Controller
         /// </summary>
         private string title;
 
+        /// <summary>
+        /// The TV show repository.
+        /// </summary>
         private ITvShowRepository tvShowRepository;
 
         #endregion
 
+        /// <summary>
+        /// Initialises a new instance of the <see cref="ShowSearchController"/> class.
+        /// </summary>
+        /// <param name="tvShowRepository">The TV Show Repository.</param>
         public ShowSearchController(ITvShowRepository tvShowRepository)
         {
             this.tvShowRepository = tvShowRepository;
@@ -120,7 +127,7 @@ namespace TVSorter.Controller
         /// Searches for the specified name.
         /// </summary>
         /// <param name="name">
-        /// The name to seach for. 
+        /// The name to search for. 
         /// </param>
         public void Search(string name)
         {

@@ -8,9 +8,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter.View
 {
-    using Files;
-    using Repostitory;
-    using Storage;
     #region Using Directives
 
     using System;
@@ -21,9 +18,12 @@ namespace TVSorter.View
     using System.Linq;
     using System.Windows.Forms;
 
-    using TVSorter.Controller;
-    using TVSorter.Model;
-    using TVSorter.Properties;
+    using Controller;
+    using Files;
+    using Model;
+    using Properties;
+    using Repostitory;
+    using Storage;
 
     #endregion
 
@@ -54,16 +54,35 @@ namespace TVSorter.View
         #region Constructors and Destructors
 
         /// <summary>
-        ///   Initializes a new instance of the <see cref="TvShows" /> class.
+        ///   Initialises a new instance of the <see cref="TvShows" /> class.
         /// </summary>
         public TvShows()
         {
             this.InitializeComponent();
         }
 
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// Gets or sets the TV Show Repository.
+        /// </summary>
         public ITvShowRepository TvShowRepository { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Storage Provider.
+        /// </summary>
         public IStorageProvider StorageProvider { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Scan Manager.
+        /// </summary>
         public IScanManager ScanManager { get; set; }
+
+        /// <summary>
+        /// Gets or sets the File Result Manager.
+        /// </summary>
         public IFileResultManager FileResultManager { get; set; }
 
         #endregion
@@ -105,7 +124,7 @@ namespace TVSorter.View
         }
 
         /// <summary>
-        /// Handles the Alternatee names button being clicked.
+        /// Handles the Alternate names button being clicked.
         /// </summary>
         /// <param name="sender">
         /// The sender of the event. 
@@ -378,7 +397,7 @@ namespace TVSorter.View
         /// Handles the controller's ShowChanged event.
         /// </summary>
         /// <param name="sender">
-        /// The sender of the evetn.
+        /// The sender of the event.
         /// </param>
         /// <param name="e">
         /// The arguments of the event.

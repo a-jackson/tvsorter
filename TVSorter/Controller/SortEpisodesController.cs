@@ -8,9 +8,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter.Controller
 {
-    using Files;
-    using Repostitory;
-    using Storage;
     #region Using Directives
 
     using System.Collections.Generic;
@@ -19,8 +16,11 @@ namespace TVSorter.Controller
     using System.IO;
     using System.Linq;
 
-    using TVSorter.Model;
-    using TVSorter.View;
+    using Files;
+    using Model;
+    using Repostitory;
+    using Storage;
+    using View;
 
     using Settings = TVSorter.Model.Settings;
 
@@ -38,7 +38,14 @@ namespace TVSorter.Controller
         /// </summary>
         private IFileSearch fileSearch;
 
+        /// <summary>
+        /// The TV show repository.
+        /// </summary>
         private ITvShowRepository tvShowRepository;
+
+        /// <summary>
+        /// The storage provider.
+        /// </summary>
         private IStorageProvider storageProvider;
 
         /// <summary>
@@ -63,6 +70,12 @@ namespace TVSorter.Controller
 
         #endregion
         
+        /// <summary>
+        /// Initialises a new instance of the <see cref="SortEpisodesController"/> class.
+        /// </summary>
+        /// <param name="tvShowRepository">The TV show repository.</param>
+        /// <param name="fileSearch">The file searcher.</param>
+        /// <param name="storageProvider">The storage provider.</param>
         public SortEpisodesController(ITvShowRepository tvShowRepository, IFileSearch fileSearch, IStorageProvider storageProvider)
         {
             this.tvShowRepository = tvShowRepository;

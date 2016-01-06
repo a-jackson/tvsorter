@@ -15,7 +15,7 @@ namespace TVSorter
     using TVSorter.Storage;
 
     /// <summary>
-    /// Extenstions to the IEnumerable interface.
+    /// Extensions to the IEnumerable interface.
     /// </summary>
     public static class EnumerableExtensions
     {
@@ -35,7 +35,6 @@ namespace TVSorter
             provider.SaveShows(shows);
         }
         
-
         #endregion
     }
 }

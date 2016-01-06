@@ -34,7 +34,7 @@ namespace TVSorter.Controller
         #region Constructors and Destructors
 
         /// <summary>
-        ///   Initializes a new instance of the <see cref="LogController" /> class.
+        ///   Initialises a new instance of the <see cref="LogController" /> class.
         /// </summary>
         public LogController()
         {
@@ -95,7 +95,7 @@ namespace TVSorter.Controller
         }
 
         /// <summary>
-        /// Handles a log message being recieved.
+        /// Handles a log message being received.
         /// </summary>
         /// <param name="sender">
         /// The sender of the event. 

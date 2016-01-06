@@ -14,7 +14,7 @@ namespace TVSorter.Storage
     using TVSorter.Model;
 
     /// <summary>
-    /// Repsents an object that can provide storage for the program.
+    /// Represents an object that can provide storage for the program.
     /// </summary>
     public interface IStorageProvider
     {
@@ -42,6 +42,20 @@ namespace TVSorter.Storage
 
         #endregion
 
+        #region Properties
+
+        /// <summary>
+        /// Gets the settings object.
+        /// </summary>
+        Settings Settings { get; }
+
+        /// <summary>
+        /// Gets the missing episode settings.
+        /// </summary>
+        MissingEpisodeSettings MissingEpisodeSettings { get; }
+
+        #endregion
+
         #region Public Methods and Operators
 
         /// <summary>
@@ -59,16 +73,6 @@ namespace TVSorter.Storage
         /// The collection of episodes that are missing. 
         /// </returns>
         IEnumerable<Episode> GetMissingEpisodes();
-        
-        /// <summary>
-        /// Gets the settings object.
-        /// </summary>
-        Settings Settings { get; }
-
-        /// <summary>
-        /// Gets the missing episode settings.
-        /// </summary>
-        MissingEpisodeSettings MissingEpisodeSettings { get; }
 
         /// <summary>
         /// Loads all the TVShows from the XML file.
@@ -123,12 +127,19 @@ namespace TVSorter.Storage
         /// <summary>
         /// Reads the settings from the XML file.
         /// </summary>
+        /// <returns>
+        /// The settings that have been loaded.
+        /// </returns>
         Settings LoadSettings();
 
         /// <summary>
         /// Loads the missing episode settings from the XML file.
         /// </summary>
+        /// <returns>
+        /// The settings that have been loaded.
+        /// </returns>
         MissingEpisodeSettings LoadMissingEpisodeSettings();
+
         #endregion
     }
 }

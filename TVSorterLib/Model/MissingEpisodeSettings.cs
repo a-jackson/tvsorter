@@ -18,7 +18,7 @@ namespace TVSorter.Model
         #region Constructors and Destructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MissingEpisodeSettings"/> class.
+        /// Initialises a new instance of the <see cref="MissingEpisodeSettings"/> class.
         /// </summary>
         internal MissingEpisodeSettings()
         {
@@ -59,7 +59,7 @@ namespace TVSorter.Model
         #region Methods
         
         /// <summary>
-        /// Initiaises the settings to default values.
+        /// Initialises the settings to default values.
         /// </summary>
         private void SetDefault()
         {

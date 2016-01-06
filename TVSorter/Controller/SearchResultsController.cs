@@ -8,14 +8,14 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter.Controller
 {
-    using Repostitory;
     #region Using Directives
 
     using System.Collections.Generic;
     using System.ComponentModel;
 
-    using TVSorter.Model;
-    using TVSorter.View;
+    using Model;
+    using Repostitory;
+    using View;
 
     #endregion
 
@@ -24,10 +24,6 @@ namespace TVSorter.Controller
     /// </summary>
     public class SearchResultsController : ShowSearchController
     {
-        public SearchResultsController(ITvShowRepository tvShowRepository) : base(tvShowRepository)
-        {
-        }
-
         #region Fields
 
         /// <summary>
@@ -36,6 +32,14 @@ namespace TVSorter.Controller
         private string folderName;
 
         #endregion
+
+        /// <summary>
+        /// Initialises a new instance of the <see cref="SearchResultsController"/> class.
+        /// </summary>
+        /// <param name="tvShowRepository">The TV Show Repository.</param>
+        public SearchResultsController(ITvShowRepository tvShowRepository) : base(tvShowRepository)
+        {
+        }
 
         #region Public Methods and Operators
 

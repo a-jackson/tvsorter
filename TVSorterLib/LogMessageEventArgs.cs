@@ -22,7 +22,7 @@ namespace TVSorter
         #region Constructors and Destructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="LogMessageEventArgs"/> class. Initialises a new instance of the <see cref="LogMessageEventArgs"/> class.
+        /// Initialises a new instance of the <see cref="LogMessageEventArgs"/> class. Initialises a new instance of the <see cref="LogMessageEventArgs"/> class.
         /// </summary>
         /// <param name="message">
         ///   The message. 

@@ -91,7 +91,6 @@
     <Compile Include="Wrappers\FileInfoWrap.cs" />
     <Compile Include="Wrappers\IDirectoryInfo.cs" />
     <Compile Include="Wrappers\IFileInfo.cs" />
-    <Compile Include="XmlExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="TVSorter-5.0.xsd">

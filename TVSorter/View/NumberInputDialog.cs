@@ -23,7 +23,7 @@ namespace TVSorter.View
         #region Constructors and Destructors
 
         /// <summary>
-        ///   Initializes a new instance of the <see cref="NumberInputDialog" /> class.
+        ///   Initialises a new instance of the <see cref="NumberInputDialog" /> class.
         /// </summary>
         public NumberInputDialog()
         {

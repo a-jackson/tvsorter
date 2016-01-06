@@ -24,7 +24,7 @@ namespace TVSorter.Data
         #region Constructors and Destructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BannerDownloadRequiredEventArgs"/> class.
+        /// Initialises a new instance of the <see cref="BannerDownloadRequiredEventArgs"/> class.
         /// </summary>
         /// <param name="show">
         /// The show. 

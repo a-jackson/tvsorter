@@ -8,12 +8,12 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter
 {
-    using Files;
     using System.Drawing;
     using System.Globalization;
     using System.Windows.Forms;
 
-    using TVSorter.Model;
+    using Files;
+    using Model;
 
     /// <summary>
     /// Extension methods for the FileResult class.
@@ -27,6 +27,9 @@ namespace TVSorter
         /// </summary>
         /// <param name="result">
         /// The file result.
+        /// </param>
+        /// <param name="fileResultManager">
+        /// The file result manager.
         /// </param>
         /// <returns>
         /// The ListViewItem.

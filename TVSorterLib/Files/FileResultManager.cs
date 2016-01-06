@@ -1,33 +1,67 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using TVSorter.Model;
-using TVSorter.Storage;
-using TVSorter.Wrappers;
-
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright company="TVSorter" file="FileResultManager.cs">
+//   2012 - Andrew Jackson
+// </copyright>
+// <summary>
+//   The manager for handling File Results.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter.Files
 {
+    #region Using Directives
+
+    using System;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.IO;
+    using System.Linq;
+    using System.Text.RegularExpressions;
+
+    using Model;
+    using Storage;
+    using Wrappers;
+    
+    #endregion
+
+    /// <summary>
+    /// The manager for handling File Results.
+    /// </summary>
     public class FileResultManager : IFileResultManager
     {
+        #region Fields
+
+        /// <summary>
+        /// The storage provider.
+        /// </summary>
         private IStorageProvider storageProvider;
 
+        #endregion
+
+        #region Constructors
+
+        /// <summary>
+        /// Initialises a new instance of the <see cref="FileResultManager"/> class.
+        /// </summary>
+        /// <param name="storageProvider">
+        /// The storage provider.
+        /// </param>
         public FileResultManager(IStorageProvider storageProvider)
         {
             this.storageProvider = storageProvider;
         }
 
+        #endregion
+
+        #region Public Methods
+
         /// <summary>
         /// Gets the full path of the file for the specified destination.
         /// </summary>
+        /// <param name="fileResult">
+        /// The file result to get the path for.
+        /// </param>
         /// <param name="destination">
         /// The destination directory.
-        /// </param>
-        /// <param name="provider">
-        /// The storage provider. 
         /// </param>
         /// <returns>
         /// The full path of the file.
@@ -39,25 +73,30 @@ namespace TVSorter.Files
                 throw new InvalidOperationException("There is not enough data to get the file path.");
             }
 
-            return destination.GetFile(FormatOutputPath(fileResult));
+            return destination.GetFile(this.FormatOutputPath(fileResult));
         }
-
 
         /// <summary>
         /// Formats the output path of the episode.
         /// </summary>
+        /// <param name="fileResult">
+        /// The file result to format the path for.
+        /// </param>
         /// <returns>
         /// The formatted output path. 
         /// </returns>
         public string FormatOutputPath(FileResult fileResult)
         {
-            string formatString = GetEffectiveFormat(fileResult);
-            return FormatOutputPath(fileResult, formatString);
+            string formatString = this.GetEffectiveFormat(fileResult);
+            return this.FormatOutputPath(fileResult, formatString);
         }
 
         /// <summary>
         /// Formats the output path of the episode.
         /// </summary>
+        /// <param name="fileResult">
+        /// The file result to format the string for.
+        /// </param>
         /// <param name="formatString">
         /// The format string to use.
         /// </param>
@@ -79,7 +118,7 @@ namespace TVSorter.Files
             var regExp = new Regex(@"{([a-zA-Z]+)\(([^\)}]+)\)}");
 
             // Replace the matches with the appropriate strings.
-            formatString = regExp.Replace(formatString, (match) => ProcessMatch(match, fileResult));
+            formatString = regExp.Replace(formatString, (match) => this.ProcessMatch(match, fileResult));
 
             // Replace : with .
             formatString = formatString.Replace(':', '.');
@@ -93,6 +132,20 @@ namespace TVSorter.Files
                 formatString, (current, ch) => current.Replace(ch.ToString(CultureInfo.InvariantCulture), string.Empty));
         }
 
+        #endregion
+
+        #region Private Methods
+
+        /// <summary>
+        /// Gets the format string that corresponds the specified file result's show.
+        /// The show could have a custom format, if not, uses the default.
+        /// </summary>
+        /// <param name="fileResult">
+        /// The file result to get the format of.
+        /// </param>
+        /// <returns>
+        /// The format string.
+        /// </returns>
         private string GetEffectiveFormat(FileResult fileResult)
         {
             if (fileResult.Show == null)
@@ -105,13 +158,17 @@ namespace TVSorter.Files
                 return fileResult.Show.CustomFormat;
             }
 
-            return storageProvider.Settings.DefaultOutputFormat;
+            return this.storageProvider.Settings.DefaultOutputFormat;
         }
+
         /// <summary>
         /// Processes a single match of a format code.
         /// </summary>
         /// <param name="match">
         /// The matched format code.
+        /// </param>
+        /// <param name="fileResult">
+        /// The file result to process.
         /// </param>
         /// <returns>
         /// The string to replace the format code with.
@@ -125,7 +182,7 @@ namespace TVSorter.Files
                 case "SName":
                     return this.FormatName(fileResult.Show.Name, arg);
                 case "EName":
-                    string name = GetEpisodeName(fileResult);
+                    string name = this.GetEpisodeName(fileResult);
                     return this.FormatName(name, arg);
                 case "ENum":
                     try
@@ -160,7 +217,6 @@ namespace TVSorter.Files
 
             return match.Value;
         }
-
 
         /// <summary>
         /// Formatted the name of an episode or show
@@ -217,7 +273,7 @@ namespace TVSorter.Files
         /// Format the numbers for output
         /// </summary>
         /// <param name="arg">
-        /// The variable's argument, the length of the output num 
+        /// The variable's argument, the length of the output number. 
         /// </param>
         /// <param name="num">
         /// The numbers to format 
@@ -256,6 +312,9 @@ namespace TVSorter.Files
         /// <summary>
         /// Gets the name of the episode. Used if there is more than one episode.
         /// </summary>
+        /// <param name="fileResult">
+        /// The file result to get the episode name for.
+        /// </param>
         /// <returns>The name of the episode.</returns>
         private string GetEpisodeName(FileResult fileResult)
         {
@@ -296,5 +355,7 @@ namespace TVSorter.Files
             // Just concatenate all the names together separated with -.
             return fileResult.Episodes.Select(x => x.Name).Aggregate((x, y) => x + "-" + y);
         }
+
+        #endregion
     }
 }

@@ -1,30 +1,63 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using TVSorter.Data;
-using TVSorter.Files;
-using TVSorter.Model;
-using TVSorter.Storage;
-using TVSorter.Wrappers;
-
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright company="TVSorter" file="TvShowRepository.cs">
+//   2012 - Andrew Jackson
+// </copyright>
+// <summary>
+//   Manages the collection of TV Shows.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter.Repostitory
 {
+    #region Using Directives
+
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
+    using Data;
+    using Model;
+    using Storage;
+
+    #endregion
+
+    /// <summary>
+    /// Manages the collection of TV shows.
+    /// </summary>
     public class TvShowRepository : ITvShowRepository
     {
+        #region Fields
+
+        /// <summary>
+        /// The storage provider.
+        /// </summary>
         private IStorageProvider storageProvider;
+
+        /// <summary>
+        /// The data provider.
+        /// </summary>
         private IDataProvider dataProvider;
 
+        #endregion
+
+        #region Constructors
+
+        /// <summary>
+        /// Initialises a new instance of the <see cref="TvShowRepository"/> class.
+        /// </summary>
+        /// <param name="storageProvider">The storage provider.</param>
+        /// <param name="dataProvider">The data provider.</param>
         public TvShowRepository(IStorageProvider storageProvider, IDataProvider dataProvider)
         {
             this.storageProvider = storageProvider;
             this.dataProvider = dataProvider;
-            
+
             // Add event handlers to the storage provider.
-            storageProvider.TvShowAdded += OnTvShowAdded;
-            storageProvider.TvShowChanged += OnTvShowChanged;
-            storageProvider.TvShowRemoved += OnTvShowRemoved;
+            this.storageProvider.TvShowAdded += this.OnTvShowAdded;
+            this.storageProvider.TvShowChanged += this.OnTvShowChanged;
+            this.storageProvider.TvShowRemoved += this.OnTvShowRemoved;
         }
+
+        #endregion
 
         #region Public Events
 
@@ -44,7 +77,9 @@ namespace TVSorter.Repostitory
         public event EventHandler<TvShowEventArgs> TvShowRemoved;
 
         #endregion
-        
+
+        #region Public Methods
+
         /// <summary>
         /// Returns a new TVShow from a search result.
         /// </summary>
@@ -67,29 +102,94 @@ namespace TVSorter.Repostitory
             return show;
         }
         
+        /// <summary>
+        /// Deletes the specified show.
+        /// </summary>
+        /// <param name="show">
+        /// The show to delete.
+        /// </param>
         public void Delete(TvShow show)
         {
-
+            this.storageProvider.RemoveShow(show);
         }
 
+        /// <summary>
+        /// Saves the specified show.
+        /// </summary>
+        /// <param name="show">
+        /// The show to save.
+        /// </param>
         public void Save(TvShow show)
         {
-            storageProvider.SaveShow(show);
+            this.storageProvider.SaveShow(show);
         }
 
+        /// <summary>
+        /// Updates the specified show.
+        /// </summary>
+        /// <param name="show">
+        /// The show to update.
+        /// </param>
         public void Update(TvShow show)
         {
-            dataProvider.UpdateShow(show);
-            LockIfNoEpisodes(show);
-            Save(show);
+            this.dataProvider.UpdateShow(show);
+            this.LockIfNoEpisodes(show);
+            this.Save(show);
         }
         
         /// <summary>
+        /// Gets the full list of all TVShows from the specified provider.
+        /// </summary>
+        /// <returns>
+        /// The full list of TV Shows.
+        /// </returns>
+        public IEnumerable<TvShow> GetTvShows()
+        {
+            return this.storageProvider.LoadTvShows();
+        }
+
+        /// <summary>
+        /// Searches for new shows.
+        /// </summary>
+        /// <param name="name">
+        /// The name of the show to search.
+        /// </param>
+        /// <returns>
+        /// The results of the search.
+        /// </returns>
+        public List<TvShow> SearchShow(string name)
+        {
+            return this.dataProvider.SearchShow(name);
+        }
+
+        /// <summary>
+        /// Updates the specified collection of shows.
+        /// </summary>
+        /// <param name="shows">
+        /// The shows to update.
+        /// </param>
+        public void UpdateShows(IList<TvShow> shows)
+        {
+            foreach (var show in this.dataProvider.UpdateShows(shows))
+            {
+                this.LockIfNoEpisodes(show);
+                this.Save(show);
+            }
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        /// <summary>
         /// Locks the show if it has no episodes.
         /// </summary>
+        /// <param name="show">
+        /// The show to lock.
+        /// </param>
         private void LockIfNoEpisodes(TvShow show)
         {
-            if (storageProvider.Settings.LockShowsWithNoEpisodes && show.LastUpdated != DateTime.MinValue)
+            if (this.storageProvider.Settings.LockShowsWithNoEpisodes && show.LastUpdated != DateTime.MinValue)
             {
                 DateTime mostRecentAirDate = (from episode in show.Episodes
                                               where episode.FirstAir < DateTime.Today
@@ -108,46 +208,6 @@ namespace TVSorter.Repostitory
         }
 
         /// <summary>
-        /// Gets the full list of all TVShows from the specified provider.
-        /// </summary>
-        /// <returns>
-        /// The full list of TV Shows.
-        /// </returns>
-        public IEnumerable<TvShow> GetTvShows()
-        {
-            return storageProvider.LoadTvShows();
-        }
-
-        /// <summary>
-        /// Searches for new shows.
-        /// </summary>
-        /// <param name="name">
-        /// The name of the show to search.
-        /// </param>
-        /// <returns>
-        /// The results of the search.
-        /// </returns>
-        public List<TvShow> SearchShow(string name)
-        {
-            return dataProvider.SearchShow(name);
-        }
-
-        /// <summary>
-        /// Updates the specified collection of shows.
-        /// </summary>
-        /// <param name="shows">
-        /// The shows to update.
-        /// </param>
-        public void UpdateShows(IList<TvShow> shows)
-        {
-            foreach (var show in dataProvider.UpdateShows(shows))
-            {
-                LockIfNoEpisodes(show);
-                Save(show);
-            }
-        }
-
-        /// <summary>
         /// Handles the IStorageProvider's OnTvShowAdded event.
         /// </summary>
         /// <param name="sender">
@@ -158,9 +218,9 @@ namespace TVSorter.Repostitory
         /// </param>
         private void OnTvShowAdded(object sender, TvShowEventArgs e)
         {
-            if (TvShowAdded != null)
+            if (this.TvShowAdded != null)
             {
-                TvShowAdded(sender, e);
+                this.TvShowAdded(sender, e);
             }
         }
 
@@ -175,9 +235,9 @@ namespace TVSorter.Repostitory
         /// </param>
         private void OnTvShowChanged(object sender, TvShowEventArgs e)
         {
-            if (TvShowChanged != null)
+            if (this.TvShowChanged != null)
             {
-                TvShowChanged(sender, e);
+                this.TvShowChanged(sender, e);
             }
         }
 
@@ -192,10 +252,12 @@ namespace TVSorter.Repostitory
         /// </param>
         private void OnTvShowRemoved(object sender, TvShowEventArgs e)
         {
-            if (TvShowRemoved != null)
+            if (this.TvShowRemoved != null)
             {
-                TvShowRemoved(sender, e);
+                this.TvShowRemoved(sender, e);
             }
         }
+
+        #endregion
     }
 }

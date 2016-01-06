@@ -14,10 +14,10 @@ namespace TVSorter.Controller
     using System.Collections.Generic;
     using System.Linq;
 
-    using TVSorter.Model;
-    using Storage;
-    using TVSorter.View;
     using Files;
+    using Model;
+    using Storage;
+    using View;
     #endregion
 
     /// <summary>
@@ -32,11 +32,23 @@ namespace TVSorter.Controller
         /// </summary>
         private List<Episode> episodes;
 
+        /// <summary>
+        /// The storage provider.
+        /// </summary>
         private IStorageProvider storageProvider;
+
+        /// <summary>
+        /// The file searcher.
+        /// </summary>
         private IFileSearch fileSearch;
 
         #endregion
 
+        /// <summary>
+        /// Initialises a new instance of the <see cref="MissingDuplicateController"/> class.
+        /// </summary>
+        /// <param name="storageProvider">The storage provider.</param>
+        /// <param name="fileSearch">The file search.</param>
         public MissingDuplicateController(IStorageProvider storageProvider, IFileSearch fileSearch)
         {
             this.storageProvider = storageProvider;

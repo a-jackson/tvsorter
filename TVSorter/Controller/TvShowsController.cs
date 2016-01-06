@@ -8,9 +8,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter.Controller
 {
-    using Files;
-    using Repostitory;
-    using Storage;
     #region Using Directives
 
     using System;
@@ -18,8 +15,11 @@ namespace TVSorter.Controller
     using System.ComponentModel;
     using System.Linq;
 
-    using TVSorter.Model;
-    using TVSorter.View;
+    using Files;
+    using Model;
+    using Repostitory;
+    using Storage;
+    using View;
     using Wrappers;
     #endregion
 
@@ -41,7 +41,7 @@ namespace TVSorter.Controller
         private BindingList<TvShow> shows;
 
         /// <summary>
-        ///   The tv view.
+        ///   The TV view.
         /// </summary>
         private IView tvView;
 
@@ -55,12 +55,29 @@ namespace TVSorter.Controller
         /// </summary>
         private Model.Settings settings;
 
+        /// <summary>
+        /// The storage provider.
+        /// </summary>
         private IStorageProvider storageProvider;
+
+        /// <summary>
+        /// The TV show repository.
+        /// </summary>
         private ITvShowRepository tvShowRepository;
+
+        /// <summary>
+        /// The scan manager.
+        /// </summary>
         private IScanManager scanManager;
 
         #endregion
 
+        /// <summary>
+        /// Initialises a new instance of the <see cref="TvShowsController"/> class.
+        /// </summary>
+        /// <param name="storageProvider">The storage provider.</param>
+        /// <param name="tvShowRepository">The TV show repository.</param>
+        /// <param name="scanManager">The scan manager.</param>
         public TvShowsController(IStorageProvider storageProvider, ITvShowRepository tvShowRepository, IScanManager scanManager)
         {
             this.storageProvider = storageProvider;
@@ -195,7 +212,7 @@ namespace TVSorter.Controller
         }
 
         /// <summary>
-        /// Saves the selceted show.
+        /// Saves the selected show.
         /// </summary>
         public void SaveSelectedShow()
         {

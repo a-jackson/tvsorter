@@ -6,10 +6,14 @@
 //   An interface for the directory info.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-using System.IO;
-
 namespace TVSorter.Wrappers
 {
+    #region Using Directives
+
+    using System.IO;
+
+    #endregion
+
     /// <summary>
     /// An interface for the directory info.
     /// </summary>
@@ -22,6 +26,7 @@ namespace TVSorter.Wrappers
         /// This to avoid System folders
         /// </summary>
         FileAttributes DirectoryAttributes { get; }
+
         /// <summary>
         /// Gets a value indicating whether the directory exists.
         /// </summary>
@@ -75,7 +80,7 @@ namespace TVSorter.Wrappers
         /// Gets a sub file of the directory at the specified path.
         /// </summary>
         /// <param name="outputPath">
-        /// The path toget the file for.
+        /// The path to get the file for.
         /// </param>
         /// <returns>
         /// The IFileInfo for the file.

@@ -20,7 +20,7 @@ namespace TVSorter
         #region Constructors and Destructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TvShowEventArgs"/> class. 
+        /// Initialises a new instance of the <see cref="TvShowEventArgs"/> class. 
         /// </summary>
         /// <param name="tvShow">
         /// The TV Show for the event.

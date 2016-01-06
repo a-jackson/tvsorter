@@ -25,7 +25,7 @@ namespace TVSorter.Model
         #region Constructors and Destructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Episode"/> class.
+        /// Initialises a new instance of the <see cref="Episode"/> class.
         /// </summary>
         internal Episode()
         {
@@ -64,14 +64,9 @@ namespace TVSorter.Model
         /// Gets or sets the episodes show.
         /// </summary>
         public TvShow Show { get; set; }
-
+        
         /// <summary>
-        /// Gets or sets the episodes watched State.
-        /// </summary>
-        public bool watched { get; set; }
-
-        /// <summary>
-        ///   Gets or sets TvdbId.
+        ///   Gets or sets the TVDB ID.
         /// </summary>
         public string TvdbId { get; set; }
 

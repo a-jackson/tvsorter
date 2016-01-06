@@ -42,7 +42,7 @@ namespace TVSorter.Data.Tvdb
         #region Fields
 
         /// <summary>
-        ///   The tvdb process.
+        ///   The TVDB process.
         /// </summary>
         private readonly TvdbProcess tvdbProcess;
 
@@ -56,8 +56,11 @@ namespace TVSorter.Data.Tvdb
         #region Constructors and Destructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Tvdb"/> class.
+        /// Initialises a new instance of the <see cref="Tvdb"/> class.
         /// </summary>
+        /// <param name="storageProvider">
+        /// The storage provider.
+        /// </param>
         public Tvdb(IStorageProvider storageProvider)
         {
             this.tvdbProcess = new TvdbProcess();

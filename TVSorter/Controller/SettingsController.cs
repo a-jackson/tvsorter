@@ -8,11 +8,10 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter.Controller
 {
-    using Storage;
     #region Using Directives
 
-    using TVSorter.View;
-
+    using Storage;
+    using View;
     using Settings = TVSorter.Model.Settings;
 
     #endregion
@@ -28,9 +27,17 @@ namespace TVSorter.Controller
         ///   The current settings.
         /// </summary>
         private Settings settings;
+
+        /// <summary>
+        /// The storage provider.
+        /// </summary>
         private IStorageProvider storageProvider;
         #endregion
 
+        /// <summary>
+        /// Initialises a new instance of the <see cref="SettingsController"/> class.
+        /// </summary>
+        /// <param name="storageProvider">The storage provider.</param>
         public SettingsController(IStorageProvider storageProvider)
         {
             this.storageProvider = storageProvider;

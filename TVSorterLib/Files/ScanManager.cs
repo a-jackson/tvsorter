@@ -8,7 +8,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter.Files
 {
-    using Repostitory;
     #region Using Directives
 
     using System;
@@ -17,10 +16,11 @@ namespace TVSorter.Files
     using System.Linq;
     using System.Text.RegularExpressions;
 
-    using TVSorter.Data;
-    using TVSorter.Model;
-    using TVSorter.Storage;
-    using TVSorter.Wrappers;
+    using Data;
+    using Model;
+    using Repostitory;
+    using Storage;
+    using Wrappers;
 
     #endregion
 
@@ -46,10 +46,13 @@ namespace TVSorter.Files
         /// </summary>
         private readonly IStorageProvider storageProvider;
 
+        /// <summary>
+        /// The TV show repository.
+        /// </summary>
         private readonly ITvShowRepository tvShowRepository;
 
         /// <summary>
-        /// The list of the tvshows.
+        /// The list of the TV shows.
         /// </summary>
         private readonly List<TvShow> tvShows;
 
@@ -73,13 +76,16 @@ namespace TVSorter.Files
         #region Constructors and Destructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ScanManager"/> class.
+        /// Initialises a new instance of the <see cref="ScanManager"/> class.
         /// </summary>
         /// <param name="storageProvider">
         /// The storage provider to use.
         /// </param>
         /// <param name="dataProvider">
         /// The data provider to use. 
+        /// </param>
+        /// <param name="tvShowRepository">
+        /// The TV show repository.
         /// </param>
         public ScanManager(IStorageProvider storageProvider, IDataProvider dataProvider, ITvShowRepository tvShowRepository)
         {
@@ -88,19 +94,9 @@ namespace TVSorter.Files
             this.settings = storageProvider.Settings;
             this.tvShowRepository = tvShowRepository;
             this.tvShows = tvShowRepository.GetTvShows().ToList();
-            this.tvShowRepository.TvShowAdded += TvShowChange;
-            this.tvShowRepository.TvShowRemoved += TvShowChange;
-            this.tvShowRepository.TvShowChanged += TvShowChange;
-        }
-        
-        private void TvShowChange(object sender, TvShowEventArgs e)
-        {
-            if (this.tvShows.Contains(e.TvShow))
-            {
-                this.tvShows.Remove(e.TvShow);
-            }
-
-            this.tvShows.Add(e.TvShow);
+            this.tvShowRepository.TvShowAdded += this.TvShowAdded;
+            this.tvShowRepository.TvShowRemoved += this.TvShowRemoved;
+            this.tvShowRepository.TvShowChanged += this.TvShowChanged;
         }
 
         #endregion
@@ -142,32 +138,31 @@ namespace TVSorter.Files
         public void ResetShow(FileResult result, TvShow show)
         {
             result.Show = show;
-            List<Match> match = this.GetFirstMatch(result.InputFile);
-            if (match == null)
+            var firstMatch = this.GetMatches(result.InputFile).FirstOrDefault();
+            if (firstMatch == null)
             {
                 result.Episode = null;
             }
             else
             {
-                result.Episodes = this.ProcessEpisode(match.First(), show).ToList();
+                result.Episodes = this.ProcessEpisode(firstMatch, show).ToList();
                 result.Episode = result.Episodes.FirstOrDefault();
             }
         }
-
-        #endregion
-
-        #region Methods
-
+        
         /// <summary>
         /// Searches for new TVShows.
         /// </summary>
+        /// <param name="directories">
+        /// The directories to search in.
+        /// </param>
         /// <returns>
         /// The ambiguous results of the search for user selection.
         /// </returns>
         public Dictionary<string, List<TvShow>> SearchNewShows(IEnumerable<IDirectoryInfo> directories)
         {
             var showDirs = new List<string>();
-            List<string> existingShows = tvShowRepository.GetTvShows().Select(x => x.FolderName).ToList();
+            List<string> existingShows = this.tvShowRepository.GetTvShows().Select(x => x.FolderName).ToList();
             foreach (IDirectoryInfo dirInfo in directories)
             {
                 // Add all of dirInfo's subdirectories where they don't already exist and 
@@ -185,15 +180,15 @@ namespace TVSorter.Files
             foreach (string showName in showDirs)
             {
                 // Search for each of the shows using the directory name as the show name.
-                List<TvShow> results = tvShowRepository.SearchShow(showName);
+                List<TvShow> results = this.tvShowRepository.SearchShow(showName);
 
                 // Any with only one result should be saved or where the first result is an exact match.
                 if (results.Count == 1
                     ||
                     (results.Count > 1 && results[0].Name.Equals(showName, StringComparison.InvariantCultureIgnoreCase)))
                 {
-                    TvShow show = tvShowRepository.FromSearchResult(results[0]);
-                    tvShowRepository.Save(show);
+                    TvShow show = this.tvShowRepository.FromSearchResult(results[0]);
+                    this.tvShowRepository.Save(show);
                     Logger.OnLogMessage(show, "Found show {0}", LogType.Info, show.Name);
                 }
                 else
@@ -206,6 +201,27 @@ namespace TVSorter.Files
 
             return searchResults;
         }
+
+        /// <summary>
+        /// Searches a destination folder for files.
+        /// This is intended to be called by the file manager.
+        /// </summary>
+        /// <param name="destination">
+        /// The destination directory to search.
+        /// </param>
+        /// <returns>
+        /// The collection of matched files.
+        /// </returns>
+        public IEnumerable<FileResult> SearchDestinationFolder(IDirectoryInfo destination)
+        {
+            this.unsuccessfulMatches = new List<string>();
+            this.updatedShows = new List<TvShow>();
+            return this.ProcessDirectory(destination, false, true);
+        }
+
+        #endregion
+
+        #region Methods
 
         /// <summary>
         /// Refresh the specified directory.
@@ -256,7 +272,7 @@ namespace TVSorter.Files
             List<Episode> matchedEpsiodes = matchedFiles.SelectMany(x => x.Episodes).ToList();
 
             // Get all of the shows and episodes.
-            List<TvShow> shows = tvShowRepository.GetTvShows().ToList();
+            List<TvShow> shows = this.tvShowRepository.GetTvShows().ToList();
             IEnumerable<Episode> allEpisodes = shows.SelectMany(x => x.Episodes);
 
             // Update the file count of the episodes.
@@ -270,46 +286,27 @@ namespace TVSorter.Files
             // Save all the shows.
             shows.Save(this.storageProvider);
         }
-
+        
         /// <summary>
-        /// Searches a destination folder for files.
-        /// This is intended to be called by the file manager.
-        /// </summary>
-        /// <param name="destination">
-        /// The destination directory to search.
-        /// </param>
-        /// <returns>
-        /// The collection of matched files.
-        /// </returns>
-        public IEnumerable<FileResult> SearchDestinationFolder(IDirectoryInfo destination)
-        {
-            this.unsuccessfulMatches = new List<string>();
-            this.updatedShows = new List<TvShow>();
-            return this.ProcessDirectory(destination, false, true);
-        }
-
-        /// <summary>
-        /// Gets the first match for the specified file.
+        /// Gets the matches for the specified file.
         /// </summary>
         /// <param name="file">
         /// The file to match.
         /// </param>
         /// <returns>
-        /// The first succcessful match. Null if none.
+        /// The collection of matches.
         /// </returns>
-        private List<Match> GetFirstMatch(IFileInfo file)
+        private IEnumerable<Match> GetMatches(IFileInfo file)
         {
-            List<Match> _results = new List<Match>();
-
             foreach (var regex in this.settings.RegularExpressions)
             {
-                Match m = Regex.Match(file.Name, regex, RegexOptions.IgnoreCase);
+                Match match = Regex.Match(file.Name, regex, RegexOptions.IgnoreCase);
 
-                if (m.Success)
-                    _results.Add(m);
+                if (match.Success)
+                {
+                    yield return match;
+                }
             }
-
-            return _results;
         }
 
         /// <summary>
@@ -319,7 +316,7 @@ namespace TVSorter.Files
         /// The file name of the episode. 
         /// </param>
         /// <param name="matchIndex">
-        /// The index that the season and epsiode were identified in the file name. 
+        /// The index that the season and episode were identified in the file name. 
         /// </param>
         /// <param name="showName">
         /// The name of the show as seen by the program. 
@@ -360,7 +357,7 @@ namespace TVSorter.Files
                 Logger.OnLogMessage(this, "Attempting to add show {0}", LogType.Info, showName);
 
                 // Attempt to add the show.
-                List<TvShow> results = tvShowRepository.SearchShow(showName);
+                List<TvShow> results = this.tvShowRepository.SearchShow(showName);
                 if (results.Count == 0)
                 {
                     Logger.OnLogMessage(this, "Show not found.", LogType.Error);
@@ -383,8 +380,8 @@ namespace TVSorter.Files
             {
                 // Unlock and update the show.
                 show.Locked = false;
-                tvShowRepository.Save(show);
-                tvShowRepository.Update(show);
+                this.tvShowRepository.Save(show);
+                this.tvShowRepository.Update(show);
                 this.updatedShows.Add(show);
             }
 
@@ -398,7 +395,7 @@ namespace TVSorter.Files
         /// The directory to search. 
         /// </param>
         /// <param name="overrideRecurse">
-        /// A value indicating whether the setting for recurse subdirectories should be overriden. 
+        /// A value indicating whether to override the setting to recursively search subdirectories.
         /// </param>
         /// <param name="ignoreShowUpdate">
         /// A value indicating whether the settings for updating and locked shows should be ignored.
@@ -434,7 +431,7 @@ namespace TVSorter.Files
             }
 
             IDirectoryInfo[] dirs = directory.GetDirectories().Where(d => !d.DirectoryAttributes.HasFlag(FileAttributes.System)
-                && !settings.IgnoredDirectories.Contains(d.FullName)).ToArray();
+                && !this.settings.IgnoredDirectories.Contains(d.FullName)).ToArray();
             foreach (FileResult result in
                 dirs.SelectMany(dir => this.ProcessDirectory(dir, overrideRecurse, ignoreShowUpdate)))
             {
@@ -446,7 +443,7 @@ namespace TVSorter.Files
         /// Gets the necessary info from the file name and return the episode object
         /// </summary>
         /// <param name="match">
-        /// The regexp match 
+        /// The regular expression's match 
         /// </param>
         /// <param name="show">
         /// The show. 
@@ -506,18 +503,13 @@ namespace TVSorter.Files
         private FileResult ProcessFile(IFileInfo file, bool ignoreShowUpdate)
         {
             // Attempt to match to a regular express
-            List<Match> firstMatch = this.GetFirstMatch(file);
+            var matches = this.GetMatches(file);
             FileResult emptyResult = null;
-
-            if (firstMatch == null)
-            {
-                return null;
-            }
 
             string showname = string.Empty;
 
-            //Try to resolve an result
-            foreach (Match match in firstMatch)
+            // Try to resolve an result
+            foreach (Match match in matches)
             {
                 TvShow show = this.MatchShow(file.Name, match.Index, out showname, ignoreShowUpdate);
                 Episode episode = null;
@@ -562,18 +554,56 @@ namespace TVSorter.Files
             {
                 Logger.OnLogMessage(this, "{0} matched as {1}. Adding alternate name.", LogType.Info, showName, show.Name);
                 show.AlternateNames.Add(showName);
-                tvShowRepository.Save(show);
+                this.tvShowRepository.Save(show);
                 return show;
             }
 
             Logger.OnLogMessage(this, "Matched {0} as a new show. Adding and updating...", LogType.Info, showName);
 
             // Doesn't exist with the same TVDB. Add a new show and update.
-            show = tvShowRepository.FromSearchResult(result);
-            tvShowRepository.Save(show);
-            tvShowRepository.Update(show);
+            show = this.tvShowRepository.FromSearchResult(result);
+            this.tvShowRepository.Save(show);
+            this.tvShowRepository.Update(show);
             this.tvShows.Add(show);
             return show;
+        }
+
+        /// <summary>
+        /// Handles a TV show being changed.
+        /// </summary>
+        /// <param name="sender">The sender of the event.</param>
+        /// <param name="e">The arguments of the event.</param>
+        private void TvShowChanged(object sender, TvShowEventArgs e)
+        {
+            if (this.tvShows.Contains(e.TvShow))
+            {
+                this.tvShows.Remove(e.TvShow);
+            }
+
+            this.tvShows.Add(e.TvShow);
+        }
+
+        /// <summary>
+        /// Handles a TV show being added.
+        /// </summary>
+        /// <param name="sender">The sender of the event.</param>
+        /// <param name="e">The arguments of the event.</param>
+        private void TvShowAdded(object sender, TvShowEventArgs e)
+        {
+            this.tvShows.Add(e.TvShow);
+        }
+
+        /// <summary>
+        /// Handles a TV show being removed.
+        /// </summary>
+        /// <param name="sender">The sender of the event.</param>
+        /// <param name="e">The arguments of the event.</param>
+        private void TvShowRemoved(object sender, TvShowEventArgs e)
+        {
+            if (this.tvShows.Contains(e.TvShow))
+            {
+                this.tvShows.Remove(e.TvShow);
+            }
         }
 
         #endregion

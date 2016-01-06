@@ -35,7 +35,7 @@ namespace TVSorter.View
         #region Constructors and Destructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ShowSelectDialog"/> class.
+        /// Initialises a new instance of the <see cref="ShowSelectDialog"/> class.
         /// </summary>
         /// <param name="shows">
         /// The shows. 

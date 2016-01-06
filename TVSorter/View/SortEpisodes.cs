@@ -8,9 +8,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace TVSorter.View
 {
-    using Files;
-    using Repostitory;
-    using Storage;
     #region Using Directives
 
     using System;
@@ -18,7 +15,10 @@ namespace TVSorter.View
     using System.Linq;
     using System.Windows.Forms;
 
-    using TVSorter.Controller;
+    using Controller;
+    using Files;
+    using Repostitory;
+    using Storage;
 
     #endregion
 
@@ -39,7 +39,7 @@ namespace TVSorter.View
         #region Constructors and Destructors
 
         /// <summary>
-        ///   Initializes a new instance of the <see cref="SortEpisodes" /> class.
+        ///   Initialises a new instance of the <see cref="SortEpisodes" /> class.
         /// </summary>
         public SortEpisodes()
         {
@@ -50,11 +50,29 @@ namespace TVSorter.View
 
         #endregion
 
+        #region Properies
+
+        /// <summary>
+        /// Gets or sets the File Searcher.
+        /// </summary>
         public IFileSearch FileSearch { get; set; }
+
+        /// <summary>
+        /// Gets or sets the TV Show Repository.
+        /// </summary>
         public ITvShowRepository TvShowRepository { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Storage Provider.
+        /// </summary>
         public IStorageProvider StorageProvider { get; set; }
+
+        /// <summary>
+        /// Gets or sets the file result manager.
+        /// </summary>
         public IFileResultManager FileResultManager { get; set; }
-        
+
+        #endregion
 
         #region Public Methods and Operators
 
@@ -185,17 +203,24 @@ namespace TVSorter.View
             this.controller.Results[e.Item.Index].Checked = e.Item.Checked;
 
             if (this.controller.Results.Count(p => p.Checked) > 0)
+            {
                 setShowButton.Enabled = true;
+            }
+
             if (this.controller.Results.Count(p => p.Checked) == 1)
+            {
                 setEpisodeButton.Enabled = true;
+            }
+
             if (this.controller.Results.Count(p => p.Checked) > 1)
+            {
                 setEpisodeButton.Enabled = false;
+            }
             else if (this.controller.Results.Count(p => p.Checked) == 0)
             {
                 setEpisodeButton.Enabled = false;
                 setShowButton.Enabled = false;
             }
-
         }
 
         /// <summary>

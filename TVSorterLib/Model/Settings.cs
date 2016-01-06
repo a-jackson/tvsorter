@@ -27,7 +27,7 @@ namespace TVSorter.Model
         #region Constructors and Destructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Settings"/> class. 
+        /// Initialises a new instance of the <see cref="Settings"/> class. 
         /// </summary>
         internal Settings()
         {
@@ -84,7 +84,7 @@ namespace TVSorter.Model
         public List<string> OverwriteKeywords { get; set; }
 
         /// <summary>
-        ///   Gets or sets a value indicating whether RecurseSubdirectories.
+        ///   Gets or sets a value indicating whether to recursively search subdirectories.
         /// </summary>
         public bool RecurseSubdirectories { get; set; }
 

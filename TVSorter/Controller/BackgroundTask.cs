@@ -29,7 +29,7 @@ namespace TVSorter.Controller
         #region Constructors and Destructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BackgroundTask"/> class.
+        /// Initialises a new instance of the <see cref="BackgroundTask"/> class.
         /// </summary>
         /// <param name="action">
         /// The method to run.

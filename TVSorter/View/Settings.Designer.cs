@@ -397,7 +397,7 @@ namespace TVSorter.View
             this.addIgnore_btn.TabIndex = 0;
             this.addIgnore_btn.Text = "Add";
             this.addIgnore_btn.UseVisualStyleBackColor = true;
-            this.addIgnore_btn.Click += new System.EventHandler(this.addIgnore_btn_Click);
+            this.addIgnore_btn.Click += new System.EventHandler(this.AddIgnoreButtonClick);
             // 
             // removeIgnore_btn
             // 
@@ -409,7 +409,7 @@ namespace TVSorter.View
             this.removeIgnore_btn.TabIndex = 1;
             this.removeIgnore_btn.Text = "Remove";
             this.removeIgnore_btn.UseVisualStyleBackColor = true;
-            this.removeIgnore_btn.Click += new System.EventHandler(this.removeIgnore_btn_Click);
+            this.removeIgnore_btn.Click += new System.EventHandler(this.RemoveIgnoreButtonClick);
             // 
             // ignoreList
             // 
