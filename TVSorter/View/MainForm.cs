@@ -32,30 +32,6 @@ namespace TVSorter.View
         public MainForm()
         {
             this.InitializeComponent();
-
-            var storageProvider = new Storage.Xml();
-            var dataProvider = new Data.Tvdb.Tvdb(storageProvider);
-            var tvshowRepository = new TvShowRepository(storageProvider, dataProvider);
-            var scanManager = new ScanManager(storageProvider, dataProvider, tvshowRepository);
-            var fileResultManager = new FileResultManager(storageProvider);
-            var fileManager = new FileManager(storageProvider, dataProvider, scanManager, fileResultManager);
-            var fileSearch = new FileSearch(storageProvider, dataProvider, scanManager, fileManager);
-
-            missingDuplicateEpisodes.StorageProvider = storageProvider;
-            missingDuplicateEpisodes.FileSearch = fileSearch;
-
-            settings.StorageProvider = storageProvider;
-            settings.FileResultManager = fileResultManager;
-
-            sortEpisodes.StorageProvider = storageProvider;
-            sortEpisodes.FileSearch = fileSearch;
-            sortEpisodes.TvShowRepository = tvshowRepository;
-            sortEpisodes.FileResultManager = fileResultManager;
-
-            tvShows.StorageProvider = storageProvider;
-            tvShows.TvShowRepository = tvshowRepository;
-            tvShows.ScanManager = scanManager;
-            tvShows.FileResultManager = fileResultManager;
         }
 
         #endregion

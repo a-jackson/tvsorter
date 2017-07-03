@@ -32,6 +32,10 @@ namespace TVSorter.View
     /// </summary>
     public partial class TvShows : UserControl, IView
     {
+        private readonly ITvShowRepository tvShowRepository;
+
+        private readonly IFileResultManager fileResultManager;
+
         #region Fields
 
         /// <summary>
@@ -59,31 +63,10 @@ namespace TVSorter.View
         public TvShows()
         {
             this.InitializeComponent();
+
+            tvShowRepository = CompositionRoot.Get<ITvShowRepository>();
+            fileResultManager = CompositionRoot.Get<IFileResultManager>();
         }
-
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Gets or sets the TV Show Repository.
-        /// </summary>
-        public ITvShowRepository TvShowRepository { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Storage Provider.
-        /// </summary>
-        public IStorageProvider StorageProvider { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Scan Manager.
-        /// </summary>
-        public IScanManager ScanManager { get; set; }
-
-        /// <summary>
-        /// Gets or sets the File Result Manager.
-        /// </summary>
-        public IFileResultManager FileResultManager { get; set; }
 
         #endregion
 
@@ -119,7 +102,7 @@ namespace TVSorter.View
         /// </param>
         private void AddShowButtonClick(object sender, EventArgs e)
         {
-            var dialog = new ShowSearchDialog(new AddShowController(TvShowRepository));
+            var dialog = new ShowSearchDialog(new AddShowController(tvShowRepository));
             dialog.ShowDialog(this);
         }
 
@@ -153,7 +136,7 @@ namespace TVSorter.View
         /// </param>
         private void FormatBuilderClick(object sender, EventArgs e)
         {
-            var formatBuilderDialog = new FormatBuilder(this.selectedShowCustomFormatText.Text, FileResultManager);
+            var formatBuilderDialog = new FormatBuilder(this.selectedShowCustomFormatText.Text, fileResultManager);
             if (formatBuilderDialog.ShowDialog(this) == DialogResult.OK)
             {
                 this.selectedShowCustomFormatText.Text = formatBuilderDialog.FormatString;
@@ -354,7 +337,7 @@ namespace TVSorter.View
             {
                 foreach (var result in this.controller.SearchResults)
                 {
-                    var searchResultsController = new SearchResultsController(TvShowRepository);
+                    var searchResultsController = new SearchResultsController(tvShowRepository);
                     var dialog = new ShowSearchDialog(searchResultsController);
                     searchResultsController.SetResults(result.Key, result.Value);
                     dialog.ShowDialog(this);
@@ -496,7 +479,7 @@ namespace TVSorter.View
         {
             if (!this.DesignMode)
             {
-                this.controller = new TvShowsController(StorageProvider, TvShowRepository, ScanManager);
+                this.controller = CompositionRoot.Get<TvShowsController>();
                 this.controller.PropertyChanged += this.PropertyChanged;
                 this.controller.ShowChanged += this.ShowChanged;
                 this.controller.SearchShowsComplete += this.SearchShowsComplete;

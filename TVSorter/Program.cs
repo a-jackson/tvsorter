@@ -13,6 +13,7 @@ namespace TVSorter
     using System;
     using System.Windows.Forms;
 
+    using Ninject;
     using TVSorter.View;
 
     #endregion
@@ -30,9 +31,14 @@ namespace TVSorter
         [STAThread]
         private static void Main()
         {
+            IKernel kernel = new StandardKernel(
+                new InterfaceModule(),
+                new LibraryModule());
+            CompositionRoot.SetKernel(kernel);
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainForm());
+            Application.Run(kernel.Get<MainForm>());
         }
 
         #endregion

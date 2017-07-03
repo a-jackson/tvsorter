@@ -41,7 +41,7 @@ namespace TVSorter.View
         public Log()
         {
             this.InitializeComponent();
-            this.controller = new LogController();
+            this.controller = CompositionRoot.Get<LogController>();
         }
 
         #endregion

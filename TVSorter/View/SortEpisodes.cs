@@ -27,6 +27,8 @@ namespace TVSorter.View
     /// </summary>
     public partial class SortEpisodes : UserControl, IView
     {
+        private readonly IFileResultManager fileResultManager;
+
         #region Fields
 
         /// <summary>
@@ -46,34 +48,12 @@ namespace TVSorter.View
             this.InitializeComponent();
             this.setEpisodeButton.Enabled = false;
             this.setShowButton.Enabled = false;
+
+            fileResultManager = CompositionRoot.Get<IFileResultManager>();
         }
 
         #endregion
-
-        #region Properies
-
-        /// <summary>
-        /// Gets or sets the File Searcher.
-        /// </summary>
-        public IFileSearch FileSearch { get; set; }
-
-        /// <summary>
-        /// Gets or sets the TV Show Repository.
-        /// </summary>
-        public ITvShowRepository TvShowRepository { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Storage Provider.
-        /// </summary>
-        public IStorageProvider StorageProvider { get; set; }
-
-        /// <summary>
-        /// Gets or sets the file result manager.
-        /// </summary>
-        public IFileResultManager FileResultManager { get; set; }
-
-        #endregion
-
+        
         #region Public Methods and Operators
 
         /// <summary>
@@ -175,7 +155,7 @@ namespace TVSorter.View
         private void ProcessResults()
         {
             this.resultsList.Items.Clear();
-            this.resultsList.Items.AddRange(this.controller.Results.Select(x => x.GetListViewItem(FileResultManager)).ToArray());
+            this.resultsList.Items.AddRange(this.controller.Results.Select(x => x.GetListViewItem(fileResultManager)).ToArray());
         }
 
         /// <summary>
@@ -185,7 +165,7 @@ namespace TVSorter.View
         {
             for (int i = 0; i < this.controller.Results.Count; i++)
             {
-                this.resultsList.Items[i] = this.controller.Results[i].GetListViewItem(FileResultManager);
+                this.resultsList.Items[i] = this.controller.Results[i].GetListViewItem(fileResultManager);
             }
         }
 
@@ -307,7 +287,7 @@ namespace TVSorter.View
         {
             if (!this.DesignMode)
             {
-                this.controller = new SortEpisodesController(TvShowRepository, FileSearch, StorageProvider);
+                this.controller = CompositionRoot.Get<SortEpisodesController>();
                 this.controller.PropertyChanged += this.ControllerOnPropertyChanged;
                 this.controller.Initialise(this);
             }

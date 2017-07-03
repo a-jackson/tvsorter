@@ -27,6 +27,8 @@ namespace TVSorter.View
     /// </summary>
     public partial class Settings : UserControl, IView
     {
+        private readonly IFileResultManager fileResultManager;
+
         #region Fields
 
         /// <summary>
@@ -69,20 +71,12 @@ namespace TVSorter.View
         public Settings()
         {
             this.InitializeComponent();
+
+            fileResultManager = CompositionRoot.Get<FileResultManager>();
         }
 
         #endregion
-
-        /// <summary>
-        /// Gets or sets the storage provider.
-        /// </summary>
-        public IStorageProvider StorageProvider { get; set; }
-
-        /// <summary>
-        /// Gets or sets the file result manager.
-        /// </summary>
-        public IFileResultManager FileResultManager { get; set; }
-
+        
         #region Public Methods and Operators
 
         /// <summary>
@@ -186,7 +180,7 @@ namespace TVSorter.View
         /// </param>
         private void FormatBuilderButtonClick(object sender, EventArgs e)
         {
-            var formatBuilderDialog = new FormatBuilder(this.formatText.Text, FileResultManager);
+            var formatBuilderDialog = new FormatBuilder(this.formatText.Text, fileResultManager);
             if (formatBuilderDialog.ShowDialog(this) == DialogResult.OK)
             {
                 this.formatText.Text = formatBuilderDialog.FormatString;
@@ -350,7 +344,7 @@ namespace TVSorter.View
         {
             if (!this.DesignMode)
             {
-                this.controller = new SettingsController(StorageProvider);
+                this.controller = CompositionRoot.Get<SettingsController>();
                 this.controller.PropertyChanged += this.PropertyChanged;
                 this.controller.Initialise(this);
             }

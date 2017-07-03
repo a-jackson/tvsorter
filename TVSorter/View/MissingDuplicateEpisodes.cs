@@ -48,16 +48,6 @@ namespace TVSorter.View
 
         #endregion
 
-        /// <summary>
-        /// Gets or sets the Storage Provider.
-        /// </summary>
-        public IStorageProvider StorageProvider { get; set; }
-
-        /// <summary>
-        /// Gets or sets the File Searcher.
-        /// </summary>
-        public IFileSearch FileSearch { get; set; }
-
         #region Public Methods and Operators
 
         /// <summary>
@@ -126,7 +116,7 @@ namespace TVSorter.View
         {
             if (!this.DesignMode)
             {
-                this.controller = new MissingDuplicateController(StorageProvider, FileSearch);
+                this.controller = CompositionRoot.Get<MissingDuplicateController>();
                 this.controller.PropertyChanged += this.OnPropertyChanged;
                 this.controller.Initialise(this);
                 this.hideLocked.Checked = this.controller.Settings.HideLocked;

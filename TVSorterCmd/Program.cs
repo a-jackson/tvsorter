@@ -20,6 +20,7 @@ namespace TVSorter
     using Files;
     using Model;
     using Repostitory;
+    using Ninject;
     #endregion
 
     /// <summary>
@@ -63,13 +64,9 @@ namespace TVSorter
                 Environment.Exit(1);
             }
 
-            var storageProvider = new Storage.Xml();
-            var dataProvider = new Data.Tvdb.Tvdb(storageProvider);
-            var tvshowRepository = new TvShowRepository(storageProvider, dataProvider);
-            var scanManager = new ScanManager(storageProvider, dataProvider, tvshowRepository);
-            var fileResultManager = new FileResultManager(storageProvider);
-            var fileManager = new FileManager(storageProvider, dataProvider, scanManager, fileResultManager);
-            var fileSearch = new FileSearch(storageProvider, dataProvider, scanManager, fileManager);
+            IKernel kernel = new StandardKernel(new LibraryModule());
+            var tvshowRepository = kernel.Get<ITvShowRepository>();
+            var fileSearch = kernel.Get<IFileSearch>();
 
             if (options.UpdateAll)
             {
