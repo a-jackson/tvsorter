@@ -86,7 +86,7 @@ namespace TVSorter.Test
         public void AddUnmatchedShow()
         {
             // Create new show and episodes
-            var delta = new TvShow { Name = "Delta", FolderName = "Delta", TvdbId = "4" };
+            var delta = new TvShow { Name = "Delta", FolderName = "Delta", TvdbId = 4 };
             var episode1 = new Episode { EpisodeNumber = 1, SeasonNumber = 1, Name = "Episode 1", TvdbId = "41" };
 
             // Create a file for the search to return.
@@ -341,9 +341,9 @@ namespace TVSorter.Test
         [Test]
         public void SearchShowTest()
         {
-            var gamma = new TvShow { Name = "Gamma", TvdbId = "3", FolderName = "Gamma Folder" };
-            var delta = new TvShow { Name = "Delta", TvdbId = "4", FolderName = "Delta Folder" };
-            var delta2 = new TvShow { Name = "Delta2", TvdbId = "5", FolderName = "Delta2 Folder" };
+            var gamma = new TvShow { Name = "Gamma", TvdbId = 3, FolderName = "Gamma Folder" };
+            var delta = new TvShow { Name = "Delta", TvdbId = 4, FolderName = "Delta Folder" };
+            var delta2 = new TvShow { Name = "Delta2", TvdbId = 5, FolderName = "Delta2 Folder" };
 
             this.dataProvider.SearchShow("Gamma Folder").Returns(new List<TvShow> { gamma });
             this.dataProvider.SearchShow("Delta Folder").Returns(new List<TvShow> { delta, delta2 });
@@ -400,16 +400,16 @@ namespace TVSorter.Test
         /// The output path for the file.
         /// </returns>
         [TestCase(@"{FName}\Season {SNum(1)}\{SName(.)}.S{SNum(2)}E{ENum(2)}.{EName(.)}{Ext}",
-            Result = @"Alpha Folder\Season 1\Alpha.Show.S01E01.Episode.One.(1).avi")]
+            ExpectedResult = @"Alpha Folder\Season 1\Alpha.Show.S01E01.Episode.One.(1).avi")]
         [TestCase(
             @"{FName}\{Date(yyyy)}\{Date(MMM)}\{SName(.)}.S{SNum(2)}E{ENum(2)}.{Date(dd-MMM-yyyy)}.{EName(.)}{Ext}",
-            Result = @"Alpha Folder\2012\Jan\Alpha.Show.S01E01.01-Jan-2012.Episode.One.(1).avi")]
-        [TestCase(@"{FName}", Result = "Alpha Folder")]
-        [TestCase(@"{SName( )} {SName(.)} {SName(_)}", Result = "Alpha Show Alpha.Show Alpha_Show")]
-        [TestCase(@"{EName( )} {EName(.)} {EName(_)}", Result = "Episode One (1) Episode.One.(1) Episode_One_(1)")]
-        [TestCase(@"{SNum(1)} {SNum(2)} {SNum(3)}", Result = "1 01 001")]
-        [TestCase(@"{ENum(1)} {ENum(2)} {ENum(3)}", Result = "1 01 001")]
-        [TestCase(@"{Date(yyyy)} {Date(MM)} {Date(MMM)} {Date(dd)}", Result = "2012 01 Jan 01")]
+            ExpectedResult = @"Alpha Folder\2012\Jan\Alpha.Show.S01E01.01-Jan-2012.Episode.One.(1).avi")]
+        [TestCase(@"{FName}", ExpectedResult = "Alpha Folder")]
+        [TestCase(@"{SName( )} {SName(.)} {SName(_)}", ExpectedResult = "Alpha Show Alpha.Show Alpha_Show")]
+        [TestCase(@"{EName( )} {EName(.)} {EName(_)}", ExpectedResult = "Episode One (1) Episode.One.(1) Episode_One_(1)")]
+        [TestCase(@"{SNum(1)} {SNum(2)} {SNum(3)}", ExpectedResult = "1 01 001")]
+        [TestCase(@"{ENum(1)} {ENum(2)} {ENum(3)}", ExpectedResult = "1 01 001")]
+        [TestCase(@"{Date(yyyy)} {Date(MM)} {Date(MMM)} {Date(dd)}", ExpectedResult = "2012 01 Jan 01")]
         public string TestOutputFormat(string format)
         {
             // Creat the result.

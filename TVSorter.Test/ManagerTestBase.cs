@@ -49,7 +49,7 @@ namespace TVSorter.Test
                     {
                         Name = "Alpha Show",
                         FolderName = "Alpha Folder",
-                        TvdbId = "1",
+                        TvdbId = 1,
                         Episodes =
                                 new List<Episode>
                                     {
@@ -77,7 +77,7 @@ namespace TVSorter.Test
                     {
                         Name = "Beta Show",
                         FolderName = "Beta Folder",
-                        TvdbId = "2",
+                        TvdbId = 2,
                         Episodes =
                                 new List<Episode>
                                     {

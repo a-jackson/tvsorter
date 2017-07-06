@@ -21,6 +21,7 @@ namespace TVSorter
     using Model;
     using Repostitory;
     using Ninject;
+    using TheTvdbDotNet.Ninject;
     #endregion
 
     /// <summary>
@@ -34,7 +35,7 @@ namespace TVSorter
         /// The program's entry point.
         /// </summary>
         /// <param name="args">
-        /// The command line arguments. 
+        /// The command line arguments.
         /// </param>
         public static void Main(string[] args)
         {
@@ -59,12 +60,14 @@ namespace TVSorter
                 };
 
             Options options = new Options();
-            if (!new CommandLineParser(new CommandLineParserSettings(false, true, Console.Error)).ParseArguments(args, options))
+            if (!Parser.Default.ParseArgumentsStrict(args, options))
             {
                 Environment.Exit(1);
             }
 
-            IKernel kernel = new StandardKernel(new LibraryModule());
+            IKernel kernel = new StandardKernel(
+                new LibraryModule(),
+                new TheTvdbDotNetModule("D4DCAEBFCA5A6BC1"));
             var tvshowRepository = kernel.Get<ITvShowRepository>();
             var fileSearch = kernel.Get<IFileSearch>();
 

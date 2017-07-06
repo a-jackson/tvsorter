@@ -279,7 +279,7 @@ namespace TVSorter.Storage
 
             XElement show =
                 this.document.Descendants(GetName("Show")).FirstOrDefault(
-                    x => x.GetAttribute("tvdbid") == episode.Show.TvdbId);
+                    x => x.GetAttribute("tvdbid") == episode.Show.TvdbId.ToString());
 
             if (show == null)
             {
@@ -358,7 +358,7 @@ namespace TVSorter.Storage
         public void SaveShow(TvShow show)
         {
             XElement showElement =
-                this.document.Descendants(GetName("Show")).FirstOrDefault(x => x.GetAttribute("tvdbid") == show.TvdbId);
+                this.document.Descendants(GetName("Show")).FirstOrDefault(x => x.GetAttribute("tvdbid") == show.TvdbId.ToString());
 
             if (showElement != null)
             {
@@ -399,7 +399,7 @@ namespace TVSorter.Storage
                 // Check if the show already exists. Else add it.
                 XElement showElement =
                     this.document.Descendants(GetName("Show")).FirstOrDefault(
-                        x => x.GetAttribute("tvdbid") == show.TvdbId);
+                        x => x.GetAttribute("tvdbid") == show.TvdbId.ToString());
 
                 if (showElement != null)
                 {

@@ -15,6 +15,7 @@ namespace TVSorter
 
     using Ninject;
     using TVSorter.View;
+    using TheTvdbDotNet.Ninject;
 
     #endregion
 
@@ -33,7 +34,8 @@ namespace TVSorter
         {
             IKernel kernel = new StandardKernel(
                 new InterfaceModule(),
-                new LibraryModule());
+                new LibraryModule(),
+                new TheTvdbDotNetModule("D4DCAEBFCA5A6BC1"));
             CompositionRoot.SetKernel(kernel);
 
             Application.EnableVisualStyles();

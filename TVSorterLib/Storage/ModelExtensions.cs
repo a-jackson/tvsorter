@@ -84,7 +84,7 @@ namespace TVSorter.Storage
         {
             show.Name = showNode.GetAttribute("name", string.Empty);
             show.FolderName = showNode.GetAttribute("foldername", string.Empty);
-            show.TvdbId = showNode.GetAttribute("tvdbid", string.Empty);
+            show.TvdbId = int.Parse(showNode.GetAttribute("tvdbid", string.Empty));
             show.Banner = showNode.GetAttribute("banner", string.Empty);
             show.CustomFormat = showNode.GetAttribute("customformat", string.Empty);
             show.UseCustomFormat = bool.Parse(showNode.GetAttribute("usecustomformat", "false"));
@@ -224,7 +224,7 @@ namespace TVSorter.Storage
                 Xml.GetName("Show"), 
                 new XAttribute("name", show.Name ?? string.Empty), 
                 new XAttribute("foldername", show.FolderName ?? string.Empty), 
-                new XAttribute("tvdbid", show.TvdbId ?? string.Empty), 
+                new XAttribute("tvdbid", show.TvdbId), 
                 new XAttribute("banner", show.Banner ?? string.Empty), 
                 new XAttribute("customformat", show.CustomFormat ?? string.Empty), 
                 new XAttribute("usecustomformat", show.UseCustomFormat), 

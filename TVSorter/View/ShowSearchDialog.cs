@@ -130,7 +130,7 @@ namespace TVSorter.View
                     {
                         foreach (TvShow show in this.controller.SearchResults)
                         {
-                            this.listResults.Items.Add(new ListViewItem(new[] { show.Name, show.TvdbId }));
+                            this.listResults.Items.Add(new ListViewItem(new [] { show.Name, show.TvdbId.ToString() }));
                         }
 
                         if (this.controller.SearchResults.Count > 0)

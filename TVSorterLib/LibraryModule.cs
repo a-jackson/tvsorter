@@ -1,6 +1,6 @@
 ﻿using Ninject.Modules;
 using TVSorter.Data;
-using TVSorter.Data.Tvdb;
+using TVSorter.Data.TvdbV2;
 using TVSorter.Files;
 using TVSorter.Repostitory;
 using TVSorter.Storage;
@@ -12,7 +12,7 @@ namespace TVSorter
         public override void Load()
         {
             Bind<IStorageProvider>().To<Xml>().InSingletonScope();
-            Bind<IDataProvider>().To<Tvdb>().InSingletonScope();
+            Bind<IDataProvider>().To<TvdbV2>().InSingletonScope();
             Bind<IScanManager>().To<ScanManager>().InSingletonScope();
             Bind<IFileResultManager>().To<FileResultManager>().InSingletonScope();
             Bind<IFileManager>().To<FileManager>().InSingletonScope();

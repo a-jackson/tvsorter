@@ -82,7 +82,7 @@ namespace TVSorter.Model
         /// <summary>
         ///   Gets or sets the TVDB ID.
         /// </summary>
-        public string TvdbId { get; set; }
+        public int TvdbId { get; set; }
 
         /// <summary>
         ///   Gets or sets a value indicating whether to Use Custom Format.
@@ -171,7 +171,7 @@ namespace TVSorter.Model
         /// <filterpriority>2</filterpriority>
         public override int GetHashCode()
         {
-            return this.TvdbId != null ? this.TvdbId.GetHashCode() : 0;
+            return this.TvdbId.GetHashCode();
         }
         
         #endregion
