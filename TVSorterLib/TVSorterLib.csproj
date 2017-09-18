@@ -52,16 +52,15 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="TheTvdbDotNet, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\TheTvdbDotNet.0.0.1\lib\netstandard2.0\TheTvdbDotNet.dll</HintPath>
+    <Reference Include="TheTvdbDotNet, Version=0.1.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\TheTvdbDotNet.0.1.1\lib\netstandard2.0\TheTvdbDotNet.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CompositionRoot.cs" />
-    <Compile Include="Data\BannerDownloadRequiredEventArgs.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Data\IDataProvider.cs" />
+    <Compile Include="Data\TvdbV2\IStreamWriter.cs" />
+    <Compile Include="Data\TvdbV2\StreamWriter.cs" />
     <Compile Include="Data\TvdbV2\TvdbV2.cs" />
     <Compile Include="Files\FileManager.cs">
       <SubType>Code</SubType>

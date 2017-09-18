@@ -18,6 +18,7 @@ namespace TVSorter
             Bind<IFileManager>().To<FileManager>().InSingletonScope();
             Bind<IFileSearch>().To<FileSearch>().InSingletonScope();
             Bind<ITvShowRepository>().To<TvShowRepository>().InSingletonScope();
+            Bind<IStreamWriter>().To<StreamWriter>().InSingletonScope();
         }
     }
 }

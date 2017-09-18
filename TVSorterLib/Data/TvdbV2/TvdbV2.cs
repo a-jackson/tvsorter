@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using TheTvdbDotNet;
 using TVSorter.Model;
@@ -11,12 +12,14 @@ namespace TVSorter.Data.TvdbV2
         private readonly ITvdbSeries series;
         private readonly ITvdbSearch search;
         private readonly ITvdbUpdate update;
+        private readonly IStreamWriter streamWriter;
 
-        public TvdbV2(ITvdbSeries series, ITvdbSearch search, ITvdbUpdate update)
+        public TvdbV2(ITvdbSeries series, ITvdbSearch search, ITvdbUpdate update, IStreamWriter streamWriter)
         {
             this.series = series;
             this.search = search;
             this.update = update;
+            this.streamWriter = streamWriter;
         }
 
         public List<TvShow> SearchShow(string name)
@@ -32,6 +35,15 @@ namespace TVSorter.Data.TvdbV2
 
         public void UpdateShow(TvShow show)
         {
+            var newSeries = series.GetSeriesAsync(show.TvdbId).Result;
+            if (show.Banner != newSeries.Data.Banner)
+            {
+                show.Banner = newSeries.Data.Banner;
+                var banner = series.GetBannerAsnyc(newSeries.Data).Result;
+                var targetPath = $"Images{Path.DirectorySeparatorChar}{show.TvdbId}.jpg";
+                streamWriter.WriteStream(banner, targetPath);
+            }
+
             var newEpisodes = series.GetAllEpisodesAsync(show.TvdbId).Result
                 .Select(x =>
                     new Episode

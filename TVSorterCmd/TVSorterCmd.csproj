@@ -56,11 +56,11 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="TheTvdbDotNet, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\TheTvdbDotNet.0.0.1\lib\netstandard2.0\TheTvdbDotNet.dll</HintPath>
+    <Reference Include="TheTvdbDotNet, Version=0.1.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\TheTvdbDotNet.0.1.1\lib\netstandard2.0\TheTvdbDotNet.dll</HintPath>
     </Reference>
-    <Reference Include="TheTvdbDotNet.Ninject, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\TheTvdbDotNet.Ninject.0.0.1\lib\net461\TheTvdbDotNet.Ninject.dll</HintPath>
+    <Reference Include="TheTvdbDotNet.Ninject, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\TheTvdbDotNet.Ninject.0.1.0\lib\net461\TheTvdbDotNet.Ninject.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
