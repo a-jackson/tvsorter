@@ -24,18 +24,25 @@ namespace TVSorter.Data.TvdbV2
 
         public List<TvShow> SearchShow(string name)
         {
-            var series = search.SeriesSearchAsync(name: name).Result;
-            return series.Data.Select(x => new TvShow
+            try
             {
-                Name = x.SeriesName,
-                TvdbId = x.Id,
-                FolderName = name,
-            }).ToList();
+                var series = search.SeriesSearchAsync(name: name).GetAwaiter().GetResult();
+                return series.Data.Select(x => new TvShow
+                {
+                    Name = x.SeriesName,
+                    TvdbId = x.Id,
+                    FolderName = name,
+                }).ToList();
+            }
+            catch (TvdbRequestException)
+            {
+                return new List<TvShow>();
+            }
         }
 
         public void UpdateShow(TvShow show)
         {
-            var newSeries = series.GetSeriesAsync(show.TvdbId).Result;
+            var newSeries = series.GetSeriesAsync(show.TvdbId).GetAwaiter().GetResult();
             if (show.Banner != newSeries.Data.Banner)
             {
                 show.Banner = newSeries.Data.Banner;
@@ -44,7 +51,7 @@ namespace TVSorter.Data.TvdbV2
                 streamWriter.WriteStream(banner, targetPath);
             }
 
-            var newEpisodes = series.GetAllEpisodesAsync(show.TvdbId).Result
+            var newEpisodes = series.GetAllEpisodesAsync(show.TvdbId).GetAwaiter().GetResult()
                 .Select(x =>
                     new Episode
                     {
