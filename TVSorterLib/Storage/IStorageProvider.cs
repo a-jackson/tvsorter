@@ -121,13 +121,5 @@ namespace TVSorter.Storage
         ///     The settings that have been loaded.
         /// </returns>
         Settings LoadSettings();
-
-        /// <summary>
-        ///     Loads the missing episode settings from the XML file.
-        /// </summary>
-        /// <returns>
-        ///     The settings that have been loaded.
-        /// </returns>
-        MissingEpisodeSettings LoadMissingEpisodeSettings();
     }
 }

@@ -38,37 +38,11 @@ namespace TVSorter.Storage
         {
             if (element == null)
             {
-                throw new ArgumentNullException("element");
+                throw new ArgumentNullException(nameof(element));
             }
 
             var attribute = element.Attribute(name);
-            return attribute != null ? attribute.Value : defaultValue;
-        }
-
-        /// <summary>
-        ///     Gets the text from child element of the specified element. Returns defaultValue if it doesn't exist.
-        /// </summary>
-        /// <param name="element">
-        ///     The element to read.
-        /// </param>
-        /// <param name="name">
-        ///     The name of the child element.
-        /// </param>
-        /// <param name="defaultValue">
-        ///     The default value to return if it doesn't exist.
-        /// </param>
-        /// <returns>
-        ///     The child element's inner text.
-        /// </returns>
-        public static string GetElementText(this XElement element, XName name, string defaultValue = null)
-        {
-            if (element == null)
-            {
-                throw new ArgumentNullException("element");
-            }
-
-            var childElement = element.Element(name);
-            return childElement != null ? childElement.Value : defaultValue;
+            return attribute?.Value ?? defaultValue;
         }
 
         /// <summary>
@@ -87,10 +61,15 @@ namespace TVSorter.Storage
         {
             if (element == null)
             {
-                throw new ArgumentNullException("element");
+                throw new ArgumentNullException(nameof(element));
             }
 
             return element.Elements(name).Select(childElement => childElement.Value);
+        }
+
+        public static XName GetElementName(this string elementName)
+        {
+            return Xml.XmlNamespace + elementName;
         }
     }
 }

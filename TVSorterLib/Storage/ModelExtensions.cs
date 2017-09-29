@@ -45,29 +45,29 @@ namespace TVSorter.Storage
             settings.LockShowsWithNoEpisodes = bool.Parse(settingsNode.GetAttribute("lockshowsnonewepisodes", "false"));
             settings.DefaultDestinationDirectory = settingsNode.GetAttribute("defaultdestinationdir", string.Empty);
 
-            var destinationDirectories = settingsNode.Element(Xml.GetName("DestinationDirectories"));
+            var destinationDirectories = settingsNode.Element("DestinationDirectories".GetElementName());
 
             if (destinationDirectories != null)
             {
                 settings.DestinationDirectories =
-                    destinationDirectories.GetElementsText(Xml.GetName("Destination")).ToList();
+                    destinationDirectories.GetElementsText("Destination".GetElementName()).ToList();
             }
 
-            var ignoredDirectories = settingsNode.Element(Xml.GetName("IgnoredDirectories"));
+            var ignoredDirectories = settingsNode.Element("IgnoredDirectories".GetElementName());
 
             if (ignoredDirectories != null)
             {
-                settings.IgnoredDirectories = ignoredDirectories.GetElementsText(Xml.GetName("Ignored")).ToList();
+                settings.IgnoredDirectories = ignoredDirectories.GetElementsText("Ignored".GetElementName()).ToList();
             }
 
-            settings.FileExtensions = settingsNode.Element(Xml.GetName("FileExtensions"))
-                .GetElementsText(Xml.GetName("Extension"))
+            settings.FileExtensions = settingsNode.Element("FileExtensions".GetElementName())
+                .GetElementsText("Extension".GetElementName())
                 .ToList();
-            settings.RegularExpressions = settingsNode.Element(Xml.GetName("RegularExpression"))
-                .GetElementsText(Xml.GetName("RegEx"))
+            settings.RegularExpressions = settingsNode.Element("RegularExpression".GetElementName())
+                .GetElementsText("RegEx".GetElementName())
                 .ToList();
-            settings.OverwriteKeywords = settingsNode.Element(Xml.GetName("OverwriteKeywords"))
-                .GetElementsText(Xml.GetName("Keyword"))
+            settings.OverwriteKeywords = settingsNode.Element("OverwriteKeywords".GetElementName())
+                .GetElementsText("Keyword".GetElementName())
                 .ToList();
         }
 
@@ -93,10 +93,10 @@ namespace TVSorter.Storage
             show.LastUpdated = DateTime.Parse(showNode.GetAttribute("lastupdated", "1970-01-01 00:00:00"));
             show.UseCustomDestination = bool.Parse(showNode.GetAttribute("usecustomdestination", "false"));
             show.CustomDestinationDir = showNode.GetAttribute("customdestinationdir");
-            show.AlternateNames = showNode.Descendants(Xml.GetName("AlternateName"))
+            show.AlternateNames = showNode.Descendants("AlternateName".GetElementName())
                 .Select(altName => altName.Value)
                 .ToList();
-            show.Episodes = showNode.Descendants(Xml.GetName("Episode"))
+            show.Episodes = showNode.Descendants("Episode".GetElementName())
                 .Select(
                     x =>
                     {
@@ -156,27 +156,27 @@ namespace TVSorter.Storage
         internal static XElement ToXml(this Settings settings)
         {
             var destinationDirectories = new XElement(
-                Xml.GetName("DestinationDirectories"),
-                settings.DestinationDirectories.Select(dir => new XElement(Xml.GetName("Destination"), dir)));
+                "DestinationDirectories".GetElementName(),
+                settings.DestinationDirectories.Select(dir => new XElement("Destination".GetElementName(), dir)));
 
             var ignoredDirectories = new XElement(
-                Xml.GetName("IgnoredDirectories"),
-                settings.IgnoredDirectories.Select(dir => new XElement(Xml.GetName("Ignored"), dir)));
+                "IgnoredDirectories".GetElementName(),
+                settings.IgnoredDirectories.Select(dir => new XElement("Ignored".GetElementName(), dir)));
 
             var fileExtensions = new XElement(
-                Xml.GetName("FileExtensions"),
-                settings.FileExtensions.Select(ext => new XElement(Xml.GetName("Extension"), ext)));
+                "FileExtensions".GetElementName(),
+                settings.FileExtensions.Select(ext => new XElement("Extension".GetElementName(), ext)));
 
             var regularExpressions = new XElement(
-                Xml.GetName("RegularExpression"),
-                settings.RegularExpressions.Select(exp => new XElement(Xml.GetName("RegEx"), exp)));
+                "RegularExpression".GetElementName(),
+                settings.RegularExpressions.Select(exp => new XElement("RegEx".GetElementName(), exp)));
 
             var overwriteKeywords = new XElement(
-                Xml.GetName("OverwriteKeywords"),
-                settings.OverwriteKeywords.Select(key => new XElement(Xml.GetName("Keyword"), key)));
+                "OverwriteKeywords".GetElementName(),
+                settings.OverwriteKeywords.Select(key => new XElement("Keyword".GetElementName(), key)));
 
             return new XElement(
-                Xml.GetName("Settings"),
+                "Settings".GetElementName(),
                 new XAttribute("sourcedirectory", settings.SourceDirectory),
                 new XAttribute("defaultformat", settings.DefaultOutputFormat),
                 new XAttribute("recursesubdirectories", settings.RecurseSubdirectories),
@@ -204,15 +204,15 @@ namespace TVSorter.Storage
         /// </returns>
         internal static XElement ToXml(this TvShow show)
         {
-            var alternateNames = new XElement(Xml.GetName("AlternateNames"));
+            var alternateNames = new XElement("AlternateNames".GetElementName());
             if (show.AlternateNames != null)
             {
                 alternateNames.Add(
                     show.AlternateNames.Select(
-                        alternateName => new XElement(Xml.GetName("AlternateName"), alternateName)));
+                        alternateName => new XElement("AlternateName".GetElementName(), alternateName)));
             }
 
-            var episodes = new XElement(Xml.GetName("Episodes"));
+            var episodes = new XElement("Episodes".GetElementName());
 
             if (show.Episodes != null)
             {
@@ -220,7 +220,7 @@ namespace TVSorter.Storage
             }
 
             var element = new XElement(
-                Xml.GetName("Show"),
+                "Show".GetElementName(),
                 new XAttribute("name", show.Name ?? string.Empty),
                 new XAttribute("foldername", show.FolderName ?? string.Empty),
                 new XAttribute("tvdbid", show.TvdbId),
@@ -250,7 +250,7 @@ namespace TVSorter.Storage
         internal static XElement ToXml(this MissingEpisodeSettings settings)
         {
             return new XElement(
-                Xml.GetName("MissingEpisodeSettings"),
+                "MissingEpisodeSettings".GetElementName(),
                 new XAttribute("hidenotaired", settings.HideNotYetAired),
                 new XAttribute("hidelocked", settings.HideLocked),
                 new XAttribute("hidepart2", settings.HidePart2),
@@ -270,7 +270,7 @@ namespace TVSorter.Storage
         internal static XElement ToXml(this Episode episode)
         {
             var episodeElement = new XElement(
-                Xml.GetName("Episode"),
+                "Episode".GetElementName(),
                 new XAttribute("name", episode.Name),
                 new XAttribute("tvdbid", episode.TvdbId),
                 new XAttribute("seasonnum", episode.SeasonNumber),
