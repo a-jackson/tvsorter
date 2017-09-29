@@ -6,26 +6,19 @@
 //   The public interface of the progress task.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
+using System;
+
 namespace TVSorter.Controller
 {
-    #region Using Directives
-
-    using System;
-
-    #endregion
-
     /// <summary>
-    /// The public interface of the progress task.
+    ///     The public interface of the progress task.
     /// </summary>
     public interface IProgressTask
     {
-        #region Public Events
-
         /// <summary>
-        ///   Occurs when the task is complete.
+        ///     Occurs when the task is complete.
         /// </summary>
         event EventHandler TaskComplete;
-
-        #endregion
     }
 }

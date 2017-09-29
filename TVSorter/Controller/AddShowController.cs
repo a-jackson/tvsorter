@@ -6,43 +6,37 @@
 //   Controller for adding new shows.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
+using TVSorter.Repostitory;
+using TVSorter.View;
+
 namespace TVSorter.Controller
 {
-    using Repostitory;
-    #region Using Directives
-
-    using TVSorter.View;
-
-    #endregion
-
     /// <summary>
-    /// Controller for adding new shows.
+    ///     Controller for adding new shows.
     /// </summary>
     public class AddShowController : ShowSearchController
     {
         /// <summary>
-        /// Initialises a new instance of the <see cref="AddShowController" /> class.
+        ///     Initialises a new instance of the <see cref="AddShowController" /> class.
         /// </summary>
         /// <param name="tvShowRepository">The TV Show Repository.</param>
-        public AddShowController(ITvShowRepository tvShowRepository) : base(tvShowRepository)
+        public AddShowController(ITvShowRepository tvShowRepository)
+            : base(tvShowRepository)
         {
         }
 
-        #region Public Methods and Operators
-
         /// <summary>
-        /// Initialises the controller.
+        ///     Initialises the controller.
         /// </summary>
         /// <param name="view">
-        /// The view the controller is for. 
+        ///     The view the controller is for.
         /// </param>
         public override void Initialise(IView view)
         {
             base.Initialise(view);
-            this.Title = "Add Show";
-            this.CloseButtonText = "Close";
+            Title = "Add Show";
+            CloseButtonText = "Close";
         }
-
-        #endregion
     }
 }

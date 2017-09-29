@@ -6,20 +6,17 @@
 //   Contains the version information about TVSorter.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
 namespace TVSorter
 {
     /// <summary>
-    /// Contains the version information about TVSorter.
+    ///     Contains the version information about TVSorter.
     /// </summary>
     public static class Version
     {
-        #region Constants
-
         /// <summary>
-        /// The current version of TVSorter.
+        ///     The current version of TVSorter.
         /// </summary>
         public const string CurrentVersion = "1.3.1";
-
-        #endregion
     }
 }

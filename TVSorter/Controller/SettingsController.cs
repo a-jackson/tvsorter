@@ -6,36 +6,30 @@
 //   The controller for the settings tab.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
+using TVSorter.Storage;
+using TVSorter.View;
+using Settings = TVSorter.Model.Settings;
+
 namespace TVSorter.Controller
 {
-    #region Using Directives
-
-    using Storage;
-    using View;
-    using Settings = TVSorter.Model.Settings;
-
-    #endregion
-
     /// <summary>
-    /// The controller for the settings tab.
+    ///     The controller for the settings tab.
     /// </summary>
     public class SettingsController : ControllerBase
     {
-        #region Fields
+        /// <summary>
+        ///     The storage provider.
+        /// </summary>
+        private readonly IStorageProvider storageProvider;
 
         /// <summary>
-        ///   The current settings.
+        ///     The current settings.
         /// </summary>
         private Settings settings;
 
         /// <summary>
-        /// The storage provider.
-        /// </summary>
-        private IStorageProvider storageProvider;
-        #endregion
-
-        /// <summary>
-        /// Initialises a new instance of the <see cref="SettingsController"/> class.
+        ///     Initialises a new instance of the <see cref="SettingsController" /> class.
         /// </summary>
         /// <param name="storageProvider">The storage provider.</param>
         public SettingsController(IStorageProvider storageProvider)
@@ -43,56 +37,45 @@ namespace TVSorter.Controller
             this.storageProvider = storageProvider;
         }
 
-        #region Public Properties
-
         /// <summary>
-        ///   Gets the settings.
+        ///     Gets the settings.
         /// </summary>
         public Settings Settings
         {
-            get
-            {
-                return this.settings;
-            }
+            get => settings;
 
             private set
             {
-                this.settings = value;
-                this.OnPropertyChanged("Settings");
+                settings = value;
+                OnPropertyChanged("Settings");
             }
         }
 
-        #endregion
-
-        #region Public Methods and Operators
-
         /// <summary>
-        /// Initialises the controller.
+        ///     Initialises the controller.
         /// </summary>
         /// <param name="view">
-        /// The view the controller is for. 
+        ///     The view the controller is for.
         /// </param>
         public override void Initialise(IView view)
         {
-            this.Revert();
+            Revert();
         }
 
         /// <summary>
-        /// Reverts the settings.
+        ///     Reverts the settings.
         /// </summary>
         public void Revert()
         {
-            this.Settings = storageProvider.LoadSettings();
+            Settings = storageProvider.LoadSettings();
         }
 
         /// <summary>
-        /// Saves the settings.
+        ///     Saves the settings.
         /// </summary>
         public void Save()
         {
             storageProvider.SaveSettings();
         }
-
-        #endregion
     }
 }

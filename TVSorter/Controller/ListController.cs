@@ -6,132 +6,106 @@
 //   Controller for lists.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using TVSorter.View;
+
 namespace TVSorter.Controller
 {
-    #region Using Directives
-
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Linq;
-
-    using TVSorter.View;
-
-    #endregion
-
     /// <summary>
-    /// Controller for lists.
+    ///     Controller for lists.
     /// </summary>
     public class ListController : ControllerBase
     {
-        #region Fields
-
         /// <summary>
-        ///   The list of items.
+        ///     The list of items.
         /// </summary>
         private BindingList<string> itemList;
 
         /// <summary>
-        ///   The title of the form.
+        ///     The title of the form.
         /// </summary>
         private string title;
 
-        #endregion
-
-        #region Constructors and Destructors
-
         /// <summary>
-        /// Initialises a new instance of the <see cref="ListController"/> class.
+        ///     Initialises a new instance of the <see cref="ListController" /> class.
         /// </summary>
         /// <param name="list">
-        /// The list. 
+        ///     The list.
         /// </param>
         /// <param name="dialogTitle">
-        /// The dialog title. 
+        ///     The dialog title.
         /// </param>
         public ListController(IList<string> list, string dialogTitle)
         {
             // Clone the list. That way, if the close button is used
             // the original list won't be affected.
-            this.List = new BindingList<string>(list.ToList());
-            this.Title = dialogTitle;
+            List = new BindingList<string>(list.ToList());
+            Title = dialogTitle;
         }
 
-        #endregion
-
-        #region Public Properties
-
         /// <summary>
-        ///   Gets List.
+        ///     Gets List.
         /// </summary>
         public BindingList<string> List
         {
-            get
-            {
-                return this.itemList;
-            }
+            get => itemList;
 
             private set
             {
-                this.itemList = value;
-                this.OnPropertyChanged("List");
+                itemList = value;
+                OnPropertyChanged("List");
             }
         }
 
         /// <summary>
-        ///   Gets Title.
+        ///     Gets Title.
         /// </summary>
         public string Title
         {
-            get
-            {
-                return this.title;
-            }
+            get => title;
 
             private set
             {
-                this.title = value;
-                this.OnPropertyChanged("Title");
+                title = value;
+                OnPropertyChanged("Title");
             }
         }
 
-        #endregion
-
-        #region Public Methods and Operators
-
         /// <summary>
-        /// Adds an item to the list.
+        ///     Adds an item to the list.
         /// </summary>
         /// <param name="item">
-        /// The item. 
+        ///     The item.
         /// </param>
         public void Add(string item)
         {
-            this.List.Add(item);
+            List.Add(item);
         }
 
         /// <summary>
-        /// Initialises the controller.
+        ///     Initialises the controller.
         /// </summary>
         /// <param name="view">
-        /// The view the controller is for. 
+        ///     The view the controller is for.
         /// </param>
         public override void Initialise(IView view)
         {
-            this.OnPropertyChanged("List");
-            this.OnPropertyChanged("Title");
+            OnPropertyChanged("List");
+            OnPropertyChanged("Title");
         }
 
         /// <summary>
-        /// Removes an item from the list.
+        ///     Removes an item from the list.
         /// </summary>
         /// <param name="item">
-        /// The item. 
+        ///     The item.
         /// </param>
         public void Remove(string item)
         {
-            this.List.Remove(item);
+            List.Remove(item);
         }
-
-        #endregion
     }
 }

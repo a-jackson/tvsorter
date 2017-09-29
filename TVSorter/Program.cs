@@ -6,28 +6,22 @@
 //   TVSorter's Program.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
+using System;
+using System.Windows.Forms;
+using Ninject;
+using TheTvdbDotNet.Ninject;
+using TVSorter.View;
+
 namespace TVSorter
 {
-    #region Using Directives
-
-    using System;
-    using System.Windows.Forms;
-
-    using Ninject;
-    using TVSorter.View;
-    using TheTvdbDotNet.Ninject;
-
-    #endregion
-
     /// <summary>
-    /// TVSorter's Program.
+    ///     TVSorter's Program.
     /// </summary>
     internal static class Program
     {
-        #region Methods
-
         /// <summary>
-        /// The main entry point for the application.
+        ///     The main entry point for the application.
         /// </summary>
         [STAThread]
         private static void Main()
@@ -42,7 +36,5 @@ namespace TVSorter
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(kernel.Get<MainForm>());
         }
-
-        #endregion
     }
 }

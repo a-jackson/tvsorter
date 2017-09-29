@@ -6,226 +6,195 @@
 //   The controller for the sort episodes tab.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using TVSorter.Files;
+using TVSorter.Model;
+using TVSorter.Repostitory;
+using TVSorter.Storage;
+using TVSorter.View;
+using Settings = TVSorter.Model.Settings;
+
 namespace TVSorter.Controller
 {
-    #region Using Directives
-
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Globalization;
-    using System.IO;
-    using System.Linq;
-
-    using Files;
-    using Model;
-    using Repostitory;
-    using Storage;
-    using View;
-
-    using Settings = TVSorter.Model.Settings;
-
-    #endregion
-
     /// <summary>
-    /// The controller for the sort episodes tab.
+    ///     The controller for the sort episodes tab.
     /// </summary>
     public class SortEpisodesController : ControllerBase
     {
-        #region Fields
-
         /// <summary>
-        /// The file searcher.
+        ///     The file searcher.
         /// </summary>
-        private IFileSearch fileSearch;
+        private readonly IFileSearch fileSearch;
 
         /// <summary>
-        /// The TV show repository.
+        ///     The storage provider.
         /// </summary>
-        private ITvShowRepository tvShowRepository;
+        private readonly IStorageProvider storageProvider;
 
         /// <summary>
-        /// The storage provider.
+        ///     The TV show repository.
         /// </summary>
-        private IStorageProvider storageProvider;
+        private readonly ITvShowRepository tvShowRepository;
 
         /// <summary>
-        ///   The last subdirectory scanned.
+        ///     The last subdirectory scanned.
         /// </summary>
         private string lastSubdirectoryScanned;
 
         /// <summary>
-        /// The system settings.
+        ///     The system settings.
         /// </summary>
         private Settings settings;
 
         /// <summary>
-        ///   The sort view.
+        ///     The sort view.
         /// </summary>
         private IView sortView;
 
         /// <summary>
-        ///   The sub directories.
+        ///     The sub directories.
         /// </summary>
         private BindingList<string> subDirectories;
 
-        #endregion
-        
         /// <summary>
-        /// Initialises a new instance of the <see cref="SortEpisodesController"/> class.
+        ///     Initialises a new instance of the <see cref="SortEpisodesController" /> class.
         /// </summary>
         /// <param name="tvShowRepository">The TV show repository.</param>
         /// <param name="fileSearch">The file searcher.</param>
         /// <param name="storageProvider">The storage provider.</param>
-        public SortEpisodesController(ITvShowRepository tvShowRepository, IFileSearch fileSearch, IStorageProvider storageProvider)
+        public SortEpisodesController(
+            ITvShowRepository tvShowRepository,
+            IFileSearch fileSearch,
+            IStorageProvider storageProvider)
         {
             this.tvShowRepository = tvShowRepository;
             this.fileSearch = fileSearch;
             this.storageProvider = storageProvider;
         }
 
-        #region Public Properties
-
         /// <summary>
-        ///   Gets Results.
+        ///     Gets Results.
         /// </summary>
-        public List<FileResult> Results
-        {
-            get
-            {
-                return this.fileSearch.Results;
-            }
-        }
+        public List<FileResult> Results => fileSearch.Results;
 
         /// <summary>
-        ///   Gets Shows.
+        ///     Gets Shows.
         /// </summary>
-        public List<TvShow> Shows
-        {
-            get
-            {
-                return tvShowRepository.GetTvShows().ToList();
-            }
-        }
+        public List<TvShow> Shows => tvShowRepository.GetTvShows().ToList();
 
         /// <summary>
-        ///   Gets SubDirectories.
+        ///     Gets SubDirectories.
         /// </summary>
         public BindingList<string> SubDirectories
         {
-            get
-            {
-                return this.subDirectories;
-            }
+            get => subDirectories;
 
             private set
             {
-                this.subDirectories = value;
-                this.OnPropertyChanged("SubDirectories");
+                subDirectories = value;
+                OnPropertyChanged("SubDirectories");
             }
         }
 
-        #endregion
-
-        #region Public Methods and Operators
-
         /// <summary>
-        /// Copies the episodes at the specified indices.
+        ///     Copies the episodes at the specified indices.
         /// </summary>
         public void CopyEpisodes()
         {
-            var task = new BackgroundTask(() => this.fileSearch.Copy());
+            var task = new BackgroundTask(() => fileSearch.Copy());
             task.Start();
-            this.sortView.StartTaskProgress(task, "Copying Episodes");
+            sortView.StartTaskProgress(task, "Copying Episodes");
         }
 
         /// <summary>
-        /// Initialises the controller.
+        ///     Initialises the controller.
         /// </summary>
         /// <param name="view">
-        /// The view the controller is for. 
+        ///     The view the controller is for.
         /// </param>
         public override void Initialise(IView view)
         {
-            this.lastSubdirectoryScanned = Path.DirectorySeparatorChar.ToString(CultureInfo.InvariantCulture);
+            lastSubdirectoryScanned = Path.DirectorySeparatorChar.ToString(CultureInfo.InvariantCulture);
 
-            this.sortView = view;
+            sortView = view;
 
-            this.LoadSettings();
+            LoadSettings();
         }
 
         /// <summary>
-        /// Moves the episodes at the specified indices.
+        ///     Moves the episodes at the specified indices.
         /// </summary>
         public void MoveEpisodes()
         {
-            var task = new BackgroundTask(() => this.fileSearch.Move());
+            var task = new BackgroundTask(() => fileSearch.Move());
             task.Start();
-            this.sortView.StartTaskProgress(task, "Moving Episodes");
-            this.ScanEpisodes(this.lastSubdirectoryScanned);
+            sortView.StartTaskProgress(task, "Moving Episodes");
+            ScanEpisodes(lastSubdirectoryScanned);
         }
 
         /// <summary>
-        /// Scans the specified subdirectory for settings.
+        ///     Scans the specified subdirectory for settings.
         /// </summary>
         /// <param name="subdirectory">
-        /// The subdirectory. 
+        ///     The subdirectory.
         /// </param>
         public void ScanEpisodes(string subdirectory)
         {
             var task = new BackgroundTask(
                 () =>
-                    {
-                        this.fileSearch.Search(subdirectory);
-                        this.OnPropertyChanged("Results");
-                    });
+                {
+                    fileSearch.Search(subdirectory);
+                    OnPropertyChanged("Results");
+                });
             task.Start();
-            this.sortView.StartTaskProgress(task, "Scanning episodes");
+            sortView.StartTaskProgress(task, "Scanning episodes");
         }
 
         /// <summary>
-        /// Sets the episode of the checked results.
+        ///     Sets the episode of the checked results.
         /// </summary>
         /// <param name="seasonNum">
-        /// The season number.
+        ///     The season number.
         /// </param>
         /// <param name="episodeNum">
-        /// The episode number.
+        ///     The episode number.
         /// </param>
         public void SetEpisode(int seasonNum, int episodeNum)
         {
-            this.fileSearch.SetEpisode(seasonNum, episodeNum);
+            fileSearch.SetEpisode(seasonNum, episodeNum);
         }
 
         /// <summary>
-        /// Sets the show of the specified indices.
+        ///     Sets the show of the specified indices.
         /// </summary>
         /// <param name="show">
-        /// The show to set them to. 
+        ///     The show to set them to.
         /// </param>
         public void SetShow(TvShow show)
         {
-            this.fileSearch.SetShow(show);
+            fileSearch.SetShow(show);
         }
 
-        #endregion
-
-        #region Methods
-
         /// <summary>
-        /// Loads the settings.
+        ///     Loads the settings.
         /// </summary>
         private void LoadSettings()
         {
-            this.settings = storageProvider.Settings;
-            storageProvider.SettingsSaved += (sender, e) => { this.SubDirectories = this.LoadSubDirectories(); };
-            this.SubDirectories = this.LoadSubDirectories();
+            settings = storageProvider.Settings;
+            storageProvider.SettingsSaved += (sender, e) => { SubDirectories = LoadSubDirectories(); };
+            SubDirectories = LoadSubDirectories();
         }
 
         /// <summary>
-        /// Loads the subdirectories of the input folder.
+        ///     Loads the subdirectories of the input folder.
         /// </summary>
         /// <returns>
-        /// A list of the subdirectories. 
+        ///     A list of the subdirectories.
         /// </returns>
         private BindingList<string> LoadSubDirectories()
         {
@@ -233,11 +202,11 @@ namespace TVSorter.Controller
 
             try
             {
-                var source = new DirectoryInfo(this.settings.SourceDirectory);
+                var source = new DirectoryInfo(settings.SourceDirectory);
                 if (source.Exists)
                 {
                     dirs.Add(Path.DirectorySeparatorChar.ToString(CultureInfo.InvariantCulture));
-                    foreach (DirectoryInfo subDir in source.GetDirectories())
+                    foreach (var subDir in source.GetDirectories())
                     {
                         dirs.Add(string.Concat(Path.DirectorySeparatorChar, subDir.Name));
                     }
@@ -249,7 +218,5 @@ namespace TVSorter.Controller
 
             return dirs;
         }
-
-        #endregion
     }
 }

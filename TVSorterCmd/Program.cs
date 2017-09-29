@@ -6,81 +6,74 @@
 //   TVSorterCmd's program.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
+using System;
+using System.Diagnostics;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using CommandLine;
+using Ninject;
+using TheTvdbDotNet.Ninject;
+using TVSorter.Files;
+using TVSorter.Repostitory;
+
 namespace TVSorter
 {
-    #region Using Directives
-
-    using System;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using System.Linq;
-
-    using CommandLine;
-
-    using Files;
-    using Model;
-    using Repostitory;
-    using Ninject;
-    using TheTvdbDotNet.Ninject;
-    #endregion
-
     /// <summary>
-    /// Entry point class for the TVSorter Command Line application.
+    ///     Entry point class for the TVSorter Command Line application.
     /// </summary>
     internal static class Program
     {
-        #region Public Methods and Operators
-
         /// <summary>
-        /// The program's entry point.
+        ///     The program's entry point.
         /// </summary>
         /// <param name="args">
-        /// The command line arguments.
+        ///     The command line arguments.
         /// </param>
         public static void Main(string[] args)
         {
             // If program already running, quit.
-            if (System.Diagnostics.Process.GetProcessesByName(
-                System.IO.Path.GetFileNameWithoutExtension(
-                System.Reflection.Assembly.GetEntryAssembly().Location)).Count() > 1)
+            if (Process.GetProcessesByName(Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().Location))
+                    .Count() >
+                1)
             {
-                System.Diagnostics.Process.GetCurrentProcess().Kill();
+                Process.GetCurrentProcess().Kill();
             }
 
             Logger.LogMessage += (sender, e) =>
+            {
+                if (e.Type == LogType.Error)
                 {
-                    if (e.Type == LogType.Error)
-                    {
-                        Console.Error.WriteLine(e.LogMessage);
-                    }
-                    else
-                    {
-                        Console.WriteLine(e.LogMessage);
-                    }
-                };
+                    Console.Error.WriteLine(e.LogMessage);
+                }
+                else
+                {
+                    Console.WriteLine(e.LogMessage);
+                }
+            };
 
-            Options options = new Options();
+            var options = new Options();
             if (!Parser.Default.ParseArgumentsStrict(args, options))
             {
                 Environment.Exit(1);
             }
 
-            IKernel kernel = new StandardKernel(
-                new LibraryModule(),
-                new TheTvdbDotNetModule("D4DCAEBFCA5A6BC1"));
+            IKernel kernel = new StandardKernel(new LibraryModule(), new TheTvdbDotNetModule("D4DCAEBFCA5A6BC1"));
             var tvshowRepository = kernel.Get<ITvShowRepository>();
             var fileSearch = kernel.Get<IFileSearch>();
 
             if (options.UpdateAll)
             {
-                List<TvShow> shows = tvshowRepository.GetTvShows().Where(x => !x.Locked).ToList();
+                var shows = tvshowRepository.GetTvShows().Where(x => !x.Locked).ToList();
                 tvshowRepository.UpdateShows(shows);
             }
 
             if (options.UpdateShow != null)
             {
-                var show =
-                    tvshowRepository.GetTvShows().FirstOrDefault(
+                var show = tvshowRepository.GetTvShows()
+                    .FirstOrDefault(
                         x => x.Name.Equals(options.UpdateShow, StringComparison.InvariantCultureIgnoreCase));
                 if (show != null)
                 {
@@ -95,7 +88,7 @@ namespace TVSorter
             if (options.Copy || options.Move || options.Scan)
             {
                 fileSearch.Search(null);
-                foreach (FileResult result in fileSearch.Results)
+                foreach (var result in fileSearch.Results)
                 {
                     result.Checked = true;
                 }
@@ -138,15 +131,17 @@ namespace TVSorter
                                 "* {0} {1} {2} {3} {4}",
                                 result.InputFile.Name.FormatLength(17),
                                 result.ShowName.FormatLength(20),
-                                (result.Episode != null ? result.Episode.SeasonNumber.ToString(CultureInfo.InvariantCulture) : string.Empty).FormatLength(7),
-                                (result.Episode != null ? result.Episode.EpisodeNumber.ToString(CultureInfo.InvariantCulture) : string.Empty).FormatLength(7),
+                                (result.Episode != null
+                                    ? result.Episode.SeasonNumber.ToString(CultureInfo.InvariantCulture)
+                                    : string.Empty).FormatLength(7),
+                                (result.Episode != null
+                                    ? result.Episode.EpisodeNumber.ToString(CultureInfo.InvariantCulture)
+                                    : string.Empty).FormatLength(7),
                                 (result.Episode != null ? result.Episode.Name : string.Empty).FormatLength(22));
                         }
                     }
                 }
             }
         }
-
-        #endregion
     }
 }

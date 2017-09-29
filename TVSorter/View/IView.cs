@@ -6,34 +6,26 @@
 //   The public interface of a view.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
+using System.ComponentModel;
+using TVSorter.Controller;
+
 namespace TVSorter.View
 {
-    #region Using Directives
-
-    using System.ComponentModel;
-
-    using TVSorter.Controller;
-
-    #endregion
-
     /// <summary>
-    /// The public interface of a view.
+    ///     The public interface of a view.
     /// </summary>
     public interface IView : ISynchronizeInvoke
     {
-        #region Public Methods and Operators
-
         /// <summary>
-        /// Starts the progress indication for the specified Project Task.
+        ///     Starts the progress indication for the specified Project Task.
         /// </summary>
         /// <param name="task">
-        /// The task. 
+        ///     The task.
         /// </param>
         /// <param name="taskName">
-        /// The task name. 
+        ///     The task name.
         /// </param>
         void StartTaskProgress(IProgressTask task, string taskName);
-
-        #endregion
     }
 }

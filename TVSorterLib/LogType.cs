@@ -3,20 +3,21 @@
 //   2012 - Andrew Jackson
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
+
 namespace TVSorter
 {
     /// <summary>
-    /// The type of the log message.
+    ///     The type of the log message.
     /// </summary>
     public enum LogType
     {
         /// <summary>
-        /// An information log message.
+        ///     An information log message.
         /// </summary>
-        Info, 
+        Info,
 
         /// <summary>
-        /// An error log message.
+        ///     An error log message.
         /// </summary>
         Error
     }

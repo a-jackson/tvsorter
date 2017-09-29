@@ -6,116 +6,125 @@
 //   The tv show.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using TVSorter.Wrappers;
+
 namespace TVSorter.Model
 {
-    #region Using Directives
-
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-
-    using TVSorter.Data;
-    using TVSorter.Files;
-    using TVSorter.Storage;
-    using TVSorter.Wrappers;
-
-    #endregion
-
     /// <summary>
-    /// The tv show.
+    ///     The tv show.
     /// </summary>
     public class TvShow : IEquatable<TvShow>
     {
-        #region Constructors and Destructors
-
         /// <summary>
-        /// Initialises a new instance of the <see cref="TvShow"/> class.
+        ///     Initialises a new instance of the <see cref="TvShow" /> class.
         /// </summary>
         internal TvShow()
         {
         }
 
-        #endregion
-
-        #region Public Properties
-
         /// <summary>
-        ///   Gets or sets AlternateNames.
+        ///     Gets or sets AlternateNames.
         /// </summary>
         public List<string> AlternateNames { get; set; }
 
         /// <summary>
-        ///   Gets or sets Banner.
+        ///     Gets or sets Banner.
         /// </summary>
         public string Banner { get; set; }
 
         /// <summary>
-        ///   Gets or sets CustomFormat.
+        ///     Gets or sets CustomFormat.
         /// </summary>
         public string CustomFormat { get; set; }
 
         /// <summary>
-        /// Gets the episodes of the show.
+        ///     Gets the episodes of the show.
         /// </summary>
         public List<Episode> Episodes { get; internal set; }
 
         /// <summary>
-        ///   Gets or sets FolderName.
+        ///     Gets or sets FolderName.
         /// </summary>
         public string FolderName { get; set; }
 
         /// <summary>
-        ///   Gets or sets LastUpdated.
+        ///     Gets or sets LastUpdated.
         /// </summary>
         public DateTime LastUpdated { get; set; }
 
         /// <summary>
-        ///   Gets or sets a value indicating whether Locked.
+        ///     Gets or sets a value indicating whether Locked.
         /// </summary>
         public bool Locked { get; set; }
 
         /// <summary>
-        ///   Gets or sets Name.
+        ///     Gets or sets Name.
         /// </summary>
         public string Name { get; set; }
 
         /// <summary>
-        ///   Gets or sets the TVDB ID.
+        ///     Gets or sets the TVDB ID.
         /// </summary>
         public int TvdbId { get; set; }
 
         /// <summary>
-        ///   Gets or sets a value indicating whether to Use Custom Format.
+        ///     Gets or sets a value indicating whether to Use Custom Format.
         /// </summary>
         public bool UseCustomFormat { get; set; }
 
         /// <summary>
-        ///   Gets or sets a value indicating whether to use DVD Order.
+        ///     Gets or sets a value indicating whether to use DVD Order.
         /// </summary>
         public bool UseDvdOrder { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether to use a custom destination.
+        ///     Gets or sets a value indicating whether to use a custom destination.
         /// </summary>
         public bool UseCustomDestination { get; set; }
 
         /// <summary>
-        /// Gets or sets the custom output destination directory to use.
+        ///     Gets or sets the custom output destination directory to use.
         /// </summary>
         public string CustomDestinationDir { get; set; }
 
-        #endregion
-
-        #region Public Methods and Operators
-      
         /// <summary>
-        /// Determines whether the specified <see cref="T:System.Object"/> is equal to the current <see cref="T:System.Object"/> .
+        ///     Indicates whether the current object is equal to another object of the same type.
         /// </summary>
         /// <returns>
-        /// true if the specified <see cref="T:System.Object"/> is equal to the current <see cref="T:System.Object"/> ; otherwise, false. 
+        ///     true if the current object is equal to the <paramref name="other" /> parameter; otherwise, false.
+        /// </returns>
+        /// <param name="other">
+        ///     An object to compare with this object.
+        /// </param>
+        public bool Equals(TvShow other)
+        {
+            if (ReferenceEquals(null, other))
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
+
+            return Equals(other.TvdbId, TvdbId);
+        }
+
+        /// <summary>
+        ///     Determines whether the specified <see cref="T:System.Object" /> is equal to the current
+        ///     <see cref="T:System.Object" /> .
+        /// </summary>
+        /// <returns>
+        ///     true if the specified <see cref="T:System.Object" /> is equal to the current <see cref="T:System.Object" /> ;
+        ///     otherwise, false.
         /// </returns>
         /// <param name="obj">
-        /// The <see cref="T:System.Object"/> to compare with the current <see cref="T:System.Object"/> . 
+        ///     The <see cref="T:System.Object" /> to compare with the current <see cref="T:System.Object" /> .
         /// </param>
         /// <filterpriority>2</filterpriority>
         public override bool Equals(object obj)
@@ -135,96 +144,68 @@ namespace TVSorter.Model
                 return false;
             }
 
-            return this.Equals((TvShow)obj);
+            return Equals((TvShow)obj);
         }
 
         /// <summary>
-        /// Indicates whether the current object is equal to another object of the same type.
+        ///     Serves as a hash function for a particular type.
         /// </summary>
         /// <returns>
-        /// true if the current object is equal to the <paramref name="other"/> parameter; otherwise, false. 
-        /// </returns>
-        /// <param name="other">
-        /// An object to compare with this object. 
-        /// </param>
-        public bool Equals(TvShow other)
-        {
-            if (ReferenceEquals(null, other))
-            {
-                return false;
-            }
-
-            if (ReferenceEquals(this, other))
-            {
-                return true;
-            }
-
-            return Equals(other.TvdbId, this.TvdbId);
-        }
-
-        /// <summary>
-        /// Serves as a hash function for a particular type.
-        /// </summary>
-        /// <returns>
-        /// A hash code for the current <see cref="T:System.Object"/> . 
+        ///     A hash code for the current <see cref="T:System.Object" /> .
         /// </returns>
         /// <filterpriority>2</filterpriority>
         public override int GetHashCode()
         {
-            return this.TvdbId.GetHashCode();
+            return TvdbId.GetHashCode();
         }
-        
-        #endregion
 
-        #region Methods
-        
         /// <summary>
-        /// Gets all the possible names of this show.
+        ///     Gets all the possible names of this show.
         /// </summary>
         /// <returns>The possible names of the show.</returns>
         internal IEnumerable<string> GetShowNames()
         {
-            return this.GetNames(new[] { this.Name, this.FolderName }.Concat(this.AlternateNames)).Distinct();
+            return GetNames(new[] { Name, FolderName }.Concat(AlternateNames)).Distinct();
         }
 
         /// <summary>
-        /// Gets the custom destination directory for the show.
+        ///     Gets the custom destination directory for the show.
         /// </summary>
         /// <returns>The IDirectoryInfo the show's custom directory.</returns>
         internal IDirectoryInfo GetCustomDestinationDirectory()
         {
             // TODO: This needs to be able to return a substituted one for the tests
-            return new DirectoryInfoWrap(this.CustomDestinationDir);
+            return new DirectoryInfoWrap(CustomDestinationDir);
         }
 
         /// <summary>
-        /// Initialises the show with default values.
+        ///     Initialises the show with default values.
         /// </summary>
         internal void InitialiseDefaultData()
         {
-            this.AlternateNames = new List<string>();
-            this.Banner = string.Empty;
-            this.CustomFormat = string.Empty;
-            this.LastUpdated = DateTime.MinValue;
-            this.Locked = false;
-            this.UseCustomFormat = false;
-            this.UseDvdOrder = false;
-            this.UseCustomDestination = false;
-            this.CustomDestinationDir = string.Empty;
+            AlternateNames = new List<string>();
+            Banner = string.Empty;
+            CustomFormat = string.Empty;
+            LastUpdated = DateTime.MinValue;
+            Locked = false;
+            UseCustomFormat = false;
+            UseDvdOrder = false;
+            UseCustomDestination = false;
+            CustomDestinationDir = string.Empty;
         }
-        
+
         /// <summary>
-        /// Gets the names from the specified collection of names.
+        ///     Gets the names from the specified collection of names.
         /// </summary>
         /// <param name="names">
-        /// The names to convert.
+        ///     The names to convert.
         /// </param>
         /// <returns>
-        /// The complete list of names including string processing.
+        ///     The complete list of names including string processing.
         /// </returns>
         private IEnumerable<string> GetNames(IEnumerable<string> names)
         {
-            foreach (string name in names.Where(name => name != null))
+            foreach (var name in names.Where(name => name != null))
             {
                 yield return name;
                 yield return name.GetFileSafeName();
@@ -233,7 +214,5 @@ namespace TVSorter.Model
                 yield return name.AlphaNumericOnly();
             }
         }
-
-        #endregion
     }
 }

@@ -6,105 +6,85 @@
 //   Dialog for selecting a show.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
+using System;
+using System.Collections.Generic;
+using System.Windows.Forms;
+using TVSorter.Model;
+
 namespace TVSorter.View
 {
-    #region Using Directives
-
-    using System;
-    using System.Collections.Generic;
-    using System.Windows.Forms;
-
-    using TVSorter.Model;
-
-    #endregion
-
     /// <summary>
-    /// Dialog for selecting a show.
+    ///     Dialog for selecting a show.
     /// </summary>
     public partial class ShowSelectDialog : Form
     {
-        #region Fields
-
         /// <summary>
-        ///   The list of shows.
+        ///     The list of shows.
         /// </summary>
         private readonly List<TvShow> shows;
 
-        #endregion
-
-        #region Constructors and Destructors
-
         /// <summary>
-        /// Initialises a new instance of the <see cref="ShowSelectDialog"/> class.
+        ///     Initialises a new instance of the <see cref="ShowSelectDialog" /> class.
         /// </summary>
         /// <param name="shows">
-        /// The shows. 
+        ///     The shows.
         /// </param>
         public ShowSelectDialog(List<TvShow> shows)
         {
             this.shows = shows;
-            this.InitializeComponent();
+            InitializeComponent();
         }
 
-        #endregion
-
-        #region Public Properties
-
         /// <summary>
-        ///   Gets SelectedShow.
+        ///     Gets SelectedShow.
         /// </summary>
         public TvShow SelectedShow { get; private set; }
 
-        #endregion
-
-        #region Methods
-
         /// <summary>
-        /// Handles the Close button being clicked.
+        ///     Handles the Close button being clicked.
         /// </summary>
         /// <param name="sender">
-        /// The sender of the event. 
+        ///     The sender of the event.
         /// </param>
         /// <param name="e">
-        /// The arguments of the event. 
+        ///     The arguments of the event.
         /// </param>
         private void CloseButtonClick(object sender, EventArgs e)
         {
-            this.DialogResult = DialogResult.Cancel;
-            this.Close();
+            DialogResult = DialogResult.Cancel;
+            Close();
         }
 
         /// <summary>
-        /// Handles the Select button being clicked.
+        ///     Handles the Select button being clicked.
         /// </summary>
         /// <param name="sender">
-        /// The sender of the event. 
+        ///     The sender of the event.
         /// </param>
         /// <param name="e">
-        /// The arguments of the event. 
+        ///     The arguments of the event.
         /// </param>
         private void SelectButtonClick(object sender, EventArgs e)
         {
-            this.SelectedShow = (TvShow)this.showList.SelectedItem;
-            this.DialogResult = DialogResult.OK;
-            this.Close();
+            SelectedShow = (TvShow)showList.SelectedItem;
+            DialogResult = DialogResult.OK;
+            Close();
         }
 
         /// <summary>
-        /// Handles the dialog loading.
+        ///     Handles the dialog loading.
         /// </summary>
         /// <param name="sender">
-        /// The sender of the event. 
+        ///     The sender of the event.
         /// </param>
         /// <param name="e">
-        /// The arguments of the event. 
+        ///     The arguments of the event.
         /// </param>
         private void ShowSelectDialogLoad(object sender, EventArgs e)
         {
-            this.showList.DisplayMember = "Name";
-            this.showList.DataSource = this.shows;
+            showList.DisplayMember = "Name";
+            showList.DataSource = shows;
         }
-
-        #endregion
     }
 }

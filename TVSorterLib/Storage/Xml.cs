@@ -6,143 +6,106 @@
 //   Class that manages access to the XML file.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Xml;
+using System.Xml.Linq;
+using System.Xml.Schema;
+using TVSorter.Model;
+
 namespace TVSorter.Storage
 {
-    #region Using Directives
-
-    using System;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using System.IO;
-    using System.Linq;
-    using System.Xml;
-    using System.Xml.Linq;
-    using System.Xml.Schema;
-
-    using TVSorter.Model;
-
-    #endregion
-
     /// <summary>
-    /// Class that manages access to the XML file.
+    ///     Class that manages access to the XML file.
     /// </summary>
     public class Xml : IStorageProvider
     {
-        #region Constants
-
         /// <summary>
-        ///   The path the XML file.
+        ///     The path the XML file.
         /// </summary>
         private const string XmlFile = "TVSorter.xml";
 
         /// <summary>
-        /// The file path of the XSD file. Contains the version number of the XML file.
+        ///     The file path of the XSD file. Contains the version number of the XML file.
         /// </summary>
         private const string XsdFile = "TVSorter-{0}.0.xsd";
 
         /// <summary>
-        /// The current version of the XML file.
-        /// </summary>
-        private static readonly int XmlVersion = 5;
-
-        #endregion
-
-        #region Static Fields
-
-        /// <summary>
-        /// The namespace of the XML.
+        ///     The namespace of the XML.
         /// </summary>
         private static readonly XNamespace XmlNamespace = "http://code.google.com/p/tvsorter";
 
-        #endregion
-
-        #region Fields
+        /// <summary>
+        ///     The current version of the XML file.
+        /// </summary>
+        private static readonly int XmlVersion = 5;
 
         /// <summary>
-        /// The XML Document.
+        ///     The XML Document.
         /// </summary>
         private XDocument document;
 
         /// <summary>
-        /// The settings.
+        ///     The missing episode settings.
+        /// </summary>
+        private MissingEpisodeSettings missingEpisodeSettings;
+
+        /// <summary>
+        ///     The settings.
         /// </summary>
         private Settings settings;
 
         /// <summary>
-        /// The missing episode settings.
-        /// </summary>
-        private MissingEpisodeSettings missingEpisodeSettings;
-
-        #endregion
-
-        #region Constructors and Destructors
-
-        /// <summary>
-        ///   Initialises a new instance of the <see cref="Xml" /> class. Initialises a new instance of the TvShowXml class.
+        ///     Initialises a new instance of the <see cref="Xml" /> class. Initialises a new instance of the TvShowXml class.
         /// </summary>
         public Xml()
         {
-            this.Initialise();
+            Initialise();
         }
 
-        #endregion
-
-        #region Public Events
-
         /// <summary>
-        /// Occurs when settings are saved.
+        ///     Occurs when settings are saved.
         /// </summary>
         public event EventHandler SettingsSaved;
 
         /// <summary>
-        /// Occurs when a TV Show is added.
+        ///     Occurs when a TV Show is added.
         /// </summary>
         public event EventHandler<TvShowEventArgs> TvShowAdded;
 
         /// <summary>
-        /// Occurs when a TV Show changes.
+        ///     Occurs when a TV Show changes.
         /// </summary>
         public event EventHandler<TvShowEventArgs> TvShowChanged;
 
         /// <summary>
-        /// Occurs when a TV Show is removed.
+        ///     Occurs when a TV Show is removed.
         /// </summary>
         public event EventHandler<TvShowEventArgs> TvShowRemoved;
 
         /// <summary>
-        /// Gets the settings.
+        ///     Gets the settings.
         /// </summary>
-        public Settings Settings
-        {
-            get
-            {
-                return this.settings;
-            }
-        }
+        public Settings Settings => settings;
+
+        /// <inheritdoc />
+        /// <summary>
+        ///     Gets the missing episode settings.
+        /// </summary>
+        public MissingEpisodeSettings MissingEpisodeSettings => missingEpisodeSettings;
 
         /// <summary>
-        /// Gets the missing episode settings.
-        /// </summary>
-        public MissingEpisodeSettings MissingEpisodeSettings
-        {
-            get
-            {
-                return this.missingEpisodeSettings;
-            }
-        }
-
-        #endregion
-
-        #region Public Methods and Operators
-
-        /// <summary>
-        /// Gets the XName for a name.
+        ///     Gets the XName for a name.
         /// </summary>
         /// <param name="name">
-        /// The name to get.
+        ///     The name to get.
         /// </param>
         /// <returns>
-        /// The XName.
+        ///     The XName.
         /// </returns>
         public static XName GetName(string name)
         {
@@ -150,84 +113,84 @@ namespace TVSorter.Storage
         }
 
         /// <summary>
-        /// Gets the episodes that have more than 1 file grouped by show.
+        ///     Gets the episodes that have more than 1 file grouped by show.
         /// </summary>
         /// <returns>
-        /// The collection of episodes that are duplicated. 
+        ///     The collection of episodes that are duplicated.
         /// </returns>
         public IEnumerable<Episode> GetDuplicateEpisodes()
         {
-            return this.GetEpisodes(x => x > 1);
+            return GetEpisodes(x => x > 1);
         }
 
         /// <summary>
-        /// Gets the episodes that are missing grouped by show.
+        ///     Gets the episodes that are missing grouped by show.
         /// </summary>
         /// <returns>
-        /// The collection of episodes that are missing. 
+        ///     The collection of episodes that are missing.
         /// </returns>
         public IEnumerable<Episode> GetMissingEpisodes()
         {
-            return this.GetEpisodes(x => x == 0);
+            return GetEpisodes(x => x == 0);
         }
 
         /// <summary>
-        /// Loads the missing episode settings from the XML file.
+        ///     Loads the missing episode settings from the XML file.
         /// </summary>
         /// <returns>
-        /// The settings that have been loaded.
+        ///     The settings that have been loaded.
         /// </returns>
         public MissingEpisodeSettings LoadMissingEpisodeSettings()
         {
-            if (this.document.Root == null)
+            if (document.Root == null)
             {
                 throw new XmlException("XML is invalid.");
             }
 
-            XElement settingsNode = this.document.Root.Element(GetName("MissingEpisodeSettings"));
+            var settingsNode = document.Root.Element(GetName("MissingEpisodeSettings"));
             if (settingsNode == null)
             {
                 throw new XmlSchemaException("The XML file is invalid.");
             }
 
-            this.missingEpisodeSettings.FromXml(settingsNode);
-            return this.missingEpisodeSettings;
+            missingEpisodeSettings.FromXml(settingsNode);
+            return missingEpisodeSettings;
         }
 
         /// <summary>
-        /// Reads the settings from the XML file.
+        ///     Reads the settings from the XML file.
         /// </summary>
         /// <returns>
-        /// The settings that have been loaded.
+        ///     The settings that have been loaded.
         /// </returns>
         public Settings LoadSettings()
         {
-            if (this.document.Root == null)
+            if (document.Root == null)
             {
                 throw new XmlException("XML is invalid.");
             }
 
-            XElement settingsNode = this.document.Root.Element(GetName("Settings"));
+            var settingsNode = document.Root.Element(GetName("Settings"));
             if (settingsNode == null)
             {
                 throw new XmlSchemaException("The XML file is invalid.");
             }
 
-            this.settings.FromXml(settingsNode);
-            return this.settings;
+            settings.FromXml(settingsNode);
+            return settings;
         }
 
         /// <summary>
-        /// Loads all the TVShows from the XML file.
+        ///     Loads all the TVShows from the XML file.
         /// </summary>
         /// <returns>
-        /// The list of TV shows. 
+        ///     The list of TV shows.
         /// </returns>
         public IEnumerable<TvShow> LoadTvShows()
         {
             try
             {
-                return this.document.Descendants(GetName("Show")).Select(NewTvShow).OrderBy(x => x.Name);
+                return document.Descendants(GetName("Show")).Select(NewTvShow).OrderBy(x => x.Name);
             }
             catch
             {
@@ -236,40 +199,42 @@ namespace TVSorter.Storage
         }
 
         /// <summary>
-        /// Removes the specified show from the storage.
+        ///     Removes the specified show from the storage.
         /// </summary>
         /// <param name="show">
-        /// The show to remove. 
+        ///     The show to remove.
         /// </param>
         public void RemoveShow(TvShow show)
         {
-            XElement showElement = this.document.Descendants(GetName("Show")).Where(
-                x =>
+            var showElement = document.Descendants(GetName("Show"))
+                .Where(
+                    x =>
                     {
-                        XAttribute tvdbId = x.Attribute("tvdbid");
-                        return tvdbId != null && tvdbId.Value.Equals(show.TvdbId);
-                    }).FirstOrDefault();
+                        var tvdbId = x.Attribute("tvdbid");
+                        return (tvdbId != null) && tvdbId.Value.Equals(show.TvdbId.ToString());
+                    })
+                .FirstOrDefault();
 
             if (showElement != null)
             {
                 showElement.Remove();
-                this.OnTvShowRemoved(show);
+                OnTvShowRemoved(show);
             }
 
-            this.document.Save(XmlFile);
+            document.Save(XmlFile);
         }
 
         /// <summary>
-        /// Saves the specified episode.
+        ///     Saves the specified episode.
         /// </summary>
         /// <param name="episode">
-        /// The episode to save.
+        ///     The episode to save.
         /// </param>
         public void SaveEpisode(Episode episode)
         {
             if (episode == null)
             {
-                throw new ArgumentNullException("episode", "Episode cannot be null.");
+                throw new ArgumentNullException(nameof(episode), "Episode cannot be null.");
             }
 
             if (episode.Show == null)
@@ -277,24 +242,23 @@ namespace TVSorter.Storage
                 throw new NullReferenceException("The episode's show parameter cannot be null.");
             }
 
-            XElement show =
-                this.document.Descendants(GetName("Show")).FirstOrDefault(
-                    x => x.GetAttribute("tvdbid") == episode.Show.TvdbId.ToString());
+            var show = document.Descendants(GetName("Show"))
+                .FirstOrDefault(x => x.GetAttribute("tvdbid") == episode.Show.TvdbId.ToString());
 
             if (show == null)
             {
                 throw new InvalidOperationException("The specified show is not saved.");
             }
 
-            XElement episodes = show.Element(GetName("Episodes"));
+            var episodes = show.Element(GetName("Episodes"));
 
             if (episodes == null)
             {
                 throw new XmlException("XML is invalid.");
             }
 
-            XElement episodeElement =
-                episodes.Elements(GetName("Episode")).FirstOrDefault(x => x.GetAttribute("tvdbid") == episode.TvdbId);
+            var episodeElement = episodes.Elements(GetName("Episode"))
+                .FirstOrDefault(x => x.GetAttribute("tvdbid") == episode.TvdbId);
 
             if (episodeElement != null)
             {
@@ -305,129 +269,124 @@ namespace TVSorter.Storage
                 episodes.Add(episode.ToXml());
             }
 
-            this.document.Save(XmlFile);
+            document.Save(XmlFile);
         }
 
         /// <summary>
-        /// Saves the missing episode settings into the XML file.
-        /// </summary> 
+        ///     Saves the missing episode settings into the XML file.
+        /// </summary>
         public void SaveMissingEpisodeSettings()
         {
-            if (this.document.Root == null)
+            if (document.Root == null)
             {
                 throw new XmlException("XML is invalid.");
             }
 
-            XElement settingsNode = this.document.Root.Element(GetName("MissingEpisodeSettings"));
+            var settingsNode = document.Root.Element(GetName("MissingEpisodeSettings"));
             if (settingsNode == null)
             {
                 throw new XmlException("Xml is invalid");
             }
 
-            settingsNode.ReplaceWith(this.missingEpisodeSettings.ToXml());
-            this.document.Save(XmlFile);
+            settingsNode.ReplaceWith(missingEpisodeSettings.ToXml());
+            document.Save(XmlFile);
         }
 
         /// <summary>
-        /// Saves the specified settings into the XML file.
+        ///     Saves the specified settings into the XML file.
         /// </summary>
         public void SaveSettings()
         {
-            if (this.document.Root == null)
+            if (document.Root == null)
             {
                 throw new XmlException("XML is invalid.");
             }
 
-            XElement settingsNode = this.document.Root.Element(GetName("Settings"));
+            var settingsNode = document.Root.Element(GetName("Settings"));
             if (settingsNode == null)
             {
                 throw new XmlException("Xml is invalid");
             }
 
-            settingsNode.ReplaceWith(this.settings.ToXml());
-            this.document.Save(XmlFile);
-            this.OnSettingsSaved();
+            settingsNode.ReplaceWith(settings.ToXml());
+            document.Save(XmlFile);
+            OnSettingsSaved();
         }
 
         /// <summary>
-        /// Saves the specified show. Updates if it already exists and adds if it doesn't
+        ///     Saves the specified show. Updates if it already exists and adds if it doesn't
         /// </summary>
         /// <param name="show">
-        /// The show to save. 
+        ///     The show to save.
         /// </param>
         public void SaveShow(TvShow show)
         {
-            XElement showElement =
-                this.document.Descendants(GetName("Show")).FirstOrDefault(x => x.GetAttribute("tvdbid") == show.TvdbId.ToString());
+            var showElement = document.Descendants(GetName("Show"))
+                .FirstOrDefault(x => x.GetAttribute("tvdbid") == show.TvdbId.ToString());
 
             if (showElement != null)
             {
                 showElement.ReplaceWith(show.ToXml());
-                this.OnTvShowChanged(show);
+                OnTvShowChanged(show);
             }
             else
             {
-                XElement shows = this.document.Descendants(GetName("Shows")).FirstOrDefault();
+                var shows = document.Descendants(GetName("Shows")).FirstOrDefault();
                 if (shows == null)
                 {
                     throw new XmlException("XML is invalid.");
                 }
 
                 shows.Add(show.ToXml());
-                this.OnTvShowAdded(show);
+                OnTvShowAdded(show);
             }
 
-            this.document.Save(XmlFile);
+            document.Save(XmlFile);
         }
 
         /// <summary>
-        /// Saves a collection of shows.
+        ///     Saves a collection of shows.
         /// </summary>
         /// <param name="shows">
-        /// The shows to save.
+        ///     The shows to save.
         /// </param>
         public void SaveShows(IEnumerable<TvShow> shows)
         {
-            XElement showsElement = this.document.Descendants(GetName("Shows")).FirstOrDefault();
+            var showsElement = document.Descendants(GetName("Shows")).FirstOrDefault();
             if (showsElement == null)
             {
                 throw new XmlException("XML is invalid.");
             }
 
-            foreach (TvShow show in shows)
+            foreach (var show in shows)
             {
                 // Check if the show already exists. Else add it.
-                XElement showElement =
-                    this.document.Descendants(GetName("Show")).FirstOrDefault(
-                        x => x.GetAttribute("tvdbid") == show.TvdbId.ToString());
+                var showElement = document.Descendants(GetName("Show"))
+                    .FirstOrDefault(x => x.GetAttribute("tvdbid") == show.TvdbId.ToString());
 
                 if (showElement != null)
                 {
                     showElement.ReplaceWith(show.ToXml());
-                    this.OnTvShowChanged(show);
+                    OnTvShowChanged(show);
                 }
                 else
                 {
                     showsElement.Add(show.ToXml());
-                    this.OnTvShowAdded(show);
+                    OnTvShowAdded(show);
                 }
             }
 
-            this.document.Save(XmlFile);
+            document.Save(XmlFile);
         }
 
-        #endregion
-
-        #region Methods
-
         /// <summary>
-        /// Gets a new TVShow from the specified element.
+        ///     Gets a new TVShow from the specified element.
         /// </summary>
         /// <param name="element">
-        /// The element to load.
+        ///     The element to load.
         /// </param>
         /// <returns>
-        /// The new TV Show.
+        ///     The new TV Show.
         /// </returns>
         private static TvShow NewTvShow(XElement element)
         {
@@ -437,30 +396,30 @@ namespace TVSorter.Storage
         }
 
         /// <summary>
-        /// Updates the specified element to XML format version 2.
+        ///     Updates the specified element to XML format version 2.
         /// </summary>
         /// <param name="root">
-        /// The root element of the document.
+        ///     The root element of the document.
         /// </param>
         private static void UpdateToVersion2(XElement root)
         {
-            XElement settingsNode = root.Element(GetName("Settings"));
+            var settingsNode = root.Element(GetName("Settings"));
             if (settingsNode == null)
             {
                 throw new XmlException("XML is not valid.");
             }
 
             // Update the first regualar expression to use the one with dual episode support
-            XElement regularExpression = settingsNode.Element(GetName("RegularExpression"));
+            var regularExpression = settingsNode.Element(GetName("RegularExpression"));
             if (regularExpression == null)
             {
                 throw new XmlException("XML is not valid.");
             }
 
-            XElement regex = regularExpression.Element(GetName("RegEx"));
+            var regex = regularExpression.Element(GetName("RegEx"));
 
             // If it is the old text then replace with the new text
-            if (regex != null && regex.Value.Equals("s(?<S>[0-9]+)e(?<E>[0-9]+)"))
+            if ((regex != null) && regex.Value.Equals("s(?<S>[0-9]+)e(?<E>[0-9]+)"))
             {
                 regex.Value = "s(?<S>[0-9]+)e((?<E>[0-9]+)-{0,1})+";
             }
@@ -470,14 +429,14 @@ namespace TVSorter.Storage
         }
 
         /// <summary>
-        /// Updates the XML to version 3.
+        ///     Updates the XML to version 3.
         /// </summary>
         /// <param name="root">
-        /// The root of the document.
+        ///     The root of the document.
         /// </param>
         private static void UpdateToVersion3(XElement root)
         {
-            XElement settingsNode = root.Element(GetName("Settings"));
+            var settingsNode = root.Element(GetName("Settings"));
             if (settingsNode == null)
             {
                 throw new XmlException("XML is not valid");
@@ -489,20 +448,20 @@ namespace TVSorter.Storage
         }
 
         /// <summary>
-        /// Updates the XML to version 4
+        ///     Updates the XML to version 4
         /// </summary>
         /// <param name="root">The root of the document.</param>
         private static void UpdateToVersion4(XElement root)
         {
-            XElement settingsNode = root.Element(GetName("Settings"));
+            var settingsNode = root.Element(GetName("Settings"));
             if (settingsNode == null)
             {
                 throw new XmlException("Xml is not valid");
             }
 
-            string selectedDestination = string.Empty;
+            var selectedDestination = string.Empty;
             var destinations = settingsNode.Descendants(GetName("Destination"));
-            foreach (XElement destination in destinations)
+            foreach (var destination in destinations)
             {
                 if (bool.Parse(destination.GetAttribute("selected", "false")))
                 {
@@ -515,21 +474,21 @@ namespace TVSorter.Storage
             settingsNode.Add(new XAttribute("defaultdestinationdir", selectedDestination));
 
             // Update the first regualar expression
-            XElement regularExpression = settingsNode.Element(GetName("RegularExpression"));
+            var regularExpression = settingsNode.Element(GetName("RegularExpression"));
             if (regularExpression == null)
             {
                 throw new XmlException("XML is not valid.");
             }
 
-            XElement regex = regularExpression.Element(GetName("RegEx"));
+            var regex = regularExpression.Element(GetName("RegEx"));
 
             // If it is the old text then replace with the new text
-            if (regex != null && regex.Value.Equals("s(?<S>[0-9]+)e((?<E>[0-9]+)-{0,1})+"))
+            if ((regex != null) && regex.Value.Equals("s(?<S>[0-9]+)e((?<E>[0-9]+)-{0,1})+"))
             {
                 regex.Value = "s(?<S>[0-9]+)e((?<E>[0-9]+)[e-]{0,1})+";
             }
 
-            foreach (XElement show in root.Descendants(GetName("Show")))
+            foreach (var show in root.Descendants(GetName("Show")))
             {
                 show.Add(new XAttribute("usecustomdestination", false));
                 show.Add(new XAttribute("customdestinationdir", string.Empty));
@@ -537,56 +496,56 @@ namespace TVSorter.Storage
         }
 
         /// <summary>
-        /// Updates the xml to version 5
+        ///     Updates the xml to version 5
         /// </summary>
         /// <param name="root">
-        /// The root element of the document.
+        ///     The root element of the document.
         /// </param>
         private static void UpdateToVersion5(XElement root)
         {
-            XElement settingsNode = root.Element(GetName("Settings"));
+            var settingsNode = root.Element(GetName("Settings"));
             if (settingsNode == null)
             {
                 throw new XmlException("Xml is not valid");
             }
 
-            settingsNode.FirstNode.AddAfterSelf(new XElement("IgnoredDirectories", new string[] { }));
+            settingsNode.FirstNode.AddAfterSelf(new XElement("IgnoredDirectories", new object[] { }));
         }
 
         /// <summary>
-        /// Get the XDocument instance of the XML file.
+        ///     Get the XDocument instance of the XML file.
         /// </summary>
         private void GetDocument()
         {
-            this.document = XDocument.Load(XmlFile);
-            if (this.document.Root == null)
+            document = XDocument.Load(XmlFile);
+            if (document.Root == null)
             {
                 throw new XmlSchemaValidationException("The XML file is invalid.");
             }
 
-            XElement root = this.document.Root;
+            var root = document.Root;
 
-            int version = int.Parse(this.document.Root.GetAttribute("version", "0"));
+            var version = int.Parse(document.Root.GetAttribute("version", "0"));
             if (version == 0)
             {
                 // Verison 0 is the XML before it was verisoned from 1.0b.
                 // Add the version and namespace declaration so it will match verison 1.
-                this.document.Root.Add(new XAttribute("version", 1));
+                document.Root.Add(new XAttribute("version", 1));
 
-                foreach (XElement element in this.document.Descendants())
+                foreach (var element in document.Descendants())
                 {
                     element.Name = GetName(element.Name.LocalName);
                 }
 
                 version = 1;
-                this.document.Save(XmlFile);
+                document.Save(XmlFile);
             }
 
             // Check that the XML is up to date.
             if (version < XmlVersion)
             {
                 // Ensure that the file is valid for it's version
-                this.ValidateXml(string.Format(XsdFile, version));
+                ValidateXml(string.Format(XsdFile, version));
 
                 if (version < 2)
                 {
@@ -608,30 +567,30 @@ namespace TVSorter.Storage
                     UpdateToVersion5(root);
                 }
 
-                XAttribute versionAttribute = root.Attribute("version");
+                var versionAttribute = root.Attribute("version");
                 if (versionAttribute != null)
                 {
                     versionAttribute.Value = XmlVersion.ToString(CultureInfo.InvariantCulture);
                 }
 
-                this.SanitizeXml(this.document.Root);
-                this.document.Save(XmlFile);
+                SanitizeXml(document.Root);
+                document.Save(XmlFile);
             }
 
-            this.ValidateXml(string.Format(XsdFile, XmlVersion));
+            ValidateXml(string.Format(XsdFile, XmlVersion));
         }
 
         /// <summary>
-        /// Sanitizes the XML file of empty namespaces
+        ///     Sanitizes the XML file of empty namespaces
         /// </summary>
         /// <param name="root">
-        /// The root element to sanitize.
+        ///     The root element to sanitize.
         /// </param>
         private void SanitizeXml(XElement root)
         {
+            // If we have an empty namespace...
             foreach (var node in root.Descendants())
             {
-                // If we have an empty namespace...
                 if (node.Name.NamespaceName == string.Empty)
                 {
                     // Remove the xmlns='' attribute. Note the use of
@@ -642,55 +601,58 @@ namespace TVSorter.Storage
                     node.Attributes("xmlns").Remove();
 
                     // Inherit the parent namespace instead
-                    node.Name = node.Parent.Name.Namespace + node.Name.LocalName;
+                    if (node.Parent != null)
+                    {
+                        node.Name = node.Parent.Name.Namespace + node.Name.LocalName;
+                    }
                 }
             }
         }
 
         /// <summary>
-        /// Gets the episodes based on the specified function of file count.
+        ///     Gets the episodes based on the specified function of file count.
         /// </summary>
         /// <param name="fileCountSelector">
-        /// The function to determine if the episode should be selected based on file count. 
+        ///     The function to determine if the episode should be selected based on file count.
         /// </param>
         /// <returns>
-        /// The collection of episodes that match the predicate. 
+        ///     The collection of episodes that match the predicate.
         /// </returns>
         private IEnumerable<Episode> GetEpisodes(Func<int, bool> fileCountSelector)
         {
-            IEnumerable<TvShow> tvshows = this.LoadTvShows();
+            var tvshows = LoadTvShows();
             return tvshows.SelectMany(x => x.Episodes).Where(x => fileCountSelector(x.FileCount));
         }
 
         /// <summary>
-        /// Initialises the class for reading the XML file.
+        ///     Initialises the class for reading the XML file.
         /// </summary>
         private void Initialise()
         {
             try
             {
-                this.settings = new Settings();
-                this.missingEpisodeSettings = new MissingEpisodeSettings();
+                settings = new Settings();
+                missingEpisodeSettings = new MissingEpisodeSettings();
 
                 // Check that the file exists
                 if (!File.Exists(XmlFile))
                 {
                     // Create the file and populate with default settings.
-                    var doc = new XDocument(
-                        new XDeclaration("1.0", "utf-8", "yes"),
-                        new XElement(
-                            GetName("TVSorter"),
-                            new XAttribute("version", XmlVersion),
-                            this.settings.ToXml(),
-                            this.missingEpisodeSettings.ToXml(),
-                            new XElement(GetName("Shows"))));
+                    var root = new XElement(
+                        GetName("TVSorter"),
+                        new XAttribute("version", XmlVersion),
+                        settings.ToXml(),
+                        missingEpisodeSettings.ToXml(),
+                        new XElement(GetName("Shows")));
+
+                    var doc = new XDocument(new XDeclaration("1.0", "utf-8", "yes"), root);
 
                     doc.Save(XmlFile);
                 }
 
-                this.GetDocument();
-                this.LoadSettings();
-                this.LoadMissingEpisodeSettings();
+                GetDocument();
+                LoadSettings();
+                LoadMissingEpisodeSettings();
             }
             catch (Exception e)
             {
@@ -699,75 +661,77 @@ namespace TVSorter.Storage
         }
 
         /// <summary>
-        /// Fires the SettingsSaved event.
+        ///     Fires the SettingsSaved event.
         /// </summary>
         private void OnSettingsSaved()
         {
-            if (this.SettingsSaved != null)
+            if (SettingsSaved != null)
             {
-                this.SettingsSaved(this, EventArgs.Empty);
+                SettingsSaved(this, EventArgs.Empty);
             }
         }
 
         /// <summary>
-        /// Fires a TVShow added event.
+        ///     Fires a TVShow added event.
         /// </summary>
         /// <param name="show">
-        /// The show that was added.
+        ///     The show that was added.
         /// </param>
         private void OnTvShowAdded(TvShow show)
         {
-            if (this.TvShowAdded != null)
+            if (TvShowAdded != null)
             {
-                this.TvShowAdded(this, new TvShowEventArgs(show));
+                TvShowAdded(this, new TvShowEventArgs(show));
             }
         }
 
         /// <summary>
-        /// Fires a TvShowChanged event.
+        ///     Fires a TvShowChanged event.
         /// </summary>
         /// <param name="show">
-        /// The show that changed.
+        ///     The show that changed.
         /// </param>
         private void OnTvShowChanged(TvShow show)
         {
-            if (this.TvShowChanged != null)
+            if (TvShowChanged != null)
             {
-                this.TvShowChanged(this, new TvShowEventArgs(show));
+                TvShowChanged(this, new TvShowEventArgs(show));
             }
         }
 
         /// <summary>
-        /// Fires a TvShowRemoved event.
+        ///     Fires a TvShowRemoved event.
         /// </summary>
         /// <param name="show">
-        /// The show that was removed.
+        ///     The show that was removed.
         /// </param>
         private void OnTvShowRemoved(TvShow show)
         {
-            if (this.TvShowRemoved != null)
+            if (TvShowRemoved != null)
             {
-                this.TvShowRemoved(this, new TvShowEventArgs(show));
+                TvShowRemoved(this, new TvShowEventArgs(show));
             }
         }
 
         /// <summary>
-        /// Validates the XML file against the specified schema.
+        ///     Validates the XML file against the specified schema.
         /// </summary>
         /// <param name="schema">
-        /// The schema to validate against.
+        ///     The schema to validate against.
         /// </param>
         private void ValidateXml(string schema)
         {
             if (File.Exists(schema))
             {
                 // Get the schemas to validate against.
-                var settings = new XmlReaderSettings { ValidationType = ValidationType.Schema };
-                settings.Schemas.Add(XmlNamespace.NamespaceName, schema);
-                settings.ValidationEventHandler +=
-                    (sender, args) => { throw new XmlSchemaValidationException(args.Message, args.Exception); };
+                var xmlSettings = new XmlReaderSettings { ValidationType = ValidationType.Schema };
+                xmlSettings.Schemas.Add(XmlNamespace.NamespaceName, schema);
+                xmlSettings.ValidationEventHandler += (sender, args) =>
+                {
+                    throw new XmlSchemaValidationException(args.Message, args.Exception);
+                };
 
-                using (XmlReader reader = XmlReader.Create(XmlFile, settings))
+                using (var reader = XmlReader.Create(XmlFile, xmlSettings))
                 {
                     while (reader.Read())
                     {
@@ -775,7 +739,5 @@ namespace TVSorter.Storage
                 }
             }
         }
-
-        #endregion
     }
 }

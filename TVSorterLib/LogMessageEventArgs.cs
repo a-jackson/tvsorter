@@ -6,73 +6,59 @@
 //   The log message event args.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
+using System;
+
 namespace TVSorter
 {
-    #region Using Directives
-
-    using System;
-
-    #endregion
-
     /// <summary>
-    /// The log message event args.
+    ///     The log message event args.
     /// </summary>
     public class LogMessageEventArgs : EventArgs
     {
-        #region Constructors and Destructors
-
         /// <summary>
-        /// Initialises a new instance of the <see cref="LogMessageEventArgs"/> class. Initialises a new instance of the <see cref="LogMessageEventArgs"/> class.
+        ///     Initialises a new instance of the <see cref="LogMessageEventArgs" /> class. Initialises a new instance of the
+        ///     <see cref="LogMessageEventArgs" /> class.
         /// </summary>
         /// <param name="message">
-        ///   The message. 
+        ///     The message.
         /// </param>
         /// <param name="time">
-        ///   The time. 
+        ///     The time.
         /// </param>
         /// <param name="type"> The type of the log message.</param>
         public LogMessageEventArgs(string message, DateTime time, LogType type)
         {
-            this.LogTime = time;
-            this.Type = type;
-            this.LogMessage = message;
+            LogTime = time;
+            Type = type;
+            LogMessage = message;
         }
 
-        #endregion
-
-        #region Public Properties
-
         /// <summary>
-        ///   Gets the log message of the event.
+        ///     Gets the log message of the event.
         /// </summary>
-        public string LogMessage { get; private set; }
+        public string LogMessage { get; }
 
         /// <summary>
-        ///   Gets the time the event was raised.
+        ///     Gets the time the event was raised.
         /// </summary>
-        public DateTime LogTime { get; private set; }
+        public DateTime LogTime { get; }
 
         /// <summary>
-        /// Gets the type of the log message.
+        ///     Gets the type of the log message.
         /// </summary>
-        public LogType Type { get; private set; }
-
-        #endregion
-
-        #region Public Methods and Operators
+        public LogType Type { get; }
 
         /// <summary>
-        /// Returns a <see cref="T:System.String"/> that represents the current <see cref="T:System.Object"/> .
+        ///     Returns a <see cref="T:System.String" /> that represents the current <see cref="T:System.Object" /> .
         /// </summary>
         /// <returns>
-        /// A <see cref="T:System.String"/> that represents the current <see cref="T:System.Object"/> . 
+        ///     A <see cref="T:System.String" /> that represents the current <see cref="T:System.Object" /> .
         /// </returns>
         /// <filterpriority>2</filterpriority>
         public override string ToString()
         {
-            return string.Format("{0:HH:mm:ss}: {1}", this.LogTime, this.LogMessage);
+            return string.Format("{0:HH:mm:ss}: {1}", LogTime, LogMessage);
         }
-
-        #endregion
     }
 }

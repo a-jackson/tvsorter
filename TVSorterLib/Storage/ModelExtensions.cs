@@ -6,30 +6,28 @@
 //   Contains extension methods to model object for storage in XML.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Xml.Linq;
+using TVSorter.Model;
+
 namespace TVSorter.Storage
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Xml.Linq;
-
-    using TVSorter.Model;
-
     /// <summary>
-    /// Contains extension methods to model object for storage in XML.
+    ///     Contains extension methods to model object for storage in XML.
     /// </summary>
     internal static class ModelExtensions
     {
-        #region Methods
-
         /// <summary>
-        /// Populates the specified settings object from the XElement.
+        ///     Populates the specified settings object from the XElement.
         /// </summary>
         /// <param name="settings">
-        /// The settings object.
+        ///     The settings object.
         /// </param>
         /// <param name="settingsNode">
-        /// The settings element.
+        ///     The settings element.
         /// </param>
         internal static void FromXml(this Settings settings, XElement settingsNode)
         {
@@ -47,7 +45,7 @@ namespace TVSorter.Storage
             settings.LockShowsWithNoEpisodes = bool.Parse(settingsNode.GetAttribute("lockshowsnonewepisodes", "false"));
             settings.DefaultDestinationDirectory = settingsNode.GetAttribute("defaultdestinationdir", string.Empty);
 
-            XElement destinationDirectories = settingsNode.Element(Xml.GetName("DestinationDirectories"));
+            var destinationDirectories = settingsNode.Element(Xml.GetName("DestinationDirectories"));
 
             if (destinationDirectories != null)
             {
@@ -55,30 +53,32 @@ namespace TVSorter.Storage
                     destinationDirectories.GetElementsText(Xml.GetName("Destination")).ToList();
             }
 
-            XElement ignoredDirectories = settingsNode.Element(Xml.GetName("IgnoredDirectories"));
+            var ignoredDirectories = settingsNode.Element(Xml.GetName("IgnoredDirectories"));
 
             if (ignoredDirectories != null)
             {
-                settings.IgnoredDirectories =
-                    ignoredDirectories.GetElementsText(Xml.GetName("Ignored")).ToList();
+                settings.IgnoredDirectories = ignoredDirectories.GetElementsText(Xml.GetName("Ignored")).ToList();
             }
 
-            settings.FileExtensions =
-                settingsNode.Element(Xml.GetName("FileExtensions")).GetElementsText(Xml.GetName("Extension")).ToList();
-            settings.RegularExpressions =
-                settingsNode.Element(Xml.GetName("RegularExpression")).GetElementsText(Xml.GetName("RegEx")).ToList();
-            settings.OverwriteKeywords =
-                settingsNode.Element(Xml.GetName("OverwriteKeywords")).GetElementsText(Xml.GetName("Keyword")).ToList();
+            settings.FileExtensions = settingsNode.Element(Xml.GetName("FileExtensions"))
+                .GetElementsText(Xml.GetName("Extension"))
+                .ToList();
+            settings.RegularExpressions = settingsNode.Element(Xml.GetName("RegularExpression"))
+                .GetElementsText(Xml.GetName("RegEx"))
+                .ToList();
+            settings.OverwriteKeywords = settingsNode.Element(Xml.GetName("OverwriteKeywords"))
+                .GetElementsText(Xml.GetName("Keyword"))
+                .ToList();
         }
 
         /// <summary>
-        /// Loads the specified XElement into the show.
+        ///     Loads the specified XElement into the show.
         /// </summary>
         /// <param name="show">
-        /// The show to read.
+        ///     The show to read.
         /// </param>
         /// <param name="showNode">
-        /// The element to read from.
+        ///     The element to read from.
         /// </param>
         internal static void FromXml(this TvShow show, XElement showNode)
         {
@@ -93,25 +93,28 @@ namespace TVSorter.Storage
             show.LastUpdated = DateTime.Parse(showNode.GetAttribute("lastupdated", "1970-01-01 00:00:00"));
             show.UseCustomDestination = bool.Parse(showNode.GetAttribute("usecustomdestination", "false"));
             show.CustomDestinationDir = showNode.GetAttribute("customdestinationdir");
-            show.AlternateNames =
-                showNode.Descendants(Xml.GetName("AlternateName")).Select(altName => altName.Value).ToList();
-            show.Episodes = showNode.Descendants(Xml.GetName("Episode")).Select(
-                x =>
+            show.AlternateNames = showNode.Descendants(Xml.GetName("AlternateName"))
+                .Select(altName => altName.Value)
+                .ToList();
+            show.Episodes = showNode.Descendants(Xml.GetName("Episode"))
+                .Select(
+                    x =>
                     {
                         var episode = new Episode { Show = show };
                         episode.FromXml(x);
                         return episode;
-                    }).ToList();
+                    })
+                .ToList();
         }
 
         /// <summary>
-        /// Loads the specified missing episode settings from XML.
+        ///     Loads the specified missing episode settings from XML.
         /// </summary>
         /// <param name="settings">
-        /// The settings to load into.
+        ///     The settings to load into.
         /// </param>
         /// <param name="missingEpsiodeElement">
-        /// The XML element to load from.
+        ///     The XML element to load from.
         /// </param>
         internal static void FromXml(this MissingEpisodeSettings settings, XElement missingEpsiodeElement)
         {
@@ -123,13 +126,13 @@ namespace TVSorter.Storage
         }
 
         /// <summary>
-        /// Loads the episode from XML.
+        ///     Loads the episode from XML.
         /// </summary>
         /// <param name="episode">
-        /// The episode to load into.
+        ///     The episode to load into.
         /// </param>
         /// <param name="episodeNode">
-        /// The Episode element to load.
+        ///     The Episode element to load.
         /// </param>
         internal static void FromXml(this Episode episode, XElement episodeNode)
         {
@@ -142,66 +145,62 @@ namespace TVSorter.Storage
         }
 
         /// <summary>
-        /// Gets the XML for these settings.
+        ///     Gets the XML for these settings.
         /// </summary>
         /// <param name="settings">
-        /// The settings.
+        ///     The settings.
         /// </param>
         /// <returns>
-        /// The XML element that represents these settings.
+        ///     The XML element that represents these settings.
         /// </returns>
         internal static XElement ToXml(this Settings settings)
         {
             var destinationDirectories = new XElement(
-                Xml.GetName("DestinationDirectories"), 
-                settings.DestinationDirectories.Select(
-                    dir =>
-                    new XElement(
-                        Xml.GetName("Destination"), 
-                        dir)));
+                Xml.GetName("DestinationDirectories"),
+                settings.DestinationDirectories.Select(dir => new XElement(Xml.GetName("Destination"), dir)));
 
             var ignoredDirectories = new XElement(
                 Xml.GetName("IgnoredDirectories"),
                 settings.IgnoredDirectories.Select(dir => new XElement(Xml.GetName("Ignored"), dir)));
 
             var fileExtensions = new XElement(
-                Xml.GetName("FileExtensions"), 
+                Xml.GetName("FileExtensions"),
                 settings.FileExtensions.Select(ext => new XElement(Xml.GetName("Extension"), ext)));
 
             var regularExpressions = new XElement(
-                Xml.GetName("RegularExpression"), 
+                Xml.GetName("RegularExpression"),
                 settings.RegularExpressions.Select(exp => new XElement(Xml.GetName("RegEx"), exp)));
 
             var overwriteKeywords = new XElement(
-                Xml.GetName("OverwriteKeywords"), 
+                Xml.GetName("OverwriteKeywords"),
                 settings.OverwriteKeywords.Select(key => new XElement(Xml.GetName("Keyword"), key)));
 
             return new XElement(
-                Xml.GetName("Settings"), 
-                new XAttribute("sourcedirectory", settings.SourceDirectory), 
-                new XAttribute("defaultformat", settings.DefaultOutputFormat), 
-                new XAttribute("recursesubdirectories", settings.RecurseSubdirectories), 
-                new XAttribute("deleteemptysubdirectories", settings.DeleteEmptySubdirectories), 
-                new XAttribute("renameifexists", settings.RenameIfExists), 
-                new XAttribute("addunmatchedshows", settings.AddUnmatchedShows), 
-                new XAttribute("unlockmatchedshows", settings.UnlockMatchedShows), 
-                new XAttribute("lockshowsnonewepisodes", settings.LockShowsWithNoEpisodes), 
+                Xml.GetName("Settings"),
+                new XAttribute("sourcedirectory", settings.SourceDirectory),
+                new XAttribute("defaultformat", settings.DefaultOutputFormat),
+                new XAttribute("recursesubdirectories", settings.RecurseSubdirectories),
+                new XAttribute("deleteemptysubdirectories", settings.DeleteEmptySubdirectories),
+                new XAttribute("renameifexists", settings.RenameIfExists),
+                new XAttribute("addunmatchedshows", settings.AddUnmatchedShows),
+                new XAttribute("unlockmatchedshows", settings.UnlockMatchedShows),
+                new XAttribute("lockshowsnonewepisodes", settings.LockShowsWithNoEpisodes),
                 new XAttribute("defaultdestinationdir", settings.DefaultDestinationDirectory),
-                destinationDirectories, 
+                destinationDirectories,
                 ignoredDirectories,
-                fileExtensions, 
-                regularExpressions, 
+                fileExtensions,
+                regularExpressions,
                 overwriteKeywords);
         }
 
         /// <summary>
-        /// Converts the TVShow to XML.
+        ///     Converts the TVShow to XML.
         /// </summary>
         /// <param name="show">
-        /// The show.
+        ///     The show.
         /// </param>
         /// <returns>
-        /// The XML element for the show.
+        ///     The XML element for the show.
         /// </returns>
         internal static XElement ToXml(this TvShow show)
         {
@@ -221,66 +220,64 @@ namespace TVSorter.Storage
             }
 
             var element = new XElement(
-                Xml.GetName("Show"), 
-                new XAttribute("name", show.Name ?? string.Empty), 
-                new XAttribute("foldername", show.FolderName ?? string.Empty), 
-                new XAttribute("tvdbid", show.TvdbId), 
-                new XAttribute("banner", show.Banner ?? string.Empty), 
-                new XAttribute("customformat", show.CustomFormat ?? string.Empty), 
-                new XAttribute("usecustomformat", show.UseCustomFormat), 
-                new XAttribute("usedvdorder", show.UseDvdOrder), 
-                new XAttribute("locked", show.Locked), 
-                new XAttribute("lastupdated", show.LastUpdated), 
+                Xml.GetName("Show"),
+                new XAttribute("name", show.Name ?? string.Empty),
+                new XAttribute("foldername", show.FolderName ?? string.Empty),
+                new XAttribute("tvdbid", show.TvdbId),
+                new XAttribute("banner", show.Banner ?? string.Empty),
+                new XAttribute("customformat", show.CustomFormat ?? string.Empty),
+                new XAttribute("usecustomformat", show.UseCustomFormat),
+                new XAttribute("usedvdorder", show.UseDvdOrder),
+                new XAttribute("locked", show.Locked),
+                new XAttribute("lastupdated", show.LastUpdated),
                 new XAttribute("usecustomdestination", show.UseCustomDestination),
                 new XAttribute("customdestinationdir", show.CustomDestinationDir ?? string.Empty),
-                alternateNames, 
+                alternateNames,
                 episodes);
 
             return element;
         }
 
         /// <summary>
-        /// Converts the settings to XML.
+        ///     Converts the settings to XML.
         /// </summary>
         /// <param name="settings">
-        /// The settings.
+        ///     The settings.
         /// </param>
         /// <returns>
-        /// The XML for the settings.
+        ///     The XML for the settings.
         /// </returns>
         internal static XElement ToXml(this MissingEpisodeSettings settings)
         {
             return new XElement(
-                Xml.GetName("MissingEpisodeSettings"), 
-                new XAttribute("hidenotaired", settings.HideNotYetAired), 
-                new XAttribute("hidelocked", settings.HideLocked), 
-                new XAttribute("hidepart2", settings.HidePart2), 
-                new XAttribute("hideseason0", settings.HideSeason0), 
+                Xml.GetName("MissingEpisodeSettings"),
+                new XAttribute("hidenotaired", settings.HideNotYetAired),
+                new XAttribute("hidelocked", settings.HideLocked),
+                new XAttribute("hidepart2", settings.HidePart2),
+                new XAttribute("hideseason0", settings.HideSeason0),
                 new XAttribute("hidemissingseasons", settings.HideMissingSeasons));
         }
 
         /// <summary>
-        /// Converts the episode to XML.
+        ///     Converts the episode to XML.
         /// </summary>
         /// <param name="episode">
-        /// The episode.
+        ///     The episode.
         /// </param>
         /// <returns>
-        /// The XElement.
+        ///     The XElement.
         /// </returns>
         internal static XElement ToXml(this Episode episode)
         {
             var episodeElement = new XElement(
-                Xml.GetName("Episode"), 
-                new XAttribute("name", episode.Name), 
-                new XAttribute("tvdbid", episode.TvdbId), 
-                new XAttribute("seasonnum", episode.SeasonNumber), 
-                new XAttribute("episodenum", episode.EpisodeNumber), 
-                new XAttribute("firstair", episode.FirstAir), 
+                Xml.GetName("Episode"),
+                new XAttribute("name", episode.Name),
+                new XAttribute("tvdbid", episode.TvdbId),
+                new XAttribute("seasonnum", episode.SeasonNumber),
+                new XAttribute("episodenum", episode.EpisodeNumber),
+                new XAttribute("firstair", episode.FirstAir),
                 new XAttribute("filecount", episode.FileCount));
             return episodeElement;
         }
-
-        #endregion
     }
 }

@@ -10,20 +10,19 @@
 
 namespace TVSorter.View
 {
-    #region Using Directives
+
 
     using System.ComponentModel;
     using System.Drawing;
     using System.Windows.Forms;
 
-    #endregion
 
     /// <summary>
     /// Dialog for selecting a show.
     /// </summary>
     public partial class ShowSelectDialog
     {
-        #region Constants and Fields
+
 
         /// <summary>
         ///   Required designer variable.
@@ -45,9 +44,7 @@ namespace TVSorter.View
         /// </summary>
         private ListBox showList;
 
-        #endregion
 
-        #region Methods
 
         /// <summary>
         /// Clean up any resources being used.
@@ -137,6 +134,5 @@ namespace TVSorter.View
 
         }
 
-        #endregion
     }
 }

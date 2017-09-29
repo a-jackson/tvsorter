@@ -6,117 +6,89 @@
 //   Controller for the Log.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
+using System;
+using System.Collections.Generic;
+using TVSorter.View;
+
 namespace TVSorter.Controller
 {
-    #region Using Directives
-
-    using System;
-    using System.Collections.Generic;
-
-    using TVSorter.View;
-
-    #endregion
-
     /// <summary>
-    /// Controller for the Log.
+    ///     Controller for the Log.
     /// </summary>
     public class LogController : ControllerBase
     {
-        #region Fields
-
         /// <summary>
-        ///   A value indicating whether the controller has been initialised.
+        ///     A value indicating whether the controller has been initialised.
         /// </summary>
         private bool initialised;
 
-        #endregion
-
-        #region Constructors and Destructors
-
         /// <summary>
-        ///   Initialises a new instance of the <see cref="LogController" /> class.
+        ///     Initialises a new instance of the <see cref="LogController" /> class.
         /// </summary>
         public LogController()
         {
-            this.Log = new List<LogMessageEventArgs>();
-            Logger.LogMessage += this.OnLogMessageReceived;
-            this.initialised = false;
+            Log = new List<LogMessageEventArgs>();
+            Logger.LogMessage += OnLogMessageReceived;
+            initialised = false;
         }
 
-        #endregion
-
-        #region Public Events
+        /// <summary>
+        ///     Gets the list of log messages.
+        /// </summary>
+        public List<LogMessageEventArgs> Log { get; }
 
         /// <summary>
-        ///   Occurs when a log message is received.
+        ///     Occurs when a log message is received.
         /// </summary>
         public event EventHandler<LogMessageEventArgs> LogMessageReceived;
 
-        #endregion
-
-        #region Public Properties
-
         /// <summary>
-        ///   Gets the list of log messages.
-        /// </summary>
-        public List<LogMessageEventArgs> Log { get; private set; }
-
-        #endregion
-
-        #region Public Methods and Operators
-
-        /// <summary>
-        /// Initialises the controller.
+        ///     Initialises the controller.
         /// </summary>
         /// <param name="view">
-        /// The view the controller is for. 
+        ///     The view the controller is for.
         /// </param>
         public override void Initialise(IView view)
         {
-            this.initialised = true;
+            initialised = true;
         }
 
-        #endregion
-
-        #region Methods
-
         /// <summary>
-        /// Raises a log message received event.
+        ///     Raises a log message received event.
         /// </summary>
         /// <param name="e">
-        /// The event args. 
+        ///     The event args.
         /// </param>
         private void OnLogMessageReceived(LogMessageEventArgs e)
         {
-            if (this.LogMessageReceived != null)
+            if (LogMessageReceived != null)
             {
-                this.LogMessageReceived(this, e);
+                LogMessageReceived(this, e);
             }
         }
 
         /// <summary>
-        /// Handles a log message being received.
+        ///     Handles a log message being received.
         /// </summary>
         /// <param name="sender">
-        /// The sender of the event. 
+        ///     The sender of the event.
         /// </param>
         /// <param name="e">
-        /// The arguments of the event. 
+        ///     The arguments of the event.
         /// </param>
         private void OnLogMessageReceived(object sender, LogMessageEventArgs e)
         {
             // Cache the messages in a list until the controller has been initialised.
             // Then the message can be sent directly to the view.
-            if (!this.initialised)
+            if (!initialised)
             {
-                this.Log.Add(e);
+                Log.Add(e);
             }
             else
             {
-                this.OnLogMessageReceived(e);
+                OnLogMessageReceived(e);
             }
         }
-
-        #endregion
     }
 }

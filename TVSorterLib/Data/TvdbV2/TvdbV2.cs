@@ -9,10 +9,10 @@ namespace TVSorter.Data.TvdbV2
 {
     public class TvdbV2 : IDataProvider
     {
-        private readonly ITvdbSeries series;
         private readonly ITvdbSearch search;
-        private readonly ITvdbUpdate update;
+        private readonly ITvdbSeries series;
         private readonly IStreamWriter streamWriter;
+        private readonly ITvdbUpdate update;
 
         public TvdbV2(ITvdbSeries series, ITvdbSearch search, ITvdbUpdate update, IStreamWriter streamWriter)
         {
@@ -26,13 +26,9 @@ namespace TVSorter.Data.TvdbV2
         {
             try
             {
-                var series = search.SeriesSearchAsync(name: name).GetAwaiter().GetResult();
-                return series.Data.Select(x => new TvShow
-                {
-                    Name = x.SeriesName,
-                    TvdbId = x.Id,
-                    FolderName = name,
-                }).ToList();
+                var series = search.SeriesSearchAsync(name).GetAwaiter().GetResult();
+                return series.Data.Select(x => new TvShow { Name = x.SeriesName, TvdbId = x.Id, FolderName = name })
+                    .ToList();
             }
             catch (TvdbRequestException)
             {
@@ -51,24 +47,30 @@ namespace TVSorter.Data.TvdbV2
                 streamWriter.WriteStream(banner, targetPath);
             }
 
-            var newEpisodes = series.GetAllEpisodesAsync(show.TvdbId).GetAwaiter().GetResult()
-                .Select(x =>
-                    new Episode
+            var newEpisodes = series.GetAllEpisodesAsync(show.TvdbId)
+                .GetAwaiter()
+                .GetResult()
+                .Select(
+                    x => new Episode
                     {
                         TvdbId = x.Id.ToString(),
-                        EpisodeNumber = show.UseDvdOrder && x.DvdEpisodeNumber.HasValue ? x.DvdEpisodeNumber.Value : x.AiredEpisodeNumber.Value,
-                        SeasonNumber = show.UseDvdOrder && x.DvdSeason.HasValue ? x.DvdSeason.Value : x.AiredSeason.Value,
+                        EpisodeNumber =
+                            show.UseDvdOrder && x.DvdEpisodeNumber.HasValue
+                                ? x.DvdEpisodeNumber.Value
+                                : x.AiredEpisodeNumber.Value,
+                        SeasonNumber =
+                            show.UseDvdOrder && x.DvdSeason.HasValue ? x.DvdSeason.Value : x.AiredSeason.Value,
                         FirstAir = DateTime.Parse(string.IsNullOrEmpty(x.FirstAired) ? "1970-01-01" : x.FirstAired),
                         Name = x.EpisodeName ?? string.Empty,
-                        Show = show,
+                        Show = show
                     })
                 .ToList();
 
             if (show.Episodes != null)
             {
-                foreach (Episode episode in newEpisodes)
+                foreach (var episode in newEpisodes)
                 {
-                    Episode currentEpisode = show.Episodes.FirstOrDefault(x => x.Equals(episode));
+                    var currentEpisode = show.Episodes.FirstOrDefault(x => x.Equals(episode));
                     if (currentEpisode != null)
                     {
                         episode.FileCount = currentEpisode.FileCount;
@@ -82,7 +84,7 @@ namespace TVSorter.Data.TvdbV2
 
         public IEnumerable<TvShow> UpdateShows(IList<TvShow> shows)
         {
-            DateTime firstUpdate = shows.Min(x => x.LastUpdated);
+            var firstUpdate = shows.Min(x => x.LastUpdated);
             List<int> updateIds;
 
             // Only get the updates if the date is less than a month ago.
@@ -92,11 +94,10 @@ namespace TVSorter.Data.TvdbV2
             }
             else
             {
-                // Update all shows
                 updateIds = shows.Select(x => x.TvdbId).ToList();
             }
 
-            foreach (TvShow show in shows)
+            foreach (var show in shows)
             {
                 // Skip the show if it isn't in the updateIds list.
                 if (!updateIds.Contains(show.TvdbId))

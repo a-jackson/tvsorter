@@ -6,52 +6,37 @@
 //   The main form of the program.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
+using System;
+using System.Windows.Forms;
+
 namespace TVSorter.View
 {
-    #region Using Directives
-
-    using System;
-    using System.Windows.Forms;
-
-    using Files;
-    using Repostitory;
-    using Version = TVSorter.Version;
-
-    #endregion
-
     /// <summary>
-    /// The main form of the program.
+    ///     The main form of the program.
     /// </summary>
     public partial class MainForm : Form
     {
-        #region Constructors and Destructors
-
         /// <summary>
-        ///   Initialises a new instance of the <see cref="MainForm" /> class.
+        ///     Initialises a new instance of the <see cref="MainForm" /> class.
         /// </summary>
         public MainForm()
         {
-            this.InitializeComponent();
+            InitializeComponent();
         }
 
-        #endregion
-
-        #region Methods
-
         /// <summary>
-        /// Handles the load event for the form.
+        ///     Handles the load event for the form.
         /// </summary>
         /// <param name="sender">
-        /// The sender of the event.
+        ///     The sender of the event.
         /// </param>
         /// <param name="e">
-        /// The arguments of the event.
+        ///     The arguments of the event.
         /// </param>
         private void MainFormLoad(object sender, EventArgs e)
         {
-            this.Text = "TV Sorter " + Version.CurrentVersion;
+            Text = "TV Sorter " + Version.CurrentVersion;
         }
-
-        #endregion
     }
 }

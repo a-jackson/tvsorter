@@ -6,78 +6,64 @@
 //   A task that runs in the background
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
+using System;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
 namespace TVSorter.Controller
 {
-    using System;
-    using System.Threading.Tasks;
-    using System.Windows.Forms;
-
     /// <summary>
-    /// A task that runs in the background
+    ///     A task that runs in the background
     /// </summary>
     public class BackgroundTask : IProgressTask
     {
-        #region Fields
-
         /// <summary>
-        /// The task that should be run.
+        ///     The task that should be run.
         /// </summary>
         private readonly Action action;
 
-        #endregion
-
-        #region Constructors and Destructors
-
         /// <summary>
-        /// Initialises a new instance of the <see cref="BackgroundTask"/> class.
+        ///     Initialises a new instance of the <see cref="BackgroundTask" /> class.
         /// </summary>
         /// <param name="action">
-        /// The method to run.
+        ///     The method to run.
         /// </param>
         public BackgroundTask(Action action)
         {
             this.action = action;
         }
 
-        #endregion
-
-        #region Public Events
-
         /// <summary>
-        ///   Occurs when the task is complete.
+        ///     Occurs when the task is complete.
         /// </summary>
         public event EventHandler TaskComplete;
 
-        #endregion
-
-        #region Public Methods and Operators
-
         /// <summary>
-        /// Starts the task.
+        ///     Starts the task.
         /// </summary>
         public void Start()
         {
-            Task task = Task.Factory.StartNew(
+            var task = Task.Factory.StartNew(
                 () =>
-                    {
-                        try
-                        {
-                            this.action();
-                        }
-                        catch (Exception e)
-                        {
-                            MessageBox.Show(e.Message);
-                        }
-                    });
-            task.ContinueWith(delegate
-            {
-                if (this.TaskComplete != null)
                 {
-                    this.TaskComplete(this, EventArgs.Empty);
-                }
-            });
+                    try
+                    {
+                        action();
+                    }
+                    catch (Exception e)
+                    {
+                        MessageBox.Show(e.Message);
+                    }
+                });
+            task.ContinueWith(
+                delegate
+                {
+                    if (TaskComplete != null)
+                    {
+                        TaskComplete(this, EventArgs.Empty);
+                    }
+                });
         }
-
-        #endregion
     }
 }

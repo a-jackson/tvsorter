@@ -6,40 +6,35 @@
 //   Handles log messages from the library.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
+using System;
+
 namespace TVSorter
 {
-    using System;
-
     /// <summary>
-    /// Handles log messages from the library.
+    ///     Handles log messages from the library.
     /// </summary>
     public static class Logger
     {
-        #region Public Events
-
         /// <summary>
-        /// Occurs when there is a log message.
+        ///     Occurs when there is a log message.
         /// </summary>
         public static event EventHandler<LogMessageEventArgs> LogMessage;
 
-        #endregion
-
-        #region Methods
-
         /// <summary>
-        /// Fires a log message.
+        ///     Fires a log message.
         /// </summary>
         /// <param name="sender">
-        /// The sender of the message.
+        ///     The sender of the message.
         /// </param>
         /// <param name="message">
-        /// The message.
+        ///     The message.
         /// </param>
         /// <param name="type">
-        /// The type of the message.
+        ///     The type of the message.
         /// </param>
         /// <param name="args">
-        /// The string format args.
+        ///     The string format args.
         /// </param>
         internal static void OnLogMessage(object sender, string message, LogType type, params object[] args)
         {
@@ -49,7 +44,5 @@ namespace TVSorter
                 LogMessage(sender, new LogMessageEventArgs(message, DateTime.Now, type));
             }
         }
-
-        #endregion
     }
 }

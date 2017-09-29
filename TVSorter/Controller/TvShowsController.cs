@@ -6,380 +6,353 @@
 //   The controller for the TV Shows tab.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using TVSorter.Files;
+using TVSorter.Model;
+using TVSorter.Repostitory;
+using TVSorter.Storage;
+using TVSorter.View;
+using TVSorter.Wrappers;
+using Settings = TVSorter.Model.Settings;
+
 namespace TVSorter.Controller
 {
-    #region Using Directives
-
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Linq;
-
-    using Files;
-    using Model;
-    using Repostitory;
-    using Storage;
-    using View;
-    using Wrappers;
-    #endregion
-
     /// <summary>
-    /// The controller for the TV Shows tab.
+    ///     The controller for the TV Shows tab.
     /// </summary>
     internal class TvShowsController : ControllerBase
     {
-        #region Fields
-
         /// <summary>
-        ///   The selected show.
+        ///     The scan manager.
         /// </summary>
-        private TvShow selectedShow;
+        private readonly IScanManager scanManager;
 
         /// <summary>
-        ///   The shows.
+        ///     The storage provider.
         /// </summary>
-        private BindingList<TvShow> shows;
+        private readonly IStorageProvider storageProvider;
 
         /// <summary>
-        ///   The TV view.
+        ///     The TV show repository.
         /// </summary>
-        private IView tvView;
+        private readonly ITvShowRepository tvShowRepository;
 
         /// <summary>
-        /// The collection of destination directories.
+        ///     The collection of destination directories.
         /// </summary>
         private BindingList<string> destinationDirectories;
 
         /// <summary>
-        /// The settings.
+        ///     The selected show.
         /// </summary>
-        private Model.Settings settings;
+        private TvShow selectedShow;
 
         /// <summary>
-        /// The storage provider.
+        ///     The settings.
         /// </summary>
-        private IStorageProvider storageProvider;
+        private Settings settings;
 
         /// <summary>
-        /// The TV show repository.
+        ///     The shows.
         /// </summary>
-        private ITvShowRepository tvShowRepository;
+        private BindingList<TvShow> shows;
 
         /// <summary>
-        /// The scan manager.
+        ///     The TV view.
         /// </summary>
-        private IScanManager scanManager;
-
-        #endregion
+        private IView tvView;
 
         /// <summary>
-        /// Initialises a new instance of the <see cref="TvShowsController"/> class.
+        ///     Initialises a new instance of the <see cref="TvShowsController" /> class.
         /// </summary>
         /// <param name="storageProvider">The storage provider.</param>
         /// <param name="tvShowRepository">The TV show repository.</param>
         /// <param name="scanManager">The scan manager.</param>
-        public TvShowsController(IStorageProvider storageProvider, ITvShowRepository tvShowRepository, IScanManager scanManager)
+        public TvShowsController(
+            IStorageProvider storageProvider,
+            ITvShowRepository tvShowRepository,
+            IScanManager scanManager)
         {
             this.storageProvider = storageProvider;
             this.tvShowRepository = tvShowRepository;
             this.scanManager = scanManager;
         }
 
-        #region Public Events
-
         /// <summary>
-        ///   The search shows complete.
-        /// </summary>
-        public event EventHandler SearchShowsComplete;
-
-        /// <summary>
-        /// Occurs when a show changes.
-        /// </summary>
-        public event EventHandler<TvShowEventArgs> ShowChanged;
-
-        #endregion
-
-        #region Public Properties
-
-        /// <summary>
-        ///   Gets SearchResults.
+        ///     Gets SearchResults.
         /// </summary>
         public Dictionary<string, List<TvShow>> SearchResults { get; private set; }
 
         /// <summary>
-        ///   Gets SelectedShow.
+        ///     Gets SelectedShow.
         /// </summary>
         public TvShow SelectedShow
         {
-            get
-            {
-                return this.selectedShow;
-            }
+            get => selectedShow;
 
             private set
             {
-                this.selectedShow = value;
-                this.OnPropertyChanged("SelectedShow");
+                selectedShow = value;
+                OnPropertyChanged("SelectedShow");
             }
         }
 
         /// <summary>
-        ///   Gets Shows.
+        ///     Gets Shows.
         /// </summary>
         public BindingList<TvShow> Shows
         {
-            get
-            {
-                return this.shows;
-            }
+            get => shows;
 
             private set
             {
-                this.shows = value;
-                this.OnPropertyChanged("Shows");
+                shows = value;
+                OnPropertyChanged("Shows");
             }
         }
 
         /// <summary>
-        /// Gets the destination directories.
+        ///     Gets the destination directories.
         /// </summary>
         public BindingList<string> DestinationDirectories
         {
-            get
-            {
-                return this.destinationDirectories;
-            }
+            get => destinationDirectories;
 
             private set
             {
-                this.destinationDirectories = value;
-                this.OnPropertyChanged("DestinationDirectories");
+                destinationDirectories = value;
+                OnPropertyChanged("DestinationDirectories");
             }
         }
 
-        #endregion
-
-        #region Public Methods and Operators
-        
         /// <summary>
-        /// Initialises the controller.
+        ///     The search shows complete.
+        /// </summary>
+        public event EventHandler SearchShowsComplete;
+
+        /// <summary>
+        ///     Occurs when a show changes.
+        /// </summary>
+        public event EventHandler<TvShowEventArgs> ShowChanged;
+
+        /// <summary>
+        ///     Initialises the controller.
         /// </summary>
         /// <param name="view">
-        /// The view the controller is for. 
+        ///     The view the controller is for.
         /// </param>
         public override void Initialise(IView view)
         {
-            this.tvView = view;
-            this.settings = storageProvider.Settings;
-            this.Shows = new BindingList<TvShow>(tvShowRepository.GetTvShows().ToList());
-            this.DestinationDirectories = new BindingList<string>(this.settings.DestinationDirectories);
-            this.Shows.ListChanged += (sender, e) => this.OnPropertyChanged("Shows");
-            this.TvShowSelected(0);
-            tvShowRepository.TvShowAdded += this.OnTvShowAdded;
-            tvShowRepository.TvShowChanged += this.OnTvShowChanged;
-            tvShowRepository.TvShowRemoved += this.OnTvShowRemoved;
-            storageProvider.SettingsSaved += this.OnSettingsChanged;
+            tvView = view;
+            settings = storageProvider.Settings;
+            Shows = new BindingList<TvShow>(tvShowRepository.GetTvShows().ToList());
+            DestinationDirectories = new BindingList<string>(settings.DestinationDirectories);
+            Shows.ListChanged += (sender, e) => OnPropertyChanged("Shows");
+            TvShowSelected(0);
+            tvShowRepository.TvShowAdded += OnTvShowAdded;
+            tvShowRepository.TvShowChanged += OnTvShowChanged;
+            tvShowRepository.TvShowRemoved += OnTvShowRemoved;
+            storageProvider.SettingsSaved += OnSettingsChanged;
         }
 
         /// <summary>
-        /// Removes the selected show.
+        ///     Removes the selected show.
         /// </summary>
         public void RemoveSelectedShow()
         {
-            if (this.SelectedShow == null)
+            if (SelectedShow == null)
             {
                 return;
             }
 
-            tvShowRepository.Delete(this.SelectedShow);
-            this.Shows.Remove(this.SelectedShow);
-            this.SelectedShow = null;
+            tvShowRepository.Delete(SelectedShow);
+            Shows.Remove(SelectedShow);
+            SelectedShow = null;
         }
 
         /// <summary>
-        /// Resets the last updated date of the selected show.
+        ///     Resets the last updated date of the selected show.
         /// </summary>
         public void ResetLastUpdated()
         {
-            if (this.SelectedShow == null)
+            if (SelectedShow == null)
             {
                 return;
             }
 
-            this.SelectedShow.LastUpdated = new DateTime(1970, 1, 1);
-            tvShowRepository.Save(this.SelectedShow);
-            this.OnPropertyChanged("SelectedShow");
+            SelectedShow.LastUpdated = new DateTime(1970, 1, 1);
+            tvShowRepository.Save(SelectedShow);
+            OnPropertyChanged("SelectedShow");
         }
 
         /// <summary>
-        /// Saves the selected show.
+        ///     Saves the selected show.
         /// </summary>
         public void SaveSelectedShow()
         {
-            if (this.SelectedShow == null)
+            if (SelectedShow == null)
             {
                 return;
             }
 
-            tvShowRepository.Save(this.SelectedShow);
+            tvShowRepository.Save(SelectedShow);
         }
 
         /// <summary>
-        /// Searches for new shows.
+        ///     Searches for new shows.
         /// </summary>
         public void SearchShows()
         {
             var task = new BackgroundTask(
                 () =>
-                    {
-                        this.SearchResults = scanManager.SearchNewShows(settings.DestinationDirectories.Select(x => new DirectoryInfoWrap(x)));
-                        this.OnSearchShowsComplete();
-                    });
+                {
+                    SearchResults = scanManager.SearchNewShows(
+                        settings.DestinationDirectories.Select(x => new DirectoryInfoWrap(x)));
+                    OnSearchShowsComplete();
+                });
             task.Start();
 
-            this.tvView.StartTaskProgress(task, "Searching shows");
+            tvView.StartTaskProgress(task, "Searching shows");
         }
 
         /// <summary>
-        /// Changes the selection of the TV show.
+        ///     Changes the selection of the TV show.
         /// </summary>
         /// <param name="newIndex">
-        /// The new index. 
+        ///     The new index.
         /// </param>
         public void TvShowSelected(int newIndex)
         {
-            if (newIndex < this.Shows.Count && newIndex >= 0 && this.Shows.Count > 0)
+            if (newIndex < Shows.Count && newIndex >= 0 && Shows.Count > 0)
             {
-                this.SelectedShow = this.Shows[newIndex];
+                SelectedShow = Shows[newIndex];
             }
             else
             {
-                this.SelectedShow = null;
+                SelectedShow = null;
             }
         }
 
         /// <summary>
-        /// Updates all shows.
+        ///     Updates all shows.
         /// </summary>
         public void UpdateAllShows()
         {
             var task = new BackgroundTask(
                 () =>
-                    {
-                        // Only update the unlocked shows.
-                        List<TvShow> unlockedShows = this.Shows.Where(x => !x.Locked).ToList();
-                        tvShowRepository.UpdateShows(unlockedShows);
-                        this.OnPropertyChanged("SelectedShow");
-                    });
+                {
+                    // Only update the unlocked shows.
+                    var unlockedShows = Shows.Where(x => !x.Locked).ToList();
+                    tvShowRepository.UpdateShows(unlockedShows);
+                    OnPropertyChanged("SelectedShow");
+                });
             task.Start();
 
-            this.tvView.StartTaskProgress(task, "Updating All Shows");
+            tvView.StartTaskProgress(task, "Updating All Shows");
         }
 
         /// <summary>
-        /// Updates the selected show.
+        ///     Updates the selected show.
         /// </summary>
         public void UpdateSelectedShow()
         {
             var task = new BackgroundTask(
                 () =>
+                {
+                    if (SelectedShow == null)
                     {
-                        if (this.SelectedShow == null)
-                        {
-                            return;
-                        }
+                        return;
+                    }
 
-                        tvShowRepository.Update(this.SelectedShow);
-                        this.OnPropertyChanged("SelectedShow");
-                    });
+                    tvShowRepository.Update(SelectedShow);
+                    OnPropertyChanged("SelectedShow");
+                });
             task.Start();
-            this.tvView.StartTaskProgress(task, "Updating " + this.SelectedShow.Name);
+            tvView.StartTaskProgress(task, "Updating " + SelectedShow.Name);
         }
 
-        #endregion
-
-        #region Methods
-
         /// <summary>
-        /// Raises an on search shows complete event.
+        ///     Raises an on search shows complete event.
         /// </summary>
         private void OnSearchShowsComplete()
         {
-            if (this.SearchShowsComplete != null)
+            if (SearchShowsComplete != null)
             {
-                this.SearchShowsComplete(this, EventArgs.Empty);
+                SearchShowsComplete(this, EventArgs.Empty);
             }
         }
 
         /// <summary>
-        /// Handles the TVShow's OnTvShowAdded event.
+        ///     Handles the TVShow's OnTvShowAdded event.
         /// </summary>
         /// <param name="sender">
-        /// The sender of the event.
+        ///     The sender of the event.
         /// </param>
         /// <param name="e">
-        /// The arguments of the event.
+        ///     The arguments of the event.
         /// </param>
         private void OnTvShowAdded(object sender, TvShowEventArgs e)
         {
-            this.Shows.Add(e.TvShow);
+            Shows.Add(e.TvShow);
         }
 
         /// <summary>
-        /// Handles the TVShow's OnTvShowChanged event.
+        ///     Handles the TVShow's OnTvShowChanged event.
         /// </summary>
         /// <param name="sender">
-        /// The sender of the event.
+        ///     The sender of the event.
         /// </param>
         /// <param name="e">
-        /// The arguments of the event.
+        ///     The arguments of the event.
         /// </param>
         private void OnTvShowChanged(object sender, TvShowEventArgs e)
         {
-            int index = this.Shows.IndexOf(e.TvShow);
+            var index = Shows.IndexOf(e.TvShow);
             if (index != -1)
             {
-                this.Shows[index] = e.TvShow;
-                if (e.TvShow.Equals(this.SelectedShow))
+                Shows[index] = e.TvShow;
+                if (e.TvShow.Equals(SelectedShow))
                 {
-                    this.SelectedShow = e.TvShow;
+                    SelectedShow = e.TvShow;
                 }
             }
             else
             {
-                this.Shows.Add(e.TvShow);
+                Shows.Add(e.TvShow);
             }
 
-            if (this.ShowChanged != null)
+            if (ShowChanged != null)
             {
-                this.ShowChanged(sender, e);
+                ShowChanged(sender, e);
             }
         }
 
         /// <summary>
-        /// Handles the TVShow's OnTvShowRemoved event.
+        ///     Handles the TVShow's OnTvShowRemoved event.
         /// </summary>
         /// <param name="sender">
-        /// The sender of the event.
+        ///     The sender of the event.
         /// </param>
         /// <param name="e">
-        /// The arguments of the event.
+        ///     The arguments of the event.
         /// </param>
         private void OnTvShowRemoved(object sender, TvShowEventArgs e)
         {
-            this.Shows.Remove(e.TvShow);
+            Shows.Remove(e.TvShow);
         }
 
         /// <summary>
-        /// Handles the settings changing.
+        ///     Handles the settings changing.
         /// </summary>
         /// <param name="sender">The sender of the event.</param>
         /// <param name="e">The arguments of the event.</param>
         private void OnSettingsChanged(object sender, EventArgs e)
         {
-            this.DestinationDirectories = new BindingList<string>(this.settings.DestinationDirectories);
+            DestinationDirectories = new BindingList<string>(settings.DestinationDirectories);
         }
-
-        #endregion
     }
 }

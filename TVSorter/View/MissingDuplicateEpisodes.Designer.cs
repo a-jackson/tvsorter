@@ -10,25 +10,21 @@
 
 namespace TVSorter.View
 {
-    #region Using Directives
+
 
     using System.ComponentModel;
     using System.Drawing;
     using System.Windows.Forms;
 
-    #endregion
 
     /// <summary>
     /// The missing and duplicated episodes tab.
     /// </summary>
     public partial class MissingDuplicateEpisodes
     {
-        #region Constants and Fields
 
 
-        #endregion
 
-        #region Methods
 
         /// <summary>
         /// Clean up any resources being used.
@@ -292,7 +288,6 @@ namespace TVSorter.View
 
         }
 
-        #endregion
 
         private TreeView episodesTree;
         private Button refreshButton;

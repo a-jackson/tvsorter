@@ -6,34 +6,30 @@
 //   The interface for the file manager.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
+using System.Collections.Generic;
+using TVSorter.Model;
+
 namespace TVSorter.Files
 {
-    #region Using Directives
-
-    using System.Collections.Generic;
-
-    using Model;
-    
-    #endregion
-
     /// <summary>
-    /// The interface for the file manager.
+    ///     The interface for the file manager.
     /// </summary>
     public interface IFileManager
     {
         /// <summary>
-        /// Performs a copy file operation.
+        ///     Performs a copy file operation.
         /// </summary>
         /// <param name="files">
-        /// The files to copy. 
+        ///     The files to copy.
         /// </param>
         void CopyFile(IEnumerable<FileResult> files);
 
         /// <summary>
-        /// Performs a move file operation.
+        ///     Performs a move file operation.
         /// </summary>
         /// <param name="files">
-        /// The files to move. 
+        ///     The files to move.
         /// </param>
         void MoveFile(IEnumerable<FileResult> files);
     }

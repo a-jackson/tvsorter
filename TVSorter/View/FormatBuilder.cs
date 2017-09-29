@@ -6,280 +6,264 @@
 //   The class for the FormatBuilder form.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
+using System;
+using System.IO;
+using System.Windows.Forms;
+using TVSorter.Files;
+using TVSorter.Model;
+
 namespace TVSorter.View
 {
-    using System;
-    using System.IO;
-    using System.Windows.Forms;
-
-    using Files;
-    using Model;
-
     /// <summary>
-    /// The class for the FormatBuilder form.
+    ///     The class for the FormatBuilder form.
     /// </summary>
     public partial class FormatBuilder : Form
     {
-        #region Fields
-
         /// <summary>
-        /// The result used for the example format.
+        ///     The result used for the example format.
         /// </summary>
         private readonly FileResult exampleResult;
 
         /// <summary>
-        /// The file result manager.
+        ///     The file result manager.
         /// </summary>
         private readonly IFileResultManager fileResultManager;
-        
-        #endregion
-
-        #region Constructors and Destructors
 
         /// <summary>
-        /// Initialises a new instance of the <see cref="FormatBuilder"/> class.
+        ///     Initialises a new instance of the <see cref="FormatBuilder" /> class.
         /// </summary>
         /// <param name="currentFormat">
-        /// The current format.
+        ///     The current format.
         /// </param>
         /// <param name="fileResultManager">
-        /// The file result manager.
+        ///     The file result manager.
         /// </param>
         public FormatBuilder(string currentFormat, IFileResultManager fileResultManager)
         {
-            this.InitializeComponent();
+            InitializeComponent();
             this.fileResultManager = fileResultManager;
-            this.exampleResult = FileResult.Example;
-            this.textFormat.Text = currentFormat;
+            exampleResult = FileResult.Example;
+            textFormat.Text = currentFormat;
         }
 
-        #endregion
-
-        #region Public Properties
-
         /// <summary>
-        /// Gets the format string.
+        ///     Gets the format string.
         /// </summary>
         public string FormatString { get; private set; }
 
-        #endregion
-
-        #region Methods
-
         /// <summary>
-        /// Handles the click event for the Cancel button.
+        ///     Handles the click event for the Cancel button.
         /// </summary>
         /// <param name="sender">
-        /// The sender of the event.
+        ///     The sender of the event.
         /// </param>
         /// <param name="e">
-        /// The arguments of the event.
+        ///     The arguments of the event.
         /// </param>
         private void CancelButtonClick(object sender, EventArgs e)
         {
-            this.DialogResult = DialogResult.Cancel;
-            this.Close();
+            DialogResult = DialogResult.Cancel;
+            Close();
         }
 
         /// <summary>
-        /// Handles the click event for the Date button.
+        ///     Handles the click event for the Date button.
         /// </summary>
         /// <param name="sender">
-        /// The sender of the event.
+        ///     The sender of the event.
         /// </param>
         /// <param name="e">
-        /// The arguments of the event.
+        ///     The arguments of the event.
         /// </param>
         private void DateButtonClick(object sender, EventArgs e)
         {
-            this.textFormat.Text += "{Date(" + this.dateFormat.Text + ")}";
+            textFormat.Text += "{Date(" + dateFormat.Text + ")}";
         }
 
         /// <summary>
-        /// Handles the text of the date format changing.
+        ///     Handles the text of the date format changing.
         /// </summary>
         /// <param name="sender">
-        /// The sender of the event.
+        ///     The sender of the event.
         /// </param>
         /// <param name="e">
-        /// The arguments of the event.
+        ///     The arguments of the event.
         /// </param>
         private void DateFormatTextChanged(object sender, EventArgs e)
         {
             try
             {
-                this.dateExample.Text = DateTime.Today.ToString(this.dateFormat.Text);
+                dateExample.Text = DateTime.Today.ToString(dateFormat.Text);
             }
             catch
             {
-                this.dateExample.Text = "Error";
+                dateExample.Text = "Error";
             }
         }
 
         /// <summary>
-        /// Handles the click event for the Directory button.
+        ///     Handles the click event for the Directory button.
         /// </summary>
         /// <param name="sender">
-        /// The sender of the event.
+        ///     The sender of the event.
         /// </param>
         /// <param name="e">
-        /// The arguments of the event.
+        ///     The arguments of the event.
         /// </param>
         private void DirectoryButtonClick(object sender, EventArgs e)
         {
-            this.textFormat.Text += Path.DirectorySeparatorChar;
+            textFormat.Text += Path.DirectorySeparatorChar;
         }
 
         /// <summary>
-        /// Handles the click event for the Episode Name button.
+        ///     Handles the click event for the Episode Name button.
         /// </summary>
         /// <param name="sender">
-        /// The sender of the event.
+        ///     The sender of the event.
         /// </param>
         /// <param name="e">
-        /// The arguments of the event.
+        ///     The arguments of the event.
         /// </param>
         private void EpisodeNameButtonClick(object sender, EventArgs e)
         {
-            this.textFormat.Text += "{EName(" + this.GetSeparator() + ")}";
+            textFormat.Text += "{EName(" + GetSeparator() + ")}";
         }
 
         /// <summary>
-        /// Handles the click event Episode Number for the  button.
+        ///     Handles the click event Episode Number for the  button.
         /// </summary>
         /// <param name="sender">
-        /// The sender of the event.
+        ///     The sender of the event.
         /// </param>
         /// <param name="e">
-        /// The arguments of the event.
+        ///     The arguments of the event.
         /// </param>
         private void EpisodeNumberButtonClick(object sender, EventArgs e)
         {
-            this.textFormat.Text += "{ENum(" + this.digitalSelector.Value + ")}";
+            textFormat.Text += "{ENum(" + digitalSelector.Value + ")}";
         }
 
         /// <summary>
-        /// Handles the click event for the File Extension button.
+        ///     Handles the click event for the File Extension button.
         /// </summary>
         /// <param name="sender">
-        /// The sender of the event.
+        ///     The sender of the event.
         /// </param>
         /// <param name="e">
-        /// The arguments of the event.
+        ///     The arguments of the event.
         /// </param>
         private void FileExtensionButtonClick(object sender, EventArgs e)
         {
-            this.textFormat.Text += "{Ext}";
+            textFormat.Text += "{Ext}";
         }
 
         /// <summary>
-        /// Handles the click event for the Folder Name button.
+        ///     Handles the click event for the Folder Name button.
         /// </summary>
         /// <param name="sender">
-        /// The sender of the event.
+        ///     The sender of the event.
         /// </param>
         /// <param name="e">
-        /// The arguments of the event.
+        ///     The arguments of the event.
         /// </param>
         private void FolderNameButtonClick(object sender, EventArgs e)
         {
-            this.textFormat.Text += "{FName}";
+            textFormat.Text += "{FName}";
         }
 
         /// <summary>
-        /// Handles the load event for the form.
+        ///     Handles the load event for the form.
         /// </summary>
         /// <param name="sender">
-        /// The sender of the event.
+        ///     The sender of the event.
         /// </param>
         /// <param name="e">
-        /// The arguments of the event.
+        ///     The arguments of the event.
         /// </param>
         private void FormatBuilderLoad(object sender, EventArgs e)
         {
-            this.wordSeparator.SelectedIndex = 0;
+            wordSeparator.SelectedIndex = 0;
         }
 
         /// <summary>
-        /// Gets the word separator character.
+        ///     Gets the word separator character.
         /// </summary>
         /// <returns>The word separator character.</returns>
         private string GetSeparator()
         {
-            switch (this.wordSeparator.SelectedItem.ToString())
+            switch (wordSeparator.SelectedItem.ToString())
             {
                 case "[space]":
                     return " ";
                 default:
-                    return this.wordSeparator.SelectedItem.ToString();
+                    return wordSeparator.SelectedItem.ToString();
             }
         }
 
         /// <summary>
-        /// Handles the click event for the OK button.
+        ///     Handles the click event for the OK button.
         /// </summary>
         /// <param name="sender">
-        /// The sender of the event.
+        ///     The sender of the event.
         /// </param>
         /// <param name="e">
-        /// The arguments of the event.
+        ///     The arguments of the event.
         /// </param>
         private void OkButtonClick(object sender, EventArgs e)
         {
-            this.FormatString = this.textFormat.Text;
-            this.DialogResult = DialogResult.OK;
-            this.Close();
+            FormatString = textFormat.Text;
+            DialogResult = DialogResult.OK;
+            Close();
         }
 
         /// <summary>
-        /// Handles the click event for the Season Number button.
+        ///     Handles the click event for the Season Number button.
         /// </summary>
         /// <param name="sender">
-        /// The sender of the event.
+        ///     The sender of the event.
         /// </param>
         /// <param name="e">
-        /// The arguments of the event.
+        ///     The arguments of the event.
         /// </param>
         private void SeasonNumberButtonClick(object sender, EventArgs e)
         {
-            this.textFormat.Text += "{SNum(" + this.digitalSelector.Value + ")}";
+            textFormat.Text += "{SNum(" + digitalSelector.Value + ")}";
         }
 
         /// <summary>
-        /// Handles the click event for the Show Name button.
+        ///     Handles the click event for the Show Name button.
         /// </summary>
         /// <param name="sender">
-        /// The sender of the event.
+        ///     The sender of the event.
         /// </param>
         /// <param name="e">
-        /// The arguments of the event.
+        ///     The arguments of the event.
         /// </param>
         private void ShowNameButtonClick(object sender, EventArgs e)
         {
-            this.textFormat.Text += "{SName(" + this.GetSeparator() + ")}";
+            textFormat.Text += "{SName(" + GetSeparator() + ")}";
         }
 
         /// <summary>
-        /// Handles the text for changing.
+        ///     Handles the text for changing.
         /// </summary>
         /// <param name="sender">
-        /// The sender of the event.
+        ///     The sender of the event.
         /// </param>
         /// <param name="e">
-        /// The arguments of the event.
+        ///     The arguments of the event.
         /// </param>
         private void TextFormatTextChanged(object sender, EventArgs e)
         {
             try
             {
-                this.textExample.Text = fileResultManager.FormatOutputPath(this.exampleResult, this.textFormat.Text);
+                textExample.Text = fileResultManager.FormatOutputPath(exampleResult, textFormat.Text);
             }
             catch
             {
-                this.textExample.Text = "Error";
+                textExample.Text = "Error";
             }
         }
-
-        #endregion
     }
 }

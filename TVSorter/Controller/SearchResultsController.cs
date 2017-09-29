@@ -6,83 +6,72 @@
 //   The controller for displaying search results.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
+using System.Collections.Generic;
+using System.ComponentModel;
+using TVSorter.Model;
+using TVSorter.Repostitory;
+using TVSorter.View;
+
 namespace TVSorter.Controller
 {
-    #region Using Directives
-
-    using System.Collections.Generic;
-    using System.ComponentModel;
-
-    using Model;
-    using Repostitory;
-    using View;
-
-    #endregion
-
     /// <summary>
-    /// The controller for displaying search results.
+    ///     The controller for displaying search results.
     /// </summary>
     public class SearchResultsController : ShowSearchController
     {
-        #region Fields
-
         /// <summary>
-        ///   The folder name that was searched for.
+        ///     The folder name that was searched for.
         /// </summary>
         private string folderName;
 
-        #endregion
-
         /// <summary>
-        /// Initialises a new instance of the <see cref="SearchResultsController"/> class.
+        ///     Initialises a new instance of the <see cref="SearchResultsController" /> class.
         /// </summary>
         /// <param name="tvShowRepository">The TV Show Repository.</param>
-        public SearchResultsController(ITvShowRepository tvShowRepository) : base(tvShowRepository)
+        public SearchResultsController(ITvShowRepository tvShowRepository)
+            : base(tvShowRepository)
         {
         }
 
-        #region Public Methods and Operators
-
         /// <summary>
-        /// Initialises the controller.
+        ///     Initialises the controller.
         /// </summary>
         /// <param name="view">
-        /// The view the controller is for. 
+        ///     The view the controller is for.
         /// </param>
         public override void Initialise(IView view)
         {
             base.Initialise(view);
-            this.CloseButtonText = "Skip";
+            CloseButtonText = "Skip";
         }
 
         /// <summary>
-        /// Selects the specified index as the desired result.
+        ///     Selects the specified index as the desired result.
         /// </summary>
         /// <param name="index">
-        /// The index to select. 
+        ///     The index to select.
         /// </param>
         public override void Select(int index)
         {
-            this.SearchResults[index].FolderName = this.folderName;
+            SearchResults[index].FolderName = folderName;
             base.Select(index);
         }
 
         /// <summary>
-        /// Sets the results for the specified search term.
+        ///     Sets the results for the specified search term.
         /// </summary>
         /// <param name="name">
-        /// The name of the show searched for. 
+        ///     The name of the show searched for.
         /// </param>
         /// <param name="searchResults">
-        /// The list of possible results. 
+        ///     The list of possible results.
         /// </param>
         public void SetResults(string name, IList<TvShow> searchResults)
         {
-            this.folderName = name;
-            this.Title = "Search Results: " + name;
-            this.SearchResults = new BindingList<TvShow>(searchResults);
+            folderName = name;
+            Title = "Search Results: " + name;
+            SearchResults = new BindingList<TvShow>(searchResults);
         }
-
-        #endregion
     }
 }

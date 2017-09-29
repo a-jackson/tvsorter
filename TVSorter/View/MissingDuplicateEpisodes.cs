@@ -6,58 +6,41 @@
 //   The missing and duplicated episodes tab.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
+using System;
+using System.ComponentModel;
+using System.Linq;
+using System.Windows.Forms;
+using TVSorter.Controller;
+
 namespace TVSorter.View
 {
-    #region Using Directives
-
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Linq;
-    using System.Windows.Forms;
-
-    using Controller;
-    using Files;
-    using Storage;
-
-    #endregion
-
     /// <summary>
-    /// The missing and duplicated episodes tab.
+    ///     The missing and duplicated episodes tab.
     /// </summary>
     public partial class MissingDuplicateEpisodes : UserControl, IView
     {
-        #region Fields
-
         /// <summary>
-        ///   The controller.
+        ///     The controller.
         /// </summary>
         private MissingDuplicateController controller;
 
-        #endregion
-
-        #region Constructors and Destructors
-
         /// <summary>
-        ///   Initialises a new instance of the <see cref="MissingDuplicateEpisodes" /> class.
+        ///     Initialises a new instance of the <see cref="MissingDuplicateEpisodes" /> class.
         /// </summary>
         public MissingDuplicateEpisodes()
         {
-            this.InitializeComponent();
+            InitializeComponent();
         }
 
-        #endregion
-
-        #region Public Methods and Operators
-
         /// <summary>
-        /// Starts the progress indication for the specified Project Task.
+        ///     Starts the progress indication for the specified Project Task.
         /// </summary>
         /// <param name="task">
-        /// The task. 
+        ///     The task.
         /// </param>
         /// <param name="taskName">
-        /// The task name. 
+        ///     The task name.
         /// </param>
         public void StartTaskProgress(IProgressTask task, string taskName)
         {
@@ -65,116 +48,111 @@ namespace TVSorter.View
             dialog.ShowDialog(this);
         }
 
-        #endregion
-
-        #region Methods
-
         /// <summary>
-        /// Handles the duplicates button click.
+        ///     Handles the duplicates button click.
         /// </summary>
         /// <param name="sender">
-        /// The sender of the event. 
+        ///     The sender of the event.
         /// </param>
         /// <param name="e">
-        /// The arguments of the event. 
+        ///     The arguments of the event.
         /// </param>
         private void DuplicatesButtonClick(object sender, EventArgs e)
         {
-            this.controller.SearchDuplicateEpisodes();
+            controller.SearchDuplicateEpisodes();
         }
 
         /// <summary>
-        /// Handles the missing button click.
+        ///     Handles the missing button click.
         /// </summary>
         /// <param name="sender">
-        /// The sender of the event. 
+        ///     The sender of the event.
         /// </param>
         /// <param name="e">
-        /// The arguments of the event. 
+        ///     The arguments of the event.
         /// </param>
         private void MissingButtonClick(object sender, EventArgs e)
         {
-            this.controller.Settings.HideLocked = this.hideLocked.Checked;
-            this.controller.Settings.HidePart2 = this.hidePart2.Checked;
-            this.controller.Settings.HideSeason0 = this.hideSeason0.Checked;
-            this.controller.Settings.HideNotYetAired = this.hideUnaired.Checked;
-            this.controller.Settings.HideMissingSeasons = this.hideWholeSeasons.Checked;
+            controller.Settings.HideLocked = hideLocked.Checked;
+            controller.Settings.HidePart2 = hidePart2.Checked;
+            controller.Settings.HideSeason0 = hideSeason0.Checked;
+            controller.Settings.HideNotYetAired = hideUnaired.Checked;
+            controller.Settings.HideMissingSeasons = hideWholeSeasons.Checked;
 
-            this.controller.SearchMissingEpisodes();
+            controller.SearchMissingEpisodes();
         }
 
         /// <summary>
-        /// The missing duplicate episodes load.
+        ///     The missing duplicate episodes load.
         /// </summary>
         /// <param name="sender">
-        /// The sender of the event. 
+        ///     The sender of the event.
         /// </param>
         /// <param name="e">
-        /// The arguments of the event. 
+        ///     The arguments of the event.
         /// </param>
         private void MissingDuplicateEpisodesLoad(object sender, EventArgs e)
         {
-            if (!this.DesignMode)
+            if (!DesignMode)
             {
-                this.controller = CompositionRoot.Get<MissingDuplicateController>();
-                this.controller.PropertyChanged += this.OnPropertyChanged;
-                this.controller.Initialise(this);
-                this.hideLocked.Checked = this.controller.Settings.HideLocked;
-                this.hidePart2.Checked = this.controller.Settings.HidePart2;
-                this.hideSeason0.Checked = this.controller.Settings.HideSeason0;
-                this.hideUnaired.Checked = this.controller.Settings.HideNotYetAired;
-                this.hideWholeSeasons.Checked = this.controller.Settings.HideMissingSeasons;
+                controller = CompositionRoot.Get<MissingDuplicateController>();
+                controller.PropertyChanged += OnPropertyChanged;
+                controller.Initialise(this);
+                hideLocked.Checked = controller.Settings.HideLocked;
+                hidePart2.Checked = controller.Settings.HidePart2;
+                hideSeason0.Checked = controller.Settings.HideSeason0;
+                hideUnaired.Checked = controller.Settings.HideNotYetAired;
+                hideWholeSeasons.Checked = controller.Settings.HideMissingSeasons;
             }
         }
 
         /// <summary>
-        /// The on property changed.
+        ///     The on property changed.
         /// </summary>
         /// <param name="sender">
-        /// The sender. 
+        ///     The sender.
         /// </param>
         /// <param name="e">
-        /// The e. 
+        ///     The e.
         /// </param>
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
             {
                 case "Episodes":
-                    this.UpdateTree();
-                    this.episodesCountLabel.Text = "Number of Episodes: " + this.controller.Episodes.Count;
+                    UpdateTree();
+                    episodesCountLabel.Text = "Number of Episodes: " + controller.Episodes.Count;
                     break;
             }
         }
 
         /// <summary>
-        /// Handles the refresh button click.
+        ///     Handles the refresh button click.
         /// </summary>
         /// <param name="sender">
-        /// The sender of the event. 
+        ///     The sender of the event.
         /// </param>
         /// <param name="e">
-        /// The arguments of the event. 
+        ///     The arguments of the event.
         /// </param>
         private void RefreshButtonClick(object sender, EventArgs e)
         {
-            this.controller.RefreshFileCounts();
+            controller.RefreshFileCounts();
         }
 
         /// <summary>
-        /// Updates the tree view.
+        ///     Updates the tree view.
         /// </summary>
         private void UpdateTree()
         {
-            this.episodesTree.Nodes.Clear();
-            foreach (var show in this.controller.Episodes.GroupBy(x => x.Show))
+            episodesTree.Nodes.Clear();
+            foreach (var show in controller.Episodes.GroupBy(x => x.Show))
             {
                 var showNode = new TreeNode(show.Key.Name);
-                this.episodesTree.Nodes.Add(showNode);
-                IEnumerable<IGrouping<string, string>> seasons =
-                    show.GroupBy(
-                        x => string.Format("Season {0}", x.SeasonNumber), 
-                        x => string.Format("{0} - {1}", x.EpisodeNumber, x.Name));
+                episodesTree.Nodes.Add(showNode);
+                var seasons = show.GroupBy(
+                    x => string.Format("Season {0}", x.SeasonNumber),
+                    x => string.Format("{0} - {1}", x.EpisodeNumber, x.Name));
                 foreach (var season in seasons)
                 {
                     var seasonNode = new TreeNode(season.Key);
@@ -183,7 +161,5 @@ namespace TVSorter.View
                 }
             }
         }
-
-        #endregion
     }
 }

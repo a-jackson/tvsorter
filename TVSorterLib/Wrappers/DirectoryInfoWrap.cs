@@ -3,195 +3,142 @@
 //   2012 - Andrew Jackson
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
+
+using System.IO;
+
 namespace TVSorter.Wrappers
 {
-    using System.IO;
-
     /// <summary>
-    /// A wrapper for the DirectoryInfo class.
+    ///     A wrapper for the DirectoryInfo class.
     /// </summary>
     public class DirectoryInfoWrap : IDirectoryInfo
     {
-        #region Fields
-
         /// <summary>
-        /// The directory info being wrapper.
+        ///     The directory info being wrapper.
         /// </summary>
         private readonly DirectoryInfo directoryInfo;
 
-        #endregion
-
-        #region Constructors and Destructors
-
         /// <summary>
-        /// Initialises a new instance of the <see cref="DirectoryInfoWrap"/> class.
+        ///     Initialises a new instance of the <see cref="DirectoryInfoWrap" /> class.
         /// </summary>
         /// <param name="path">
-        /// The path.
+        ///     The path.
         /// </param>
         public DirectoryInfoWrap(string path)
         {
-            this.directoryInfo = new DirectoryInfo(path);
+            directoryInfo = new DirectoryInfo(path);
         }
 
         /// <summary>
-        /// Initialises a new instance of the <see cref="DirectoryInfoWrap"/> class.
+        ///     Initialises a new instance of the <see cref="DirectoryInfoWrap" /> class.
         /// </summary>
         /// <param name="directoryInfo">
-        /// The directory info.
+        ///     The directory info.
         /// </param>
         public DirectoryInfoWrap(DirectoryInfo directoryInfo)
         {
             this.directoryInfo = directoryInfo;
         }
 
-        #endregion
-
-        #region Public Properties
-
         /// <summary>
-        /// Gets the value of the directory attributes.
-        /// This to avoid System folders
+        ///     Gets the value of the directory attributes.
+        ///     This to avoid System folders
         /// </summary>
-        public FileAttributes DirectoryAttributes
-        {
-            get
-            {
-                return this.directoryInfo.Attributes;
-            }
-        }
+        public FileAttributes DirectoryAttributes => directoryInfo.Attributes;
 
         /// <summary>
-        /// Gets a value indicating whether the directory exists.
+        ///     Gets a value indicating whether the directory exists.
         /// </summary>
-        public bool Exists
-        {
-            get
-            {
-                return this.directoryInfo.Exists;
-            }
-        }
+        public bool Exists => directoryInfo.Exists;
 
         /// <summary>
-        /// Gets the full path of the directory.
+        ///     Gets the full path of the directory.
         /// </summary>
-        public string FullName
-        {
-            get
-            {
-                return this.directoryInfo.FullName;
-            }
-        }
+        public string FullName => directoryInfo.FullName;
 
         /// <summary>
-        /// Gets the name of the directory.
+        ///     Gets the name of the directory.
         /// </summary>
-        public string Name
-        {
-            get
-            {
-                return this.directoryInfo.Name;
-            }
-        }
-
-        #endregion
-
-        #region Public Methods and Operators
+        public string Name => directoryInfo.Name;
 
         /// <summary>
-        /// Creates the directory.
+        ///     Creates the directory.
         /// </summary>
         public void Create()
         {
-            this.directoryInfo.Create();
+            directoryInfo.Create();
         }
 
         /// <summary>
-        /// Creates a file under this directory.
+        ///     Creates a file under this directory.
         /// </summary>
         /// <param name="name">
-        /// The name of the file to create.
+        ///     The name of the file to create.
         /// </param>
         /// <returns>
-        /// The IFileInfo for the new file.
+        ///     The IFileInfo for the new file.
         /// </returns>
         public IFileInfo CreateFile(string name)
         {
-            return new FileInfoWrap(this.FullName + Path.DirectorySeparatorChar + name);
+            return new FileInfoWrap(FullName + Path.DirectorySeparatorChar + name);
         }
 
         /// <summary>
-        /// Deletes the directory.
+        ///     Deletes the directory.
         /// </summary>
         /// <param name="recursive">
-        /// A value indicating whether the deletion should be recursive.
+        ///     A value indicating whether the deletion should be recursive.
         /// </param>
         public void Delete(bool recursive)
         {
-            this.directoryInfo.Delete(recursive);
+            directoryInfo.Delete(recursive);
         }
 
         /// <summary>
-        /// Gets the sub directories of this directory.
+        ///     Gets the sub directories of this directory.
         /// </summary>
         /// <returns>The collection of sub directories.</returns>
         public IDirectoryInfo[] GetDirectories()
         {
-            return ConvertDirectoryInfoToIDirectoryInfo(this.directoryInfo.GetDirectories());
+            return ConvertDirectoryInfoToIDirectoryInfo(directoryInfo.GetDirectories());
         }
 
         /// <summary>
-        /// Gets a sub file of the directory at the specified path.
+        ///     Gets a sub file of the directory at the specified path.
         /// </summary>
         /// <param name="outputPath">
-        /// The path to get the file for.
+        ///     The path to get the file for.
         /// </param>
         /// <returns>
-        /// The IFileInfo for the file.
+        ///     The IFileInfo for the file.
         /// </returns>
         public IFileInfo GetFile(string outputPath)
         {
-            return new FileInfoWrap(string.Concat(this.FullName, Path.DirectorySeparatorChar, outputPath));
+            return new FileInfoWrap(string.Concat(FullName, Path.DirectorySeparatorChar, outputPath));
         }
 
         /// <summary>
-        /// Gets the files of this directory.
+        ///     Gets the files of this directory.
         /// </summary>
         /// <returns>The collection of files.</returns>
         public IFileInfo[] GetFiles()
         {
-            return FileInfoWrap.ConvertFileInfoToIFileInfoArray(this.directoryInfo.GetFiles());
+            return FileInfoWrap.ConvertFileInfoToIFileInfoArray(directoryInfo.GetFiles());
         }
 
         /// <summary>
-        /// Returns a string that represents the current object.
-        /// </summary>
-        /// <returns>
-        /// A string that represents the current object.
-        /// </returns>
-        /// <filterpriority>2</filterpriority>
-        public override string ToString()
-        {
-            return this.directoryInfo.ToString();
-        }
-
-        #endregion
-
-        #region Methods
-
-        /// <summary>
-        /// Converts an array of DirectoryInfo into an array of IDirectoryInfo.
+        ///     Converts an array of DirectoryInfo into an array of IDirectoryInfo.
         /// </summary>
         /// <param name="directoryInfos">
-        /// The DirectoryInfo objects to convert.
+        ///     The DirectoryInfo objects to convert.
         /// </param>
         /// <returns>
-        /// The array of IDirectoryInfo.
+        ///     The array of IDirectoryInfo.
         /// </returns>
         private static IDirectoryInfo[] ConvertDirectoryInfoToIDirectoryInfo(DirectoryInfo[] directoryInfos)
         {
             var array = new IDirectoryInfo[directoryInfos.Length];
-            for (int i = 0; i < array.Length; i++)
+            for (var i = 0; i < array.Length; i++)
             {
                 array[i] = new DirectoryInfoWrap(directoryInfos[i]);
             }
@@ -199,6 +146,16 @@ namespace TVSorter.Wrappers
             return array;
         }
 
-        #endregion
+        /// <summary>
+        ///     Returns a string that represents the current object.
+        /// </summary>
+        /// <returns>
+        ///     A string that represents the current object.
+        /// </returns>
+        /// <filterpriority>2</filterpriority>
+        public override string ToString()
+        {
+            return directoryInfo.ToString();
+        }
     }
 }

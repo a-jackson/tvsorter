@@ -6,35 +6,30 @@
 //   Extenstions to the IEnumerable interface.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
+using System.Collections.Generic;
+using TVSorter.Model;
+using TVSorter.Storage;
+
 namespace TVSorter
 {
-    using System.Collections.Generic;
-
-    using TVSorter.Data;
-    using TVSorter.Model;
-    using TVSorter.Storage;
-
     /// <summary>
-    /// Extensions to the IEnumerable interface.
+    ///     Extensions to the IEnumerable interface.
     /// </summary>
     public static class EnumerableExtensions
     {
-        #region Methods
-
         /// <summary>
-        /// Saves a collection of TVShows.
+        ///     Saves a collection of TVShows.
         /// </summary>
         /// <param name="shows">
-        /// The shows to save.
+        ///     The shows to save.
         /// </param>
         /// <param name="provider">
-        /// The provider to save the shows with. 
+        ///     The provider to save the shows with.
         /// </param>
         internal static void Save(this IEnumerable<TvShow> shows, IStorageProvider provider)
         {
             provider.SaveShows(shows);
         }
-        
-        #endregion
     }
 }

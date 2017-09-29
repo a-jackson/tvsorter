@@ -6,167 +6,157 @@
 //   Handles the scanning of files.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
+using TVSorter.Data;
+using TVSorter.Model;
+using TVSorter.Repostitory;
+using TVSorter.Storage;
+using TVSorter.Wrappers;
+
 namespace TVSorter.Files
 {
-    #region Using Directives
-
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Text.RegularExpressions;
-
-    using Data;
-    using Model;
-    using Repostitory;
-    using Storage;
-    using Wrappers;
-
-    #endregion
-
     /// <summary>
-    /// Handles the scanning of files.
+    ///     Handles the scanning of files.
     /// </summary>
     public class ScanManager : IScanManager
     {
-        #region Fields
-
         /// <summary>
-        /// The data provider to use.
+        ///     The data provider to use.
         /// </summary>
         private readonly IDataProvider dataProvider;
 
         /// <summary>
-        ///   The current settings of the system.
+        ///     The current settings of the system.
         /// </summary>
         private readonly Settings settings;
 
         /// <summary>
-        /// The storage provider to use.
+        ///     The storage provider to use.
         /// </summary>
         private readonly IStorageProvider storageProvider;
 
         /// <summary>
-        /// The TV show repository.
+        ///     The TV show repository.
         /// </summary>
         private readonly ITvShowRepository tvShowRepository;
 
         /// <summary>
-        /// The list of the TV shows.
+        ///     The list of the TV shows.
         /// </summary>
         private readonly List<TvShow> tvShows;
 
         /// <summary>
-        /// Indicating whether the file counts are being refreshed or not.
+        ///     Indicating whether the file counts are being refreshed or not.
         /// </summary>
         private bool refreshingFileCounts;
 
         /// <summary>
-        /// The list of unsuccessful matches.
+        ///     The list of unsuccessful matches.
         /// </summary>
         private List<string> unsuccessfulMatches;
 
         /// <summary>
-        /// The list of shows that have been updated as part of the search.
+        ///     The list of shows that have been updated as part of the search.
         /// </summary>
         private List<TvShow> updatedShows;
 
-        #endregion
-
-        #region Constructors and Destructors
-
         /// <summary>
-        /// Initialises a new instance of the <see cref="ScanManager"/> class.
+        ///     Initialises a new instance of the <see cref="ScanManager" /> class.
         /// </summary>
         /// <param name="storageProvider">
-        /// The storage provider to use.
+        ///     The storage provider to use.
         /// </param>
         /// <param name="dataProvider">
-        /// The data provider to use. 
+        ///     The data provider to use.
         /// </param>
         /// <param name="tvShowRepository">
-        /// The TV show repository.
+        ///     The TV show repository.
         /// </param>
-        public ScanManager(IStorageProvider storageProvider, IDataProvider dataProvider, ITvShowRepository tvShowRepository)
+        public ScanManager(
+            IStorageProvider storageProvider,
+            IDataProvider dataProvider,
+            ITvShowRepository tvShowRepository)
         {
             this.storageProvider = storageProvider;
             this.dataProvider = dataProvider;
-            this.settings = storageProvider.Settings;
+            settings = storageProvider.Settings;
             this.tvShowRepository = tvShowRepository;
-            this.tvShows = tvShowRepository.GetTvShows().ToList();
-            this.tvShowRepository.TvShowAdded += this.TvShowAdded;
-            this.tvShowRepository.TvShowRemoved += this.TvShowRemoved;
-            this.tvShowRepository.TvShowChanged += this.TvShowChanged;
+            tvShows = tvShowRepository.GetTvShows().ToList();
+            this.tvShowRepository.TvShowAdded += TvShowAdded;
+            this.tvShowRepository.TvShowRemoved += TvShowRemoved;
+            this.tvShowRepository.TvShowChanged += TvShowChanged;
         }
 
-        #endregion
-
-        #region Public Methods and Operators
-
         /// <summary>
-        /// Refresh the specified sub directory.
+        ///     Refresh the specified sub directory.
         /// </summary>
         /// <param name="subDirectory">
-        /// The sub directory to refresh. 
+        ///     The sub directory to refresh.
         /// </param>
         /// <returns>
-        /// The list of files identified during the refresh operation. 
+        ///     The list of files identified during the refresh operation.
         /// </returns>
         public List<FileResult> Refresh(string subDirectory)
         {
-            var root = new DirectoryInfoWrap(string.Concat(this.settings.SourceDirectory, subDirectory));
-            return this.Refresh(root);
+            var root = new DirectoryInfoWrap(string.Concat(settings.SourceDirectory, subDirectory));
+            return Refresh(root);
         }
 
         /// <summary>
-        /// Searches for files in the output directory to set the file counts.
+        ///     Searches for files in the output directory to set the file counts.
         /// </summary>
         public void RefreshFileCounts()
         {
-            this.RefreshFileCounts(this.settings.DestinationDirectories.Select(x => new DirectoryInfoWrap(x)));
+            RefreshFileCounts(settings.DestinationDirectories.Select(x => new DirectoryInfoWrap(x)));
         }
 
         /// <summary>
-        /// Resets the show of the specified result.
+        ///     Resets the show of the specified result.
         /// </summary>
         /// <param name="result">
-        /// The result to modify.
+        ///     The result to modify.
         /// </param>
         /// <param name="show">
-        /// The show to set the result to.
+        ///     The show to set the result to.
         /// </param>
         public void ResetShow(FileResult result, TvShow show)
         {
             result.Show = show;
-            var firstMatch = this.GetMatches(result.InputFile).FirstOrDefault();
+            var firstMatch = GetMatches(result.InputFile).FirstOrDefault();
             if (firstMatch == null)
             {
                 result.Episode = null;
             }
             else
             {
-                result.Episodes = this.ProcessEpisode(firstMatch, show).ToList();
+                result.Episodes = ProcessEpisode(firstMatch, show).ToList();
                 result.Episode = result.Episodes.FirstOrDefault();
             }
         }
-        
+
         /// <summary>
-        /// Searches for new TVShows.
+        ///     Searches for new TVShows.
         /// </summary>
         /// <param name="directories">
-        /// The directories to search in.
+        ///     The directories to search in.
         /// </param>
         /// <returns>
-        /// The ambiguous results of the search for user selection.
+        ///     The ambiguous results of the search for user selection.
         /// </returns>
         public Dictionary<string, List<TvShow>> SearchNewShows(IEnumerable<IDirectoryInfo> directories)
         {
             var showDirs = new List<string>();
-            List<string> existingShows = this.tvShowRepository.GetTvShows().Select(x => x.FolderName).ToList();
-            foreach (IDirectoryInfo dirInfo in directories)
+            var existingShows = tvShowRepository.GetTvShows().Select(x => x.FolderName).ToList();
+
+            // Add all of dirInfo's subdirectories where they don't already exist and
+            // there isn't already a tv show with it as a folder name.
+            foreach (var dirInfo in directories)
             {
-                // Add all of dirInfo's subdirectories where they don't already exist and 
-                // there isn't already a tv show with it as a folder name.
                 showDirs.AddRange(
                     from dir in dirInfo.GetDirectories()
                     where !showDirs.Contains(dir.Name) && !existingShows.Contains(dir.Name)
@@ -177,18 +167,18 @@ namespace TVSorter.Files
             showDirs.Sort();
 
             var searchResults = new Dictionary<string, List<TvShow>>();
-            foreach (string showName in showDirs)
+            foreach (var showName in showDirs)
             {
                 // Search for each of the shows using the directory name as the show name.
-                List<TvShow> results = this.tvShowRepository.SearchShow(showName);
+                var results = tvShowRepository.SearchShow(showName);
 
                 // Any with only one result should be saved or where the first result is an exact match.
-                if (results.Count == 1
-                    ||
-                    (results.Count > 1 && results[0].Name.Equals(showName, StringComparison.InvariantCultureIgnoreCase)))
+                if ((results.Count == 1) ||
+                    ((results.Count > 1) &&
+                     results[0].Name.Equals(showName, StringComparison.InvariantCultureIgnoreCase)))
                 {
-                    TvShow show = this.tvShowRepository.FromSearchResult(results[0]);
-                    this.tvShowRepository.Save(show);
+                    var show = tvShowRepository.FromSearchResult(results[0]);
+                    tvShowRepository.Save(show);
                     Logger.OnLogMessage(show, "Found show {0}", LogType.Info, show.Name);
                 }
                 else
@@ -203,58 +193,54 @@ namespace TVSorter.Files
         }
 
         /// <summary>
-        /// Searches a destination folder for files.
-        /// This is intended to be called by the file manager.
+        ///     Searches a destination folder for files.
+        ///     This is intended to be called by the file manager.
         /// </summary>
         /// <param name="destination">
-        /// The destination directory to search.
+        ///     The destination directory to search.
         /// </param>
         /// <returns>
-        /// The collection of matched files.
+        ///     The collection of matched files.
         /// </returns>
         public IEnumerable<FileResult> SearchDestinationFolder(IDirectoryInfo destination)
         {
-            this.unsuccessfulMatches = new List<string>();
-            this.updatedShows = new List<TvShow>();
-            return this.ProcessDirectory(destination, false, true);
+            unsuccessfulMatches = new List<string>();
+            updatedShows = new List<TvShow>();
+            return ProcessDirectory(destination, false, true);
         }
 
-        #endregion
-
-        #region Methods
-
         /// <summary>
-        /// Refresh the specified directory.
+        ///     Refresh the specified directory.
         /// </summary>
         /// <param name="directoryInfo">
-        /// The directory to refresh.
+        ///     The directory to refresh.
         /// </param>
         /// <returns>
-        /// The list of files identified during the refresh operation.
+        ///     The list of files identified during the refresh operation.
         /// </returns>
         internal List<FileResult> Refresh(IDirectoryInfo directoryInfo)
         {
-            this.unsuccessfulMatches = new List<string>();
-            this.updatedShows = new List<TvShow>();
-            return this.ProcessDirectory(directoryInfo).ToList();
+            unsuccessfulMatches = new List<string>();
+            updatedShows = new List<TvShow>();
+            return ProcessDirectory(directoryInfo).ToList();
         }
 
         /// <summary>
-        /// Searches for files in specified directories to set the file counts.
+        ///     Searches for files in specified directories to set the file counts.
         /// </summary>
         /// <param name="directories">
-        /// The directories to search.
+        ///     The directories to search.
         /// </param>
         internal void RefreshFileCounts(IEnumerable<IDirectoryInfo> directories)
         {
-            this.unsuccessfulMatches = new List<string>();
-            this.updatedShows = new List<TvShow>();
-            this.refreshingFileCounts = true;
+            unsuccessfulMatches = new List<string>();
+            updatedShows = new List<TvShow>();
+            refreshingFileCounts = true;
 
             // Search all the destination directories for positive matches.
-            var files = directories.SelectMany(dir => this.ProcessDirectory(dir, true));
-            List<FileResult> matchedFiles = files.Where(x => !x.Incomplete).ToList();
-            List<FileResult> unmatchedFiles = files.Where(x => x.Incomplete).ToList();
+            var files = directories.SelectMany(dir => ProcessDirectory(dir, true));
+            var matchedFiles = files.Where(x => !x.Incomplete).ToList();
+            var unmatchedFiles = files.Where(x => x.Incomplete).ToList();
 
             // Log the unmatched files.
             if (unmatchedFiles.Any())
@@ -262,21 +248,24 @@ namespace TVSorter.Files
                 Logger.OnLogMessage(this, "Unable to match {0} files", LogType.Error, unmatchedFiles.Count);
                 foreach (var result in unmatchedFiles)
                 {
-                    Logger.OnLogMessage(this, "Unable to match: " + result.InputFile.FullName.Truncate(), LogType.Error);
+                    Logger.OnLogMessage(
+                        this,
+                        "Unable to match: " + result.InputFile.FullName.Truncate(),
+                        LogType.Error);
                 }
             }
 
             Logger.OnLogMessage(this, "Updating file counts...", LogType.Info);
 
             // Get all of the matched episodes.
-            List<Episode> matchedEpsiodes = matchedFiles.SelectMany(x => x.Episodes).ToList();
+            var matchedEpsiodes = matchedFiles.SelectMany(x => x.Episodes).ToList();
 
             // Get all of the shows and episodes.
-            List<TvShow> shows = this.tvShowRepository.GetTvShows().ToList();
-            IEnumerable<Episode> allEpisodes = shows.SelectMany(x => x.Episodes);
+            var shows = tvShowRepository.GetTvShows().ToList();
+            var allEpisodes = shows.SelectMany(x => x.Episodes);
 
             // Update the file count of the episodes.
-            foreach (Episode episode in allEpisodes)
+            foreach (var episode in allEpisodes)
             {
                 episode.FileCount = matchedEpsiodes.Count(x => episode.Equals(x));
             }
@@ -284,23 +273,23 @@ namespace TVSorter.Files
             Logger.OnLogMessage(this, "Saving file counts...", LogType.Info);
 
             // Save all the shows.
-            shows.Save(this.storageProvider);
+            shows.Save(storageProvider);
         }
-        
+
         /// <summary>
-        /// Gets the matches for the specified file.
+        ///     Gets the matches for the specified file.
         /// </summary>
         /// <param name="file">
-        /// The file to match.
+        ///     The file to match.
         /// </param>
         /// <returns>
-        /// The collection of matches.
+        ///     The collection of matches.
         /// </returns>
         private IEnumerable<Match> GetMatches(IFileInfo file)
         {
-            foreach (var regex in this.settings.RegularExpressions)
+            foreach (var regex in settings.RegularExpressions)
             {
-                Match match = Regex.Match(file.Name, regex, RegexOptions.IgnoreCase);
+                var match = Regex.Match(file.Name, regex, RegexOptions.IgnoreCase);
 
                 if (match.Success)
                 {
@@ -310,22 +299,22 @@ namespace TVSorter.Files
         }
 
         /// <summary>
-        /// Attempts to match the file name to to a show in storage.
+        ///     Attempts to match the file name to to a show in storage.
         /// </summary>
         /// <param name="fileName">
-        /// The file name of the episode. 
+        ///     The file name of the episode.
         /// </param>
         /// <param name="matchIndex">
-        /// The index that the season and episode were identified in the file name. 
+        ///     The index that the season and episode were identified in the file name.
         /// </param>
         /// <param name="showName">
-        /// The name of the show as seen by the program. 
+        ///     The name of the show as seen by the program.
         /// </param>
         /// <param name="ignoreShowUpdate">
-        /// A value indicating whether the settings to update and lock shows should be ignored.
+        ///     A value indicating whether the settings to update and lock shows should be ignored.
         /// </param>
         /// <returns>
-        /// The TV show that was found. 
+        ///     The TV show that was found.
         /// </returns>
         private TvShow MatchShow(string fileName, int matchIndex, out string showName, bool ignoreShowUpdate)
         {
@@ -342,75 +331,85 @@ namespace TVSorter.Files
             showName = showName.RemoveSpacerChars();
 
             var names = new[]
-                {
-                    showName, showName.RemoveSpacerChars(), showName.AlphaNumericOnly(), showName.RemoveSpecialChars(),
-                    showName.GetFileSafeName()
-                }.Distinct();
+            {
+                showName,
+                showName.RemoveSpacerChars(),
+                showName.AlphaNumericOnly(),
+                showName.RemoveSpecialChars(),
+                showName.GetFileSafeName()
+            }.Distinct();
 
-            TvShow show =
-                this.tvShows.FirstOrDefault(
-                    x => x.GetShowNames().Intersect(names, StringComparer.InvariantCultureIgnoreCase).Any());
+            var show = tvShows.FirstOrDefault(
+                x => x.GetShowNames().Intersect(names, StringComparer.InvariantCultureIgnoreCase).Any());
 
-            if (this.settings.AddUnmatchedShows && show == null && !ignoreShowUpdate
-                && !this.unsuccessfulMatches.Contains(showName))
+            if (settings.AddUnmatchedShows &&
+                (show == null) &&
+                !ignoreShowUpdate &&
+                !unsuccessfulMatches.Contains(showName))
             {
                 Logger.OnLogMessage(this, "Attempting to add show {0}", LogType.Info, showName);
 
                 // Attempt to add the show.
-                List<TvShow> results = this.tvShowRepository.SearchShow(showName);
+                var results = tvShowRepository.SearchShow(showName);
                 if (results.Count == 0)
                 {
                     Logger.OnLogMessage(this, "Show not found.", LogType.Error);
-                    this.unsuccessfulMatches.Add(showName);
+                    unsuccessfulMatches.Add(showName);
                     return null;
                 }
 
                 // If there is only 1 result, of the name of the first result is a perfect match
                 // then use it as the show.
-                if (results.Count == 1 || results[0].Name.Equals(showName, StringComparison.InvariantCultureIgnoreCase))
+                if ((results.Count == 1) ||
+                    results[0].Name.Equals(showName, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    show = this.ProcessResult(showName, results[0]);
-                    this.updatedShows.Add(show);
+                    show = ProcessResult(showName, results[0]);
+                    updatedShows.Add(show);
                 }
             }
 
             // If Unlock matched shows is on and the show is locked.
-            if (!this.refreshingFileCounts && this.settings.UnlockMatchedShows && show != null && show.Locked
-                && !ignoreShowUpdate && !this.updatedShows.Contains(show))
+            if (!refreshingFileCounts &&
+                settings.UnlockMatchedShows &&
+                (show != null) &&
+                show.Locked &&
+                !ignoreShowUpdate &&
+                !updatedShows.Contains(show))
             {
                 // Unlock and update the show.
                 show.Locked = false;
-                this.tvShowRepository.Save(show);
-                this.tvShowRepository.Update(show);
-                this.updatedShows.Add(show);
+                tvShowRepository.Save(show);
+                tvShowRepository.Update(show);
+                updatedShows.Add(show);
             }
 
             return show;
         }
 
         /// <summary>
-        /// Processes the specified directory looking for episodes.
+        ///     Processes the specified directory looking for episodes.
         /// </summary>
         /// <param name="directory">
-        /// The directory to search. 
+        ///     The directory to search.
         /// </param>
         /// <param name="overrideRecurse">
-        /// A value indicating whether to override the setting to recursively search subdirectories.
+        ///     A value indicating whether to override the setting to recursively search subdirectories.
         /// </param>
         /// <param name="ignoreShowUpdate">
-        /// A value indicating whether the settings for updating and locked shows should be ignored.
+        ///     A value indicating whether the settings for updating and locked shows should be ignored.
         /// </param>
         /// <returns>
-        /// The list of identified files. 
+        ///     The list of identified files.
         /// </returns>
         private IEnumerable<FileResult> ProcessDirectory(
-            IDirectoryInfo directory, bool overrideRecurse = false, bool ignoreShowUpdate = false)
+            IDirectoryInfo directory,
+            bool overrideRecurse = false,
+            bool ignoreShowUpdate = false)
         {
             // Get the files where the extension is in the list of extensions.
-            IEnumerable<IFileInfo> files =
-                directory.GetFiles().Where(file => this.settings.FileExtensions.Contains(file.Extension));
+            var files = directory.GetFiles().Where(file => settings.FileExtensions.Contains(file.Extension));
 
-            foreach (FileResult result in files.Select(info => this.ProcessFile(info, ignoreShowUpdate)))
+            foreach (var result in files.Select(info => ProcessFile(info, ignoreShowUpdate)))
             {
                 if (result != null)
                 {
@@ -425,39 +424,41 @@ namespace TVSorter.Files
                 Logger.OnLogMessage(this, "Scanned directory: {0}", LogType.Info, directory.FullName.Truncate());
             }
 
-            if (!this.settings.RecurseSubdirectories && !overrideRecurse)
+            if (!settings.RecurseSubdirectories && !overrideRecurse)
             {
                 yield break;
             }
 
-            IDirectoryInfo[] dirs = directory.GetDirectories().Where(d => !d.DirectoryAttributes.HasFlag(FileAttributes.System)
-                && !this.settings.IgnoredDirectories.Contains(d.FullName)).ToArray();
-            foreach (FileResult result in
-                dirs.SelectMany(dir => this.ProcessDirectory(dir, overrideRecurse, ignoreShowUpdate)))
+            var dirs = directory.GetDirectories()
+                .Where(
+                    d => !d.DirectoryAttributes.HasFlag(FileAttributes.System) &&
+                         !settings.IgnoredDirectories.Contains(d.FullName))
+                .ToArray();
+            foreach (var result in dirs.SelectMany(dir => ProcessDirectory(dir, overrideRecurse, ignoreShowUpdate)))
             {
                 yield return result;
             }
         }
 
         /// <summary>
-        /// Gets the necessary info from the file name and return the episode object
+        ///     Gets the necessary info from the file name and return the episode object
         /// </summary>
         /// <param name="match">
-        /// The regular expression's match 
+        ///     The regular expression's match
         /// </param>
         /// <param name="show">
-        /// The show. 
+        ///     The show.
         /// </param>
         /// <returns>
-        /// The episode objects that have been matched.
+        ///     The episode objects that have been matched.
         /// </returns>
         private IEnumerable<Episode> ProcessEpisode(Match match, TvShow show)
         {
-            Group season = match.Groups["S"];
-            Group episode = match.Groups["E"];
-            Group year = match.Groups["Y"];
-            Group month = match.Groups["M"];
-            Group day = match.Groups["D"];
+            var season = match.Groups["S"];
+            var episode = match.Groups["E"];
+            var year = match.Groups["Y"];
+            var month = match.Groups["M"];
+            var day = match.Groups["D"];
 
             if (show == null)
             {
@@ -467,19 +468,19 @@ namespace TVSorter.Files
             // Determine if the match was a season/episode or a date.
             if (season.Success && episode.Success)
             {
-                int seasonNum = int.Parse(season.ToString());
+                var seasonNum = int.Parse(season.ToString());
 
                 // There is the possibility of multiple episodes being matches
                 foreach (Capture episodeGroup in match.Groups["E"].Captures)
                 {
-                    int episodeNum = int.Parse(episodeGroup.ToString());
-                    yield return
-                        show.Episodes.FirstOrDefault(x => x.EpisodeNumber == episodeNum && x.SeasonNumber == seasonNum);
+                    var episodeNum = int.Parse(episodeGroup.ToString());
+                    yield return show.Episodes.FirstOrDefault(
+                        x => (x.EpisodeNumber == episodeNum) && (x.SeasonNumber == seasonNum));
                 }
             }
             else if (year.Success && month.Success && day.Success)
             {
-                DateTime date = DateTime.Parse(string.Concat(year, "-", month, "-", day));
+                var date = DateTime.Parse(string.Concat(year, "-", month, "-", day));
                 yield return show.Episodes.FirstOrDefault(x => x.FirstAir.Equals(date));
             }
             else
@@ -489,123 +490,138 @@ namespace TVSorter.Files
         }
 
         /// <summary>
-        /// Processes the specified file, overriding the show and episode search.
+        ///     Processes the specified file, overriding the show and episode search.
         /// </summary>
         /// <param name="file">
-        /// The file to process. 
+        ///     The file to process.
         /// </param>
         /// <param name="ignoreShowUpdate">
-        /// A value indicating whether the settings to update and lock shows should be ignored.
+        ///     A value indicating whether the settings to update and lock shows should be ignored.
         /// </param>
         /// <returns>
-        /// The results of the file process. 
+        ///     The results of the file process.
         /// </returns>
         private FileResult ProcessFile(IFileInfo file, bool ignoreShowUpdate)
         {
             // Attempt to match to a regular express
-            var matches = this.GetMatches(file);
+            var matches = GetMatches(file);
             FileResult emptyResult = null;
 
-            string showname = string.Empty;
+            var showname = string.Empty;
 
             // Try to resolve an result
-            foreach (Match match in matches)
+            foreach (var match in matches)
             {
-                TvShow show = this.MatchShow(file.Name, match.Index, out showname, ignoreShowUpdate);
+                var show = MatchShow(file.Name, match.Index, out showname, ignoreShowUpdate);
                 Episode episode = null;
                 IList<Episode> episodes = null;
 
                 if (show != null)
                 {
-                    episodes = this.ProcessEpisode(match, show).ToList();
+                    episodes = ProcessEpisode(match, show).ToList();
                     if (episodes.Count > 0)
                     {
                         episode = episodes.First();
                     }
 
-                    return new FileResult { Episode = episode, Episodes = episodes, InputFile = file, Show = show, ShowName = showname };
+                    return new FileResult
+                    {
+                        Episode = episode,
+                        Episodes = episodes,
+                        InputFile = file,
+                        Show = show,
+                        ShowName = showname
+                    };
                 }
-                else
+
+                emptyResult = new FileResult
                 {
-                    emptyResult = new FileResult { Episode = episode, Episodes = episodes, InputFile = file, Show = show, ShowName = showname };
-                }
+                    Episode = episode,
+                    Episodes = episodes,
+                    InputFile = file,
+                    Show = show,
+                    ShowName = showname
+                };
             }
 
             return emptyResult;
         }
 
         /// <summary>
-        /// Processes a TVShow result
+        ///     Processes a TVShow result
         /// </summary>
         /// <param name="showName">
-        /// The name of the show.
+        ///     The name of the show.
         /// </param>
         /// <param name="result">
-        /// The matched result.
+        ///     The matched result.
         /// </param>
         /// <returns>
-        /// The matched TV Show.
+        ///     The matched TV Show.
         /// </returns>
         private TvShow ProcessResult(string showName, TvShow result)
         {
             // See if we already have the show under the same TVDB.
-            TvShow show = this.tvShows.FirstOrDefault(x => x.Equals(result));
+            var show = tvShows.FirstOrDefault(x => x.Equals(result));
             if (show != null)
             {
-                Logger.OnLogMessage(this, "{0} matched as {1}. Adding alternate name.", LogType.Info, showName, show.Name);
+                Logger.OnLogMessage(
+                    this,
+                    "{0} matched as {1}. Adding alternate name.",
+                    LogType.Info,
+                    showName,
+                    show.Name);
                 show.AlternateNames.Add(showName);
-                this.tvShowRepository.Save(show);
+                tvShowRepository.Save(show);
                 return show;
             }
 
             Logger.OnLogMessage(this, "Matched {0} as a new show. Adding and updating...", LogType.Info, showName);
 
             // Doesn't exist with the same TVDB. Add a new show and update.
-            show = this.tvShowRepository.FromSearchResult(result);
-            this.tvShowRepository.Save(show);
-            this.tvShowRepository.Update(show);
-            this.tvShows.Add(show);
+            show = tvShowRepository.FromSearchResult(result);
+            tvShowRepository.Save(show);
+            tvShowRepository.Update(show);
+            tvShows.Add(show);
             return show;
         }
 
         /// <summary>
-        /// Handles a TV show being changed.
+        ///     Handles a TV show being changed.
         /// </summary>
         /// <param name="sender">The sender of the event.</param>
         /// <param name="e">The arguments of the event.</param>
         private void TvShowChanged(object sender, TvShowEventArgs e)
         {
-            if (this.tvShows.Contains(e.TvShow))
+            if (tvShows.Contains(e.TvShow))
             {
-                this.tvShows.Remove(e.TvShow);
+                tvShows.Remove(e.TvShow);
             }
 
-            this.tvShows.Add(e.TvShow);
+            tvShows.Add(e.TvShow);
         }
 
         /// <summary>
-        /// Handles a TV show being added.
+        ///     Handles a TV show being added.
         /// </summary>
         /// <param name="sender">The sender of the event.</param>
         /// <param name="e">The arguments of the event.</param>
         private void TvShowAdded(object sender, TvShowEventArgs e)
         {
-            this.tvShows.Add(e.TvShow);
+            tvShows.Add(e.TvShow);
         }
 
         /// <summary>
-        /// Handles a TV show being removed.
+        ///     Handles a TV show being removed.
         /// </summary>
         /// <param name="sender">The sender of the event.</param>
         /// <param name="e">The arguments of the event.</param>
         private void TvShowRemoved(object sender, TvShowEventArgs e)
         {
-            if (this.tvShows.Contains(e.TvShow))
+            if (tvShows.Contains(e.TvShow))
             {
-                this.tvShows.Remove(e.TvShow);
+                tvShows.Remove(e.TvShow);
             }
         }
-
-        #endregion
     }
 }

@@ -53,7 +53,7 @@
     <xs:attribute name="lockshowsnonewepisodes" type="xs:boolean" use="required" />
     <xs:attribute name="defaultdestinationdir" type="xs:string" use="required" />
   </xs:complexType>
-  
+
   <!-- Missing Episode Settings -->
   <xs:complexType name="MissingEpisodeSettings">
     <xs:attribute name="hidenotaired" type="xs:boolean" use="required" />
@@ -62,7 +62,7 @@
     <xs:attribute name="hideseason0" type="xs:boolean" use="required" />
     <xs:attribute name="hidemissingseasons" type="xs:boolean" use="required" />
   </xs:complexType>
-  
+
   <!-- A Show's Episode -->
   <xs:complexType name="Episode">
     <xs:attribute name="name" type="xs:string" use="required" />
@@ -72,7 +72,7 @@
     <xs:attribute name="firstair" type="xs:dateTime" use="required" />
     <xs:attribute name="filecount" type="xs:int" use="required" />
   </xs:complexType>
-  
+
   <!-- A TV Show -->
   <xs:complexType name="Show">
     <xs:sequence>
@@ -101,7 +101,7 @@
     <xs:attribute name="locked" type="xs:boolean" use="required" />
     <xs:attribute name="lastupdated" type="xs:dateTime" use="required" />
     <xs:attribute name="usecustomdestination" type="xs:boolean" use="required" />
-    <xs:attribute name="customdestinationdir" type="xs:string" use="required"  />
+    <xs:attribute name="customdestinationdir" type="xs:string" use="required" />
   </xs:complexType>
 
   <!-- XML Document Definition -->

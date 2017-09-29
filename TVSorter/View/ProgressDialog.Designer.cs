@@ -10,29 +10,26 @@
 
 namespace TVSorter.View
 {
-    #region Using Directives
+
 
     using System.ComponentModel;
     using System.Drawing;
     using System.Windows.Forms;
 
-    #endregion
 
     /// <summary>
     /// The dialog showing the progress bar.
     /// </summary>
     public partial class ProgressDialog
     {
-        #region Constants and Fields
+
 
         /// <summary>
         ///   Required designer variable.
         /// </summary>
         private readonly IContainer components = null;
 
-        #endregion
 
-        #region Methods
 
         /// <summary>
         /// Clean up any resources being used.
@@ -87,7 +84,6 @@ namespace TVSorter.View
 
         }
 
-        #endregion
 
         private ListBox log;
     }

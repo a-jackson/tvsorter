@@ -6,82 +6,104 @@
 //   The episode.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
+using System;
+using TVSorter.Storage;
+
 namespace TVSorter.Model
 {
-    #region Using Directives
-
-    using System;
-    using System.Collections.Generic;
-
-    using TVSorter.Storage;
-
-    #endregion
-
     /// <summary>
-    /// The episode.
+    ///     The episode.
     /// </summary>
     public class Episode : IEquatable<Episode>
     {
-        #region Constructors and Destructors
-
         /// <summary>
-        /// Initialises a new instance of the <see cref="Episode"/> class.
+        ///     Initialises a new instance of the <see cref="Episode" /> class.
         /// </summary>
         internal Episode()
         {
         }
 
-        #endregion
-
-        #region Public Properties
-
         /// <summary>
-        ///   Gets or sets EpisodeNumber.
+        ///     Gets or sets EpisodeNumber.
         /// </summary>
         public int EpisodeNumber { get; set; }
 
         /// <summary>
-        ///   Gets or sets FileCount.
+        ///     Gets or sets FileCount.
         /// </summary>
         public int FileCount { get; set; }
 
         /// <summary>
-        ///   Gets or sets FirstAir.
+        ///     Gets or sets FirstAir.
         /// </summary>
         public DateTime FirstAir { get; set; }
 
         /// <summary>
-        ///   Gets or sets Name.
+        ///     Gets or sets Name.
         /// </summary>
         public string Name { get; set; }
 
         /// <summary>
-        ///   Gets or sets SeasonNumber.
+        ///     Gets or sets SeasonNumber.
         /// </summary>
         public int SeasonNumber { get; set; }
 
         /// <summary>
-        /// Gets or sets the episodes show.
+        ///     Gets or sets the episodes show.
         /// </summary>
         public TvShow Show { get; set; }
-        
+
         /// <summary>
-        ///   Gets or sets the TVDB ID.
+        ///     Gets or sets the TVDB ID.
         /// </summary>
         public string TvdbId { get; set; }
 
-        #endregion
-
-        #region Public Methods and Operators
-        
         /// <summary>
-        /// Determines whether the specified <see cref="T:System.Object"/> is equal to the current <see cref="T:System.Object"/> .
+        ///     Indicates whether the current object is equal to another object of the same type.
         /// </summary>
         /// <returns>
-        /// true if the specified <see cref="T:System.Object"/> is equal to the current <see cref="T:System.Object"/> ; otherwise, false. 
+        ///     true if the current object is equal to the <paramref name="other" /> parameter; otherwise, false.
+        /// </returns>
+        /// <param name="other">
+        ///     An object to compare with this object.
+        /// </param>
+        public bool Equals(Episode other)
+        {
+            if (ReferenceEquals(null, other))
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
+
+            return Equals(other.TvdbId, TvdbId);
+        }
+
+        /// <summary>
+        ///     Saves the episode.
+        /// </summary>
+        /// <param name="provider">
+        ///     The provider to save the episode to.
+        /// </param>
+        internal void Save(IStorageProvider provider)
+        {
+            provider.SaveEpisode(this);
+        }
+
+        /// <summary>
+        ///     Determines whether the specified <see cref="T:System.Object" /> is equal to the current
+        ///     <see cref="T:System.Object" /> .
+        /// </summary>
+        /// <returns>
+        ///     true if the specified <see cref="T:System.Object" /> is equal to the current <see cref="T:System.Object" /> ;
+        ///     otherwise, false.
         /// </returns>
         /// <param name="obj">
-        /// The <see cref="T:System.Object"/> to compare with the current <see cref="T:System.Object"/> . 
+        ///     The <see cref="T:System.Object" /> to compare with the current <see cref="T:System.Object" /> .
         /// </param>
         /// <filterpriority>2</filterpriority>
         public override bool Equals(object obj)
@@ -101,60 +123,19 @@ namespace TVSorter.Model
                 return false;
             }
 
-            return this.Equals((Episode)obj);
+            return Equals((Episode)obj);
         }
 
         /// <summary>
-        /// Indicates whether the current object is equal to another object of the same type.
+        ///     Serves as a hash function for a particular type.
         /// </summary>
         /// <returns>
-        /// true if the current object is equal to the <paramref name="other"/> parameter; otherwise, false. 
-        /// </returns>
-        /// <param name="other">
-        /// An object to compare with this object. 
-        /// </param>
-        public bool Equals(Episode other)
-        {
-            if (ReferenceEquals(null, other))
-            {
-                return false;
-            }
-
-            if (ReferenceEquals(this, other))
-            {
-                return true;
-            }
-
-            return Equals(other.TvdbId, this.TvdbId);
-        }
-
-        /// <summary>
-        /// Serves as a hash function for a particular type.
-        /// </summary>
-        /// <returns>
-        /// A hash code for the current <see cref="T:System.Object"/> . 
+        ///     A hash code for the current <see cref="T:System.Object" /> .
         /// </returns>
         /// <filterpriority>2</filterpriority>
         public override int GetHashCode()
         {
-            return this.TvdbId != null ? this.TvdbId.GetHashCode() : 0;
+            return TvdbId != null ? TvdbId.GetHashCode() : 0;
         }
-
-        #endregion
-
-        #region Methods
-
-        /// <summary>
-        /// Saves the episode.
-        /// </summary>
-        /// <param name="provider">
-        /// The provider to save the episode to.
-        /// </param>
-        internal void Save(IStorageProvider provider)
-        {
-            provider.SaveEpisode(this);
-        }
-
-        #endregion
     }
 }

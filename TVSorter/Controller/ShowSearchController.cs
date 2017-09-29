@@ -6,49 +6,41 @@
 //   Controller for handle show searches.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
+using System.ComponentModel;
+using TVSorter.Model;
+using TVSorter.Repostitory;
+using TVSorter.View;
+
 namespace TVSorter.Controller
 {
-    #region Using Directives
-
-    using System.ComponentModel;
-
-    using Model;
-    using Repostitory;
-    using View;
-
-    #endregion
-
     /// <summary>
-    /// Controller for handle show searches.
+    ///     Controller for handle show searches.
     /// </summary>
     public abstract class ShowSearchController : ControllerBase
     {
-        #region Fields
+        /// <summary>
+        ///     The TV show repository.
+        /// </summary>
+        private readonly ITvShowRepository tvShowRepository;
 
         /// <summary>
-        ///   The text for the close button.
+        ///     The text for the close button.
         /// </summary>
         private string closeButtonText;
 
         /// <summary>
-        ///   The list of results.
+        ///     The list of results.
         /// </summary>
         private BindingList<TvShow> searchResults;
 
         /// <summary>
-        ///   The title of the form.
+        ///     The title of the form.
         /// </summary>
         private string title;
 
         /// <summary>
-        /// The TV show repository.
-        /// </summary>
-        private ITvShowRepository tvShowRepository;
-
-        #endregion
-
-        /// <summary>
-        /// Initialises a new instance of the <see cref="ShowSearchController"/> class.
+        ///     Initialises a new instance of the <see cref="ShowSearchController" /> class.
         /// </summary>
         /// <param name="tvShowRepository">The TV Show Repository.</param>
         public ShowSearchController(ITvShowRepository tvShowRepository)
@@ -56,96 +48,79 @@ namespace TVSorter.Controller
             this.tvShowRepository = tvShowRepository;
         }
 
-        #region Public Properties
-
         /// <summary>
-        ///   Gets or sets the close button text.
+        ///     Gets or sets the close button text.
         /// </summary>
         public string CloseButtonText
         {
-            get
-            {
-                return this.closeButtonText;
-            }
+            get => closeButtonText;
 
             protected set
             {
-                this.closeButtonText = value;
-                this.OnPropertyChanged("CloseButtonText");
+                closeButtonText = value;
+                OnPropertyChanged("CloseButtonText");
             }
         }
 
         /// <summary>
-        ///   Gets or sets SearchResults.
+        ///     Gets or sets SearchResults.
         /// </summary>
         public BindingList<TvShow> SearchResults
         {
-            get
-            {
-                return this.searchResults;
-            }
+            get => searchResults;
 
             protected set
             {
-                this.searchResults = value;
-                this.OnPropertyChanged("SearchResults");
+                searchResults = value;
+                OnPropertyChanged("SearchResults");
             }
         }
 
         /// <summary>
-        ///   Gets or sets the title of the form.
+        ///     Gets or sets the title of the form.
         /// </summary>
         public string Title
         {
-            get
-            {
-                return this.title;
-            }
+            get => title;
 
             protected set
             {
-                this.title = value;
-                this.OnPropertyChanged("Title");
+                title = value;
+                OnPropertyChanged("Title");
             }
         }
 
-        #endregion
-
-        #region Public Methods and Operators
-
         /// <summary>
-        /// Initialises the controller.
+        ///     Initialises the controller.
         /// </summary>
         /// <param name="view">
-        /// The view the controller is for. 
+        ///     The view the controller is for.
         /// </param>
         public override void Initialise(IView view)
         {
         }
 
         /// <summary>
-        /// Searches for the specified name.
+        ///     Searches for the specified name.
         /// </summary>
         /// <param name="name">
-        /// The name to search for. 
+        ///     The name to search for.
         /// </param>
         public void Search(string name)
         {
-            this.SearchResults = new BindingList<TvShow>(tvShowRepository.SearchShow(name));
+            SearchResults = new BindingList<TvShow>(tvShowRepository.SearchShow(name));
         }
 
         /// <summary>
-        /// Selects the specified index as the chosen result.
+        ///     Selects the specified index as the chosen result.
         /// </summary>
         /// <param name="index">
-        /// The index to select. 
+        ///     The index to select.
         /// </param>
         public virtual void Select(int index)
         {
-            TvShow show = tvShowRepository.FromSearchResult(this.SearchResults[index]);
+            var show = tvShowRepository.FromSearchResult(SearchResults[index]);
             tvShowRepository.Save(show);
         }
-
-        #endregion
     }
 }

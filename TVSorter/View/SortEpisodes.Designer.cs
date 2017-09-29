@@ -10,20 +10,19 @@
 
 namespace TVSorter.View
 {
-    #region Using Directives
+
 
     using System.ComponentModel;
     using System.Drawing;
     using System.Windows.Forms;
 
-    #endregion
 
     /// <summary>
     /// The sort episodes tab.
     /// </summary>
     public partial class SortEpisodes
     {
-        #region Constants and Fields
+
 
 
         /// <summary>
@@ -101,9 +100,7 @@ namespace TVSorter.View
         /// </summary>
         private ColumnHeader tvShowColumn;
 
-        #endregion
 
-        #region Methods
 
         /// <summary>
         /// Clean up any resources being used.
@@ -328,7 +325,6 @@ namespace TVSorter.View
 
         }
 
-        #endregion
 
         private IContainer components;
         private ToolTip toolTip;

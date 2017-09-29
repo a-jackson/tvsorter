@@ -10,20 +10,19 @@
 
 namespace TVSorter.View
 {
-    #region Using Directives
+
 
     using System.ComponentModel;
     using System.Drawing;
     using System.Windows.Forms;
 
-    #endregion
 
     /// <summary>
     /// The TV Shows tab.
     /// </summary>
     public partial class TvShows
     {
-        #region Constants and Fields
+
 
 
         /// <summary>
@@ -121,9 +120,7 @@ namespace TVSorter.View
         /// </summary>
         private Button updateShowButton;
 
-        #endregion
 
-        #region Methods
 
         /// <summary>
         /// Clean up any resources being used.
@@ -646,7 +643,6 @@ namespace TVSorter.View
 
         }
 
-        #endregion
 
         private TableLayoutPanel customFormatTable;
         private Label formatLabel;

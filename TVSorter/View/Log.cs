@@ -6,103 +6,83 @@
 //   The log tab.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
+using System;
+using System.Drawing;
+using System.Linq;
+using System.Windows.Forms;
+using TVSorter.Controller;
+
 namespace TVSorter.View
 {
-    #region Using Directives
-
-    using System;
-    using System.Drawing;
-    using System.Linq;
-    using System.Windows.Forms;
-
-    using TVSorter.Controller;
-
-    #endregion
-
     /// <summary>
-    /// The log tab.
+    ///     The log tab.
     /// </summary>
     public partial class Log : UserControl
     {
-        #region Fields
-
         /// <summary>
-        ///   The log controller.
+        ///     The log controller.
         /// </summary>
         private readonly LogController controller;
 
-        #endregion
-
-        #region Constructors and Destructors
-
         /// <summary>
-        ///   Initialises a new instance of the <see cref="Log" /> class.
+        ///     Initialises a new instance of the <see cref="Log" /> class.
         /// </summary>
         public Log()
         {
-            this.InitializeComponent();
-            this.controller = CompositionRoot.Get<LogController>();
+            InitializeComponent();
+            controller = CompositionRoot.Get<LogController>();
         }
 
-        #endregion
-
-        #region Public Methods and Operators
-
         /// <summary>
-        /// Handles a log message being received.
+        ///     Handles a log message being received.
         /// </summary>
         /// <param name="sender">
-        /// The sender of the event. 
+        ///     The sender of the event.
         /// </param>
         /// <param name="e">
-        /// The arguments of the event. 
+        ///     The arguments of the event.
         /// </param>
         public void LogMessageReceived(object sender, LogMessageEventArgs e)
         {
-            if (this.InvokeRequired)
+            if (InvokeRequired)
             {
-                this.Invoke(new Action(() => this.LogMessageReceived(sender, e)));
+                Invoke(new Action(() => LogMessageReceived(sender, e)));
             }
             else
             {
-                this.logList.Items.Add(e);
-                this.logList.SelectedIndex = this.logList.Items.Count - 1;
+                logList.Items.Add(e);
+                logList.SelectedIndex = logList.Items.Count - 1;
             }
         }
 
-        #endregion
-
-        #region Methods
-
         /// <summary>
-        /// Handles the Log tab loading.
+        ///     Handles the Log tab loading.
         /// </summary>
         /// <param name="sender">
-        /// The sender of the event. 
+        ///     The sender of the event.
         /// </param>
         /// <param name="e">
-        /// The arguments of the event. 
+        ///     The arguments of the event.
         /// </param>
         private void LogLoad(object sender, EventArgs e)
         {
-            this.controller.Initialise(null);
-            this.controller.LogMessageReceived += this.LogMessageReceived;
-            this.logList.Items.AddRange(this.controller.Log.ToArray<object>());
+            controller.Initialise(null);
+            controller.LogMessageReceived += LogMessageReceived;
+            logList.Items.AddRange(controller.Log.ToArray<object>());
         }
 
-        #endregion
-
         /// <summary>
-        /// Handles drawing a list item.
+        ///     Handles drawing a list item.
         /// </summary>
         /// <param name="sender">The sender of the event.</param>
         /// <param name="e">The arguments of the event.</param>
         private void LogListDrawItem(object sender, DrawItemEventArgs e)
         {
-            var log = (LogMessageEventArgs)this.logList.Items[e.Index];
+            var log = (LogMessageEventArgs)logList.Items[e.Index];
 
             e.DrawBackground();
-            Graphics g = e.Graphics;
+            var g = e.Graphics;
 
             if (log.Type == LogType.Error)
             {
@@ -110,7 +90,7 @@ namespace TVSorter.View
             }
 
             g.DrawString(
-                this.logList.Items[e.Index].ToString(),
+                logList.Items[e.Index].ToString(),
                 e.Font,
                 new SolidBrush(e.ForeColor),
                 new PointF(e.Bounds.X, e.Bounds.Y));

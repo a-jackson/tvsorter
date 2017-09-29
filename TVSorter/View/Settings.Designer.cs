@@ -10,20 +10,19 @@
 
 namespace TVSorter.View
 {
-    #region Using Directives
+
 
     using System.ComponentModel;
     using System.Drawing;
     using System.Windows.Forms;
 
-    #endregion
 
     /// <summary>
     /// The settings tab.
     /// </summary>
     public partial class Settings
     {
-        #region Constants and Fields
+
 
 
         /// <summary>
@@ -106,9 +105,7 @@ namespace TVSorter.View
         /// </summary>
         private TextBox sourceText;
 
-        #endregion
 
-        #region Methods
 
         /// <summary>
         /// Clean up any resources being used.
@@ -702,7 +699,6 @@ namespace TVSorter.View
 
         }
 
-        #endregion
 
         private ToolTip toolTip;
         private CheckBox addUnmatchedShowsCheck;

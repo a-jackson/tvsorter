@@ -10,20 +10,19 @@
 
 namespace TVSorter.View
 {
-    #region Using Directives
+
 
     using System.ComponentModel;
     using System.Drawing;
     using System.Windows.Forms;
 
-    #endregion
 
     /// <summary>
     /// A dialog for number entry.
     /// </summary>
     public partial class NumberInputDialog
     {
-        #region Constants and Fields
+
 
         /// <summary>
         ///   Required designer variable.
@@ -45,9 +44,7 @@ namespace TVSorter.View
         /// </summary>
         private Button okButton;
 
-        #endregion
 
-        #region Methods
 
         /// <summary>
         /// Clean up any resources being used.
@@ -196,7 +193,6 @@ namespace TVSorter.View
 
         }
 
-        #endregion
 
         private TextBox episodeNumber;
     }
