@@ -85,8 +85,8 @@ namespace TVSorter.Data.TvdbV2
             DateTime firstUpdate = shows.Min(x => x.LastUpdated);
             List<int> updateIds;
 
-            // Only get the updates if the date is less than a month ago.
-            if (firstUpdate > DateTime.Today.Subtract(TimeSpan.FromDays(30)))
+            // TVDB only returns results within the past week so no point requesting longer
+            if (firstUpdate > DateTime.Today.Subtract(TimeSpan.FromDays(7)))
             {
                 Update[] data = update.GetUpdatesAsync(firstUpdate).Result.Data;
                 if (data == null)
