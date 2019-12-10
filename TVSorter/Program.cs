@@ -29,7 +29,7 @@ namespace TVSorter
             IKernel kernel = new StandardKernel(
                 new InterfaceModule(),
                 new LibraryModule(),
-                new TheTvdbDotNetModule("D4DCAEBFCA5A6BC1"));
+                new TheTvdbDotNetModule("1c1cc44893259628eca511dfbe4ebc52"));
             CompositionRoot.SetKernel(kernel);
 
             Application.EnableVisualStyles();

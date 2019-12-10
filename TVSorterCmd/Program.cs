@@ -60,7 +60,7 @@ namespace TVSorter
                 Environment.Exit(1);
             }
 
-            IKernel kernel = new StandardKernel(new LibraryModule(), new TheTvdbDotNetModule("D4DCAEBFCA5A6BC1"));
+            IKernel kernel = new StandardKernel(new LibraryModule(), new TheTvdbDotNetModule("1c1cc44893259628eca511dfbe4ebc52"));
             var tvshowRepository = kernel.Get<ITvShowRepository>();
             var fileSearch = kernel.Get<IFileSearch>();
 
