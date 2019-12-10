@@ -57,7 +57,7 @@ namespace TVSorter.Controller
                     }
                 });
             task.ContinueWith(
-                delegate
+                x =>
                 {
                     if (TaskComplete != null)
                     {
