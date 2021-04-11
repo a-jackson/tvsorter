@@ -46,7 +46,7 @@ namespace TVSorter
                         ? string.Empty
                         : result.Episode.EpisodeNumber.ToString(CultureInfo.InvariantCulture),
                     result.Episode == null ? string.Empty : result.Episode.Name,
-                    fileResultManager.FormatOutputPath(result)
+                    fileResultManager.FormatOutputPath(result),
                 }) { BackColor = result.Incomplete ? Color.Red : Color.White, Checked = result.Checked };
         }
     }

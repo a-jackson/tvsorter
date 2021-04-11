@@ -64,6 +64,7 @@
     <Compile Include="Data\TvdbV2\IStreamWriter.cs" />
     <Compile Include="Data\TvdbV2\StreamWriter.cs" />
     <Compile Include="Data\TvdbV2\TvdbV2.cs" />
+    <Compile Include="DateTimeExtensions.cs" />
     <Compile Include="Files\FileManager.cs">
       <SubType>Code</SubType>
     </Compile>
