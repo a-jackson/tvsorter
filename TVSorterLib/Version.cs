@@ -7,6 +7,8 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System.Reflection;
+
 namespace TVSorter
 {
     /// <summary>
@@ -17,6 +19,6 @@ namespace TVSorter
         /// <summary>
         ///     The current version of TVSorter.
         /// </summary>
-        public const string CurrentVersion = "1.3.1";
+        public const string CurrentVersion = "1.5.1";
     }
 }

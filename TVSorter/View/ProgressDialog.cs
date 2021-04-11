@@ -48,7 +48,10 @@ namespace TVSorter.View
         /// </param>
         private void OnLogMessage(object sender, LogMessageEventArgs e)
         {
-            Invoke(new Action(() => log.TopIndex = log.Items.Add(e.ToString())));
+            if (IsHandleCreated)
+            {
+                BeginInvoke(new Action(() => log.TopIndex = log.Items.Add(e.ToString())));
+            }
         }
 
         /// <summary>
@@ -62,9 +65,12 @@ namespace TVSorter.View
         /// </param>
         private void OnProgressTaskOnTaskComplete(object sender, EventArgs e)
         {
-            progressTask.TaskComplete -= OnProgressTaskOnTaskComplete;
-            Logger.LogMessage -= OnLogMessage;
-            Invoke(new Action(Close));
+            if (IsHandleCreated)
+            {
+                progressTask.TaskComplete -= OnProgressTaskOnTaskComplete;
+                Logger.LogMessage -= OnLogMessage;
+                BeginInvoke(new Action(Close));
+            }
         }
     }
 }

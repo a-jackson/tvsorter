@@ -60,9 +60,9 @@ namespace TVSorter.Data.TvdbV2
                                 : x.AiredEpisodeNumber.Value,
                         SeasonNumber =
                             show.UseDvdOrder && x.DvdSeason.HasValue ? x.DvdSeason.Value : x.AiredSeason.Value,
-                        FirstAir = DateTime.Parse(string.IsNullOrEmpty(x.FirstAired) ? "1970-01-01" : x.FirstAired),
+                        FirstAir = x.FirstAired.ValidateTime() ? DateTime.Parse(x.FirstAired) : DateTime.Parse("1970-01-01"),
                         Name = x.EpisodeName ?? string.Empty,
-                        Show = show
+                        Show = show,
                     })
                 .ToList();
 
